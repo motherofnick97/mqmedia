@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mạnh Quân Media – Kết nối thương hiệu · Lan tỏa giá trị</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & Base ──────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --teal:   #0d6e6e;
+      --teal-light: #12888888;
+      --dark:   #1e2530;
+      --gold:   #f6a623;
+      --gold-light: #ffc84a;
+      --white:  #ffffff;
+      --gray:   #f5f6fa;
+      --text:   #2d3748;
+      --muted:  #718096;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Be Vietnam Pro', sans-serif;
+      color: var(--text);
+      background: var(--white);
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; color: inherit; }
+    img { max-width: 100%; }
+
+    /* ── Utility ───────────────────────────────────────── */
+    .container { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 14px 32px; border-radius: 50px; font-weight: 700;
+      font-size: 15px; cursor: pointer; transition: all .3s;
+      border: none;
+    }
+    .btn-primary {
+      background: var(--gold); color: var(--dark);
+      box-shadow: 0 4px 20px rgba(246,166,35,.4);
+    }
+    .btn-primary:hover { background: var(--gold-light); transform: translateY(-2px); box-shadow: 0 8px 28px rgba(246,166,35,.5); }
+    .btn-outline {
+      background: transparent; color: var(--white);
+      border: 2px solid rgba(255,255,255,.6);
+    }
+    .btn-outline:hover { background: rgba(255,255,255,.1); border-color: var(--white); }
+    .navbar.scrolled .btn-outline { color: var(--dark); border-color: rgba(0,0,0,.25); }
+    .navbar.scrolled .btn-outline:hover { background: rgba(0,0,0,.05); border-color: var(--dark); }
+    .tag {
+      display: inline-block; padding: 6px 16px; border-radius: 50px;
+      background: rgba(13,110,110,.1); color: var(--teal);
+      font-size: 13px; font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-size: clamp(28px, 4vw, 42px); font-weight: 800;
+      line-height: 1.2; color: var(--dark);
+    }
+    .section-sub {
+      font-size: 16px; color: var(--muted); margin-top: 12px; max-width: 560px;
+    }
+
+    /* ── Navbar ────────────────────────────────────────── */
+    .navbar {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      padding: 16px 0; transition: all .4s;
+    }
+    .navbar.scrolled {
+      background: rgba(255,255,255,.95); backdrop-filter: blur(12px);
+      box-shadow: 0 2px 20px rgba(0,0,0,.08); padding: 12px 0;
+    }
+    .navbar .container { display: flex; align-items: center; justify-content: space-between; }
+    .nav-logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 52px; height: 52px;
+      object-fit: contain;
+      mix-blend-mode: multiply;
+      border-radius: 50%;
+    }
+    .navbar.scrolled .logo-icon { mix-blend-mode: normal; }
+    .nav-logo-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .nav-logo-text span:first-child {
+      font-size: 18px; font-weight: 800; color: var(--white); letter-spacing: -.3px;
+    }
+    .navbar.scrolled .nav-logo-text span:first-child { color: var(--dark); }
+    .nav-logo-text span:last-child {
+      font-size: 11px; color: var(--gold); font-weight: 500;
+    }
+    .navbar.scrolled .nav-logo-text span:last-child { color: var(--gold); }
+    .nav-links { display: flex; align-items: center; gap: 32px; list-style: none; }
+    .nav-links a {
+      font-size: 14px; font-weight: 500; color: rgba(255,255,255,.85);
+      transition: color .2s;
+    }
+    .navbar.scrolled .nav-links a { color: var(--text); }
+    .nav-links a:hover { color: var(--gold); }
+    .nav-cta { display: flex; align-items: center; gap: 12px; }
+    .hamburger { display: none; background: none; border: none; cursor: pointer; }
+    .hamburger span {
+      display: block; width: 24px; height: 2px; background: white;
+      margin: 5px 0; transition: all .3s;
+    }
+    .navbar.scrolled .hamburger span { background: var(--dark); }
+
+    /* ── Hero ──────────────────────────────────────────── */
+    .hero {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a2a2a 0%, #0d4f4f 40%, #1a3a5c 100%);
+      position: relative; overflow: hidden;
+      display: flex; align-items: center; padding: 100px 0 60px;
+    }
+    .hero::before {
+      content: ''; position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .hero-glow {
+      position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none;
+    }
+    .glow-1 { width: 500px; height: 500px; background: rgba(13,110,110,.35); top: -100px; right: -100px; }
+    .glow-2 { width: 400px; height: 400px; background: rgba(246,166,35,.15); bottom: -100px; left: 10%; }
+    .hero .container { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; position: relative; z-index: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(246,166,35,.15); border: 1px solid rgba(246,166,35,.3);
+      border-radius: 50px; padding: 8px 16px; margin-bottom: 24px;
+      font-size: 13px; color: var(--gold); font-weight: 600;
+    }
+    .hero-badge span { width: 6px; height: 6px; background: var(--gold); border-radius: 50%; animation: pulse 2s infinite; }
+    .hero h1 {
+      font-size: clamp(32px, 5vw, 56px); font-weight: 900;
+      color: var(--white); line-height: 1.1; margin-bottom: 20px;
+    }
+    .hero h1 em { font-style: normal; color: var(--gold); }
+    .hero p {
+      font-size: 17px; color: rgba(255,255,255,.75); line-height: 1.7;
+      margin-bottom: 36px; max-width: 480px;
+    }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; gap: 32px; margin-top: 48px; padding-top: 32px;
+      border-top: 1px solid rgba(255,255,255,.1);
+    }
+    .hero-stat strong {
+      display: block; font-size: 28px; font-weight: 800; color: var(--white);
+    }
+    .hero-stat small { font-size: 13px; color: rgba(255,255,255,.55); }
+    /* Phone mockup */
+    .hero-visual { display: flex; justify-content: center; align-items: center; position: relative; }
+    .phone-wrap {
+      position: relative; width: 280px;
+      animation: float 4s ease-in-out infinite;
+    }
+    .phone {
+      background: var(--dark); border-radius: 36px;
+      padding: 12px; box-shadow: 0 40px 80px rgba(0,0,0,.5);
+      border: 2px solid rgba(255,255,255,.08);
+      position: relative; overflow: hidden;
+    }
+    .phone-screen {
+      background: #000; border-radius: 28px; overflow: hidden;
+      aspect-ratio: 9/18; position: relative;
+    }
+    .phone-screen-content {
+      background: linear-gradient(180deg, #0d1117 0%, #1a2332 100%);
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 20px; gap: 12px;
+    }
+    .tiktok-logo-mock {
+      width: 56px; height: 56px; border-radius: 16px;
+      background: linear-gradient(135deg, #010101, #1a1a1a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px;
+    }
+    .video-card {
+      width: 100%; background: rgba(255,255,255,.05); border-radius: 12px;
+      padding: 10px; display: flex; align-items: center; gap: 8px;
+    }
+    .avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; }
+    .video-info { flex: 1; }
+    .video-info span { display: block; font-size: 10px; color: rgba(255,255,255,.8); font-weight: 600; }
+    .video-info small { font-size: 9px; color: rgba(255,255,255,.4); }
+    .play-btn {
+      width: 28px; height: 28px; background: var(--gold);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 10px; flex-shrink: 0;
+    }
+    .metrics {
+      width: 100%; display: flex; justify-content: space-between;
+    }
+    .metric { text-align: center; }
+    .metric span { display: block; font-size: 13px; font-weight: 700; color: var(--white); }
+    .metric small { font-size: 8px; color: rgba(255,255,255,.4); }
+    .floating-card {
+      position: absolute; background: white; border-radius: 14px;
+      padding: 10px 14px; box-shadow: 0 8px 24px rgba(0,0,0,.2);
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 600; color: var(--dark);
+      animation: float 3s ease-in-out infinite;
+    }
+    .fc-1 { top: 10%; right: -60px; animation-delay: .5s; }
+    .fc-2 { bottom: 20%; left: -70px; animation-delay: 1s; }
+    .fc-icon { font-size: 20px; }
+
+    /* ── Services ──────────────────────────────────────── */
+    .services { padding: 100px 0; background: var(--white); }
+    .services-header { text-align: center; margin-bottom: 60px; }
+    .services-header .section-sub { margin: 12px auto 0; }
+    .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .service-card {
+      border-radius: 20px; padding: 36px 30px;
+      background: var(--gray);
+      transition: all .35s; cursor: default;
+      border: 2px solid transparent; position: relative; overflow: hidden;
+    }
+    .service-card::before {
+      content: ''; position: absolute; inset: 0; opacity: 0;
+      background: linear-gradient(135deg, rgba(13,110,110,.05), rgba(246,166,35,.05));
+      transition: opacity .35s;
+    }
+    .service-card:hover { transform: translateY(-6px); border-color: var(--teal); box-shadow: 0 20px 48px rgba(13,110,110,.12); }
+    .service-card:hover::before { opacity: 1; }
+    .service-icon {
+      width: 60px; height: 60px; border-radius: 16px;
+      background: linear-gradient(135deg, var(--teal), #1a8080);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px; margin-bottom: 22px;
+      box-shadow: 0 8px 20px rgba(13,110,110,.3);
+    }
+    .service-card h3 { font-size: 19px; font-weight: 700; margin-bottom: 10px; color: var(--dark); }
+    .service-card p { font-size: 14px; color: var(--muted); line-height: 1.7; }
+    .service-card .learn-more {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-top: 18px; font-size: 13px; font-weight: 600;
+      color: var(--teal); transition: gap .2s;
+    }
+    .service-card:hover .learn-more { gap: 10px; }
+
+    /* ── Why Us ────────────────────────────────────────── */
+    .why-us {
+      padding: 100px 0;
+      background: linear-gradient(135deg, #0a2a2a 0%, #0d4f4f 100%);
+      position: relative; overflow: hidden;
+    }
+    .why-us::after {
+      content: ''; position: absolute; right: -200px; top: 50%;
+      transform: translateY(-50%);
+      width: 600px; height: 600px; border-radius: 50%;
+      background: rgba(246,166,35,.08); pointer-events: none;
+    }
+    .why-us .container { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; position: relative; z-index: 1; }
+    .why-content .section-title { color: var(--white); }
+    .why-content .section-sub { color: rgba(255,255,255,.65); }
+    .why-list { margin-top: 36px; display: flex; flex-direction: column; gap: 20px; }
+    .why-item {
+      display: flex; gap: 16px; align-items: flex-start;
+      background: rgba(255,255,255,.06); border-radius: 14px; padding: 18px 20px;
+      border: 1px solid rgba(255,255,255,.08);
+      transition: background .3s;
+    }
+    .why-item:hover { background: rgba(255,255,255,.1); }
+    .why-item-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: rgba(246,166,35,.2); display: flex; align-items: center;
+      justify-content: center; font-size: 20px; flex-shrink: 0;
+    }
+    .why-item h4 { font-size: 15px; font-weight: 700; color: var(--white); margin-bottom: 4px; }
+    .why-item p { font-size: 13px; color: rgba(255,255,255,.55); line-height: 1.6; }
+    /* Stats grid */
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .stat-card {
+      background: rgba(255,255,255,.07); border-radius: 20px; padding: 30px 24px;
+      border: 1px solid rgba(255,255,255,.1); text-align: center;
+      transition: all .3s;
+    }
+    .stat-card:hover { background: rgba(255,255,255,.12); transform: translateY(-4px); }
+    .stat-card strong {
+      display: block; font-size: 40px; font-weight: 900; color: var(--gold);
+      line-height: 1;
+    }
+    .stat-card span { font-size: 13px; color: rgba(255,255,255,.6); margin-top: 6px; display: block; }
+
+    /* ── Process ───────────────────────────────────────── */
+    .process { padding: 100px 0; background: var(--gray); }
+    .process-header { text-align: center; margin-bottom: 60px; }
+    .process-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
+    .process-steps::before {
+      content: ''; position: absolute; top: 36px; left: 12%; right: 12%;
+      height: 2px; background: linear-gradient(90deg, var(--teal), var(--gold));
+      z-index: 0;
+    }
+    .step { text-align: center; position: relative; z-index: 1; }
+    .step-num {
+      width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 20px;
+      background: var(--white); border: 3px solid var(--teal);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: var(--teal);
+      box-shadow: 0 4px 16px rgba(13,110,110,.2);
+      transition: all .3s;
+    }
+    .step:hover .step-num { background: var(--teal); color: white; transform: scale(1.1); }
+    .step h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
+    .step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
+
+    /* ── KOL Showcase ──────────────────────────────────── */
+    .kol-section { padding: 100px 0; background: var(--white); }
+    .kol-header { text-align: center; margin-bottom: 60px; }
+    .kol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+    .kol-card {
+      border-radius: 20px; overflow: hidden;
+      background: var(--gray); transition: all .35s;
+      border: 2px solid transparent;
+    }
+    .kol-card:hover { transform: translateY(-8px); border-color: var(--gold); box-shadow: 0 20px 48px rgba(246,166,35,.15); }
+    .kol-thumb {
+      aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center;
+      font-size: 60px; position: relative; overflow: hidden;
+    }
+    .kol-thumb-bg {
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, var(--c1), var(--c2));
+    }
+    .kol-thumb-emoji { position: relative; z-index: 1; }
+    .kol-tiktok-badge {
+      position: absolute; bottom: 10px; right: 10px; z-index: 2;
+      background: rgba(0,0,0,.7); border-radius: 8px; padding: 4px 8px;
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: white; font-weight: 600;
+    }
+    .kol-info { padding: 16px; }
+    .kol-info h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
+    .kol-info span { font-size: 12px; color: var(--muted); }
+    .kol-followers {
+      display: flex; align-items: center; gap: 4px; margin-top: 8px;
+      font-size: 12px; font-weight: 600; color: var(--teal);
+    }
+
+    /* ── Platforms ─────────────────────────────────────── */
+    .platforms { padding: 80px 0; background: var(--gray); }
+    .platforms-inner { display: flex; align-items: center; gap: 60px; }
+    .platforms-text { flex: 1; }
+    /* ── Contact ───────────────────────────────────────── */
+    .contact-list { flex: 1; display: flex; flex-direction: column; gap: 18px; }
+    .contact-item {
+      display: flex; gap: 14px; align-items: center;
+      padding: 16px 20px; border-radius: 14px; background: var(--gray);
+      transition: all .3s;
+    }
+    .contact-item:hover { background: rgba(13,110,110,.08); }
+    .contact-item-icon {
+      width: 44px; height: 44px; border-radius: 12px;
+      background: var(--teal); display: flex; align-items: center;
+      justify-content: center; font-size: 18px; flex-shrink: 0;
+    }
+    .contact-item h5 { font-size: 12px; color: var(--muted); margin-bottom: 2px; }
+    .contact-item span { font-size: 14px; font-weight: 600; color: var(--dark); }
+    /* ── Footer ────────────────────────────────────────── */
+    footer {
+      background: var(--dark); color: rgba(255,255,255,.7);
+      padding: 60px 0 30px;
+    }
+    .footer-top { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,.08); }
+    .footer-brand p { font-size: 14px; line-height: 1.7; margin: 14px 0 20px; max-width: 280px; }
+    .footer-socials { display: flex; gap: 10px; }
+    .social-btn {
+      width: 38px; height: 38px; border-radius: 10px;
+      background: rgba(255,255,255,.08); display: flex; align-items: center; justify-content: center;
+      font-size: 16px; transition: all .2s;
+    }
+    .social-btn:hover { background: var(--teal); transform: translateY(-2px); }
+    .footer-col h4 { font-size: 14px; font-weight: 700; color: white; margin-bottom: 16px; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .footer-col ul a { font-size: 13px; color: rgba(255,255,255,.55); transition: color .2s; }
+    .footer-col ul a:hover { color: var(--gold); }
+    .footer-bottom { display: flex; justify-content: space-between; align-items: center; padding-top: 24px; flex-wrap: wrap; gap: 12px; }
+    .footer-bottom span { font-size: 13px; }
+
+    /* ── Portfolio ─────────────────────────────────────── */
+    .portfolio { padding: 100px 0; background: var(--white); }
+    .portfolio-header { text-align: center; margin-bottom: 60px; }
+    .portfolio-header .section-sub { margin: 12px auto 0; }
+    .portfolio-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+    .portfolio-card {
+      border-radius: 20px; overflow: hidden;
+      background: var(--gray);
+      border: 2px solid transparent;
+      transition: all .35s;
+    }
+    .portfolio-card:hover { transform: translateY(-8px); border-color: var(--teal); box-shadow: 0 20px 48px rgba(13,110,110,.12); }
+    .portfolio-thumb {
+      aspect-ratio: 16/9; position: relative; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .portfolio-thumb-bg { position: absolute; inset: 0; }
+    .portfolio-thumb-emoji { position: relative; z-index: 1; font-size: 56px; }
+    .portfolio-cat {
+      position: absolute; top: 12px; left: 12px; z-index: 2;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(6px);
+      border-radius: 8px; padding: 4px 10px;
+      font-size: 11px; color: white; font-weight: 600;
+    }
+    .portfolio-body { padding: 22px 22px 26px; }
+    .portfolio-body h3 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 8px; }
+    .portfolio-body p { font-size: 13px; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+    .portfolio-metrics { display: flex; gap: 20px; }
+    .p-metric strong { display: block; font-size: 18px; font-weight: 800; color: var(--teal); }
+    .p-metric small { font-size: 11px; color: var(--muted); }
+    @media (max-width: 900px) { .portfolio-grid { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 540px) { .portfolio-grid { grid-template-columns: 1fr; } }
+
+    /* ── Animations ────────────────────────────────────── */
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: .5; transform: scale(.8); }
+    }
+    .fade-up {
+      opacity: 0; transform: translateY(30px);
+      transition: opacity .6s ease, transform .6s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+
+    /* ── Toast ─────────────────────────────────────────── */
+    .toast {
+      position: fixed; bottom: 30px; right: 30px; z-index: 9999;
+      background: var(--teal); color: white;
+      padding: 14px 24px; border-radius: 12px;
+      font-size: 14px; font-weight: 600;
+      box-shadow: 0 8px 24px rgba(13,110,110,.4);
+      transform: translateY(80px); opacity: 0;
+      transition: all .4s;
+    }
+    .toast.show { transform: translateY(0); opacity: 1; }
+
+    /* ── Responsive ────────────────────────────────────── */
+    @media (max-width: 900px) {
+      .hero .container { grid-template-columns: 1fr; text-align: center; }
+      .hero-visual { display: none; }
+      .hero-stats { justify-content: center; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .why-us .container { grid-template-columns: 1fr; gap: 40px; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .process-steps::before { display: none; }
+      .kol-grid { grid-template-columns: 1fr 1fr; }
+      .platforms-inner { flex-direction: column; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+
+      /* Navbar mobile */
+      .nav-links {
+        display: none;
+        position: fixed; top: 65px; left: 0; right: 0;
+        background: white; flex-direction: column;
+        padding: 8px 0; gap: 0;
+        box-shadow: 0 8px 24px rgba(0,0,0,.1); z-index: 998;
+      }
+      .nav-links.open { display: flex; }
+      .nav-links li a {
+        display: block; padding: 14px 24px;
+        color: var(--text) !important; font-size: 15px;
+        border-bottom: 1px solid var(--gray);
+      }
+      .nav-links li:last-child a { border-bottom: none; }
+      .nav-cta .btn-outline { display: none; }
+      .nav-cta .btn-primary { padding: 9px 14px; font-size: 12px; }
+      .nav-logo-text span:last-child { display: none; }
+      .hamburger { display: block; }
+    }
+    @media (max-width: 540px) {
+      .services-grid { grid-template-columns: 1fr; }
+      .kol-grid { grid-template-columns: 1fr 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .hero-stats { gap: 16px; }
+      .hero-btns { justify-content: center; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── Navbar ── -->
+<nav class="navbar" id="navbar">
+  <div class="container">
+    <a href="#" class="nav-logo">
+      <img class="logo-icon" src="logo-icon.png" alt="Mạnh Quân Media logo" />
+      <div class="nav-logo-text">
+        <span>Mạnh Quân Media</span>
+        <span>Kết nối thương hiệu · Lan tỏa giá trị</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#services">Dịch vụ</a></li>
+      <li><a href="#why-us">Về chúng tôi</a></li>
+      <li><a href="#process">Quy trình</a></li>
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#kol">KOL/KOC</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#contact" class="btn btn-outline" style="padding:10px 22px;font-size:13px;">Liên hệ ngay</a>
+      <a href="https://zalo.me/0912265126" target="_blank" rel="noopener" class="btn btn-primary" style="padding:10px 22px;font-size:13px;"> <img src="Icon_of_Zalo.svg.png" alt="Mạnh Quân Media" viewBox="0 0 24 24" width="22" height="22" fill="none" /> Tư vấn miễn phí</a>
+    </div>
+    <button class="hamburger" id="hamburger" aria-label="menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ── Hero ── -->
+<section class="hero" id="hero">
+  <div class="hero-glow glow-1"></div>
+  <div class="hero-glow glow-2"></div>
+  <div class="container">
+    <div class="hero-content">
+      <div class="hero-badge">
+        <span></span> Agency TikTok uy tín Việt Nam
+      </div>
+      <h1>
+        Kết nối<br/>
+        <em>thương hiệu</em> với<br/>
+        triệu khán giả
+      </h1>
+      <p>
+        Chúng tôi booking KOL, KOC uy tín – sản xuất nội dung viral – triển khai chiến dịch quảng cáo TikTok hiệu quả, đưa thương hiệu của bạn đến đúng khách hàng mục tiêu.
+      </p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn btn-primary">🚀 Bắt đầu chiến dịch</a>
+        <a href="#services" class="btn btn-outline">Xem dịch vụ</a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <strong>200+</strong>
+          <small>KOL/KOC đối tác</small>
+        </div>
+        <div class="hero-stat">
+          <strong>20+</strong>
+          <small>Chiến dịch thành công</small>
+        </div>
+        <div class="hero-stat">
+          <strong>10M+</strong>
+          <small>Lượt tiếp cận/tháng</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-visual">
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="phone-screen">
+            <div class="phone-screen-content">
+              <div class="tiktok-logo-mock">🎵</div>
+              <div class="video-card" style="background:rgba(255,255,255,.08)">
+                <div class="avatar" style="background:linear-gradient(135deg,#f6a623,#ff6b35)"></div>
+                <div class="video-info">
+                  <span>@manh.quan.media</span>
+                  <small>Chiến dịch thương hiệu</small>
+                </div>
+                <div class="play-btn">▶</div>
+              </div>
+              <div class="metrics">
+                <div class="metric">
+                  <span style="color:#f6a623">2.4M</span>
+                  <small style="color:rgba(255,255,255,.4)">Views</small>
+                </div>
+                <div class="metric">
+                  <span style="color:#ff6b8a">89K</span>
+                  <small style="color:rgba(255,255,255,.4)">Likes</small>
+                </div>
+                <div class="metric">
+                  <span style="color:#6bffb8">12K</span>
+                  <small style="color:rgba(255,255,255,.4)">Shares</small>
+                </div>
+              </div>
+              <div class="video-card" style="background:rgba(246,166,35,.1);border:1px solid rgba(246,166,35,.2)">
+                <div class="avatar" style="background:linear-gradient(135deg,#0d6e6e,#1a8080)"></div>
+                <div class="video-info">
+                  <span style="color:#f6a623">@koc.viet.nam</span>
+                  <small style="color:rgba(255,255,255,.4)">Review sản phẩm hot</small>
+                </div>
+                <div class="play-btn" style="background:#0d6e6e">▶</div>
+              </div>
+              <div style="width:100%;background:rgba(255,255,255,.05);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
+                <span style="font-size:10px;color:rgba(255,255,255,.6)">📊 Hiệu suất chiến dịch</span>
+                <span style="font-size:10px;color:#6bffb8;font-weight:700">+340% ROI</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="floating-card fc-1">
+          <span class="fc-icon">🔥</span>
+          <div>
+            <div style="font-size:11px;font-weight:700">Viral ngay hôm nay</div>
+            <!-- <div style="font-size:10px;color:#718096">1.2M views / 24h</div> -->
+          </div>
+        </div>
+        <div class="floating-card fc-2">
+          <span class="fc-icon">⭐</span>
+          <div>
+            <div style="font-size:11px;font-weight:700">Top KOC #booking</div>
+            <!-- <div style="font-size:10px;color:#718096">Cam kết hiệu quả</div> -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Services ── -->
+<section class="services" id="services">
+  <div class="container">
+    <div class="services-header fade-up">
+      <div class="tag">Dịch vụ của chúng tôi</div>
+      <h2 class="section-title">Giải pháp marketing toàn diện<br/>trên nền tảng TikTok</h2>
+      <p class="section-sub">Từ ý tưởng đến triển khai – chúng tôi đồng hành cùng thương hiệu của bạn trong từng bước.</p>
+    </div>
+    <div class="services-grid">
+      <div class="service-card fade-up">
+        <div class="service-icon">🌟</div>
+        <h3>Booking KOL / KOC</h3>
+        <p>Kết nối với hơn 200+ KOL, KOC uy tín, phù hợp với ngành hàng và ngân sách của bạn.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div>
+      <div class="service-card fade-up" style="animation-delay:.1s">
+        <div class="service-icon" style="background:linear-gradient(135deg,#f6a623,#ff8c00)">🎬</div>
+        <h3>Sản xuất Video TikTok</h3>
+        <p>Đội ngũ sáng tạo nội dung chuyên nghiệp – quay dựng video viral, script hấp dẫn, âm nhạc trendy thu hút triệu lượt xem.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div>
+      <div class="service-card fade-up" style="animation-delay:.2s">
+        <div class="service-icon" style="background:linear-gradient(135deg,#6b48ff,#9b6bff)">📈</div>
+        <h3>Chiến dịch TikTok Content</h3>
+        <p>Triển khai chiến dịch nội dung TikTok chuyên nghiệp – lên kế hoạch bài bản, sáng tạo nội dung thu hút, tăng tương tác và nhận diện thương hiệu.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div>
+      <!-- <div class="service-card fade-up" style="animation-delay:.3s">
+        <div class="service-icon" style="background:linear-gradient(135deg,#ff4757,#ff6b81)">💡</div>
+        <h3>Chiến lược thương hiệu</h3>
+        <p>Xây dựng nhận diện thương hiệu mạnh mẽ trên mạng xã hội, định vị rõ ràng và tạo sự khác biệt với đối thủ.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div>
+      <div class="service-card fade-up" style="animation-delay:.4s">
+        <div class="service-icon" style="background:linear-gradient(135deg,#26de81,#20bf6b)">🤝</div>
+        <h3>Quản lý kênh TikTok</h3>
+        <p>Chăm sóc và phát triển kênh TikTok cho doanh nghiệp – lên kế hoạch nội dung, đăng bài đều đặn, tương tác cộng đồng.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div>
+      <div class="service-card fade-up" style="animation-delay:.5s">
+        <div class="service-icon" style="background:linear-gradient(135deg,#0d6e6e,#1a9999)">📊</div>
+        <h3>Báo cáo & Phân tích</h3>
+        <p>Báo cáo hiệu quả chiến dịch chi tiết, real-time – số liệu minh bạch, insight sâu sắc để tối ưu liên tục.</p>
+        <a href="#contact" class="learn-more">Tìm hiểu thêm →</a>
+      </div> -->
+    </div>
+  </div>
+</section>
+
+<!-- ── Why Us ── -->
+<section class="why-us" id="why-us">
+  <div class="container">
+    <div class="why-content fade-up">
+      <div class="tag" style="background:rgba(246,166,35,.15);color:var(--gold)">Tại sao chọn chúng tôi</div>
+      <h2 class="section-title">Đối tác tin cậy<br/>cho mọi chiến dịch</h2>
+      <p class="section-sub">Chúng tôi không chỉ đơn thuần là một agency – chúng tôi là người đồng hành chiến lược giúp thương hiệu bạn tăng trưởng bền vững.</p>
+      <div class="why-list">
+        <div class="why-item">
+          <div class="why-item-icon">🏆</div>
+          <div>
+            <h4>Kinh nghiệm thực chiến</h4>
+            <p>Đội ngũ có nhiều năm kinh nghiệm trong lĩnh vực digital marketing và influencer marketing tại Việt Nam.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-item-icon">⚡</div>
+          <div>
+            <h4>Triển khai nhanh chóng</h4>
+            <p>Quy trình làm việc tối ưu, triển khai chiến dịch nhanh chóng.</p>
+          </div>
+        </div>
+        <div class="why-item">
+          <div class="why-item-icon">💎</div>
+          <div>
+            <h4>Mạng lưới KOL đa dạng</h4>
+            <p>Sở hữu mạng lưới 200+ KOL/KOC đa dạng từ micro đến mega influencer, đa dạng ngành hàng.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stats-grid fade-up">
+      <div class="stat-card">
+        <strong>200+</strong>
+        <span>KOL/KOC đối tác</span>
+      </div>
+      <div class="stat-card">
+        <strong>10+</strong>
+        <span>Khách hàng tin tưởng</span>
+      </div>
+      <div class="stat-card">
+        <strong>10M+</strong>
+        <span>Lượt tiếp cận/tháng</span>
+      </div>
+      <div class="stat-card">
+        <strong>98%</strong>
+        <span>Khách hàng hài lòng</span>
+      </div>
+      <div class="stat-card" style="grid-column:span 2">
+        <strong style="font-size:32px">340%</strong>
+        <span>ROI trung bình chiến dịch</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Process ── -->
+<section class="process" id="process">
+  <div class="container">
+    <div class="process-header fade-up">
+      <div class="tag">Quy trình làm việc</div>
+      <h2 class="section-title">4 bước đơn giản để<br/>chiến dịch thành công</h2>
+    </div>
+    <div class="process-steps">
+      <div class="step fade-up">
+        <div class="step-num">1</div>
+        <h4>Tư vấn & Lên kế hoạch</h4>
+        <p>Lắng nghe mục tiêu, phân tích đối tượng và đề xuất chiến lược phù hợp.</p>
+      </div>
+      <div class="step fade-up" style="animation-delay:.1s">
+        <div class="step-num">2</div>
+        <h4>Lựa chọn KOL/KOC</h4>
+        <p>Tuyển chọn influencer phù hợp với thương hiệu và ngân sách của bạn.</p>
+      </div>
+      <div class="step fade-up" style="animation-delay:.2s">
+        <div class="step-num">3</div>
+        <h4>Sản xuất & Triển khai</h4>
+        <p>Tạo nội dung, duyệt với khách hàng rồi đăng tải theo lịch tối ưu.</p>
+      </div>
+      <div class="step fade-up" style="animation-delay:.3s">
+        <div class="step-num">4</div>
+        <h4>Báo cáo & Tối ưu</h4>
+        <p>Theo dõi số liệu thời gian thực, báo cáo chi tiết và tối ưu liên tục.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Portfolio ── -->
+<section class="portfolio" id="portfolio">
+  <div class="container">
+    <div class="portfolio-header fade-up">
+      <div class="tag">Dự án nổi bật</div>
+      <h2 class="section-title">Portfolio của<br/>Mạnh Quân Media</h2>
+      <p class="section-sub">Một số dự án content tiêu biểu chúng tôi đã thực hiện cho khách hàng.</p>
+    </div>
+    <div class="portfolio-grid">
+
+      <div class="portfolio-card fade-up">
+        <div class="portfolio-thumb">
+          <div class="portfolio-thumb-bg" style="background:linear-gradient(135deg,#f6a623,#ff6b35)"></div>
+          <span class="portfolio-thumb-emoji">🛍️</span>
+          <span class="portfolio-cat">🎬 Content</span>
+        </div>
+        <div class="portfolio-body">
+          <h3>Review sản phẩm thời trang</h3>
+          <p>Sản xuất loạt video content giới thiệu bộ sưu tập mới, kết hợp storytelling và trend âm nhạc.</p>
+          <div class="portfolio-metrics">
+            <div class="p-metric"><strong>1.8M</strong><small>Lượt xem</small></div>
+            <div class="p-metric"><strong>62K</strong><small>Lượt thích</small></div>
+            <div class="p-metric"><strong>x3.2</strong><small>Doanh số</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-card fade-up" style="animation-delay:.1s">
+        <div class="portfolio-thumb">
+          <div class="portfolio-thumb-bg" style="background:linear-gradient(135deg,#0d6e6e,#20bf6b)"></div>
+          <span class="portfolio-thumb-emoji">🍵</span>
+          <span class="portfolio-cat">📸 Branding</span>
+        </div>
+        <div class="portfolio-body">
+          <h3>Xây dựng thương hiệu F&amp;B</h3>
+          <p>Xây dựng nội dung thương hiệu cho chuỗi quán trà sữa – hình ảnh, video và caption nhất quán xuyên suốt.</p>
+          <div class="portfolio-metrics">
+            <div class="p-metric"><strong>+15K</strong><small>Followers mới</small></div>
+            <div class="p-metric"><strong>4.7%</strong><small>Engagement</small></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="portfolio-card fade-up" style="animation-delay:.2s">
+        <div class="portfolio-thumb">
+          <div class="portfolio-thumb-bg" style="background:linear-gradient(135deg,#6b48ff,#ff4757)"></div>
+          <span class="portfolio-thumb-emoji">💄</span>
+          <span class="portfolio-cat">🌟 KOC Booking</span>
+        </div>
+        <div class="portfolio-body">
+          <h3>Chiến dịch beauty KOC</h3>
+          <p>Booking 5 KOC beauty micro-influencer review dòng skincare mới ra mắt, nội dung chân thực và gần gũi.</p>
+          <div class="portfolio-metrics">
+            <div class="p-metric"><strong>3.2M</strong><small>Reach</small></div>
+            <div class="p-metric"><strong>28K</strong><small>Click sản phẩm</small></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── KOL Showcase ── -->
+<section class="kol-section" id="kol">
+  <div class="container">
+    <div class="kol-header fade-up">
+      <div class="tag">Mạng lưới KOL/KOC</div>
+      <h2 class="section-title">Đội ngũ influencer<br/>đa dạng & uy tín</h2>
+      <p class="section-sub" style="margin:12px auto 0">Từ micro-influencer đến mega KOL – chúng tôi có đúng người cho mọi chiến dịch.</p>
+    </div>
+    <div class="kol-grid">
+      <div class="kol-card fade-up">
+        <div class="kol-thumb" style="--c1:#f6a623;--c2:#ff6b35">
+          <div class="kol-thumb-bg"></div>
+          <span class="kol-thumb-emoji">👩‍💄</span>
+          <div class="kol-tiktok-badge">🎵 Beauty</div>
+        </div>
+        <div class="kol-info">
+          <h4>Beauty KOC</h4>
+          <span>Làm đẹp · Skincare · Lifestyle</span>
+          <div class="kol-followers">👥 500K–2M followers</div>
+        </div>
+      </div>
+      <div class="kol-card fade-up" style="animation-delay:.1s">
+        <div class="kol-thumb" style="--c1:#0d6e6e;--c2:#20bf6b">
+          <div class="kol-thumb-bg"></div>
+          <span class="kol-thumb-emoji">🍜</span>
+          <div class="kol-tiktok-badge">🎵 Food</div>
+        </div>
+        <div class="kol-info">
+          <h4>Food Reviewer</h4>
+          <span>Ẩm thực · Review nhà hàng</span>
+          <div class="kol-followers">👥 200K–5M followers</div>
+        </div>
+      </div>
+      <div class="kol-card fade-up" style="animation-delay:.2s">
+        <div class="kol-thumb" style="--c1:#6b48ff;--c2:#ff4757">
+          <div class="kol-thumb-bg"></div>
+          <span class="kol-thumb-emoji">🏋️</span>
+          <div class="kol-tiktok-badge">🎵 Fitness</div>
+        </div>
+        <div class="kol-info">
+          <h4>Fitness KOL</h4>
+          <span>Thể thao · Sức khỏe · Dinh dưỡng</span>
+          <div class="kol-followers">👥 300K–3M followers</div>
+        </div>
+      </div>
+      <div class="kol-card fade-up" style="animation-delay:.3s">
+        <div class="kol-thumb" style="--c1:#ff4757;--c2:#f6a623">
+          <div class="kol-thumb-bg"></div>
+          <span class="kol-thumb-emoji">🛍️</span>
+          <div class="kol-tiktok-badge">🎵 Fashion</div>
+        </div>
+        <div class="kol-info">
+          <h4>Fashion KOC</h4>
+          <span>Thời trang · Phong cách · Xu hướng</span>
+          <div class="kol-followers">👥 100K–8M followers</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Platforms ── -->
+<section class="platforms" id="contact">
+  <div class="container">
+    <div class="platforms-inner fade-up">
+      <div class="platforms-text">
+        <div class="tag">Nền tảng</div>
+        <h2 class="section-title" style="font-size:32px">Chuyên sâu TikTok,<br/>phủ rộng đa nền tảng</h2>
+        <p class="section-sub">Mạnh Quân Media tập trung vào TikTok – nền tảng tăng trưởng nhanh hiện nay, đồng thời hỗ trợ chiến dịch đa kênh.</p>
+      </div>
+      <div class="contact-list">
+        <div class="contact-item">
+          <div >
+            <img src="Icon_of_Zalo.svg.png" alt="Mạnh Quân Media" viewBox="0 0 24 24" width="44" height="44" fill="none" />
+            <!-- <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="22" height="22" fill="none">
+              <path d="M4 6h16L4 18h16" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg> -->
+          </div>
+          <div>
+            <h5>Hotline/Zalo</h5>
+            <span>0912265126</span>
+          </div>
+        </div>
+        <div class="contact-item">
+          <div class="contact-item-icon">✉️</div>
+          <div>
+            <h5>Email</h5>
+            <span>manhquanmedia@mqsocial.vn</span>
+          </div>
+        </div>
+        <!-- <div class="contact-item">
+          <div class="contact-item-icon">📍</div>
+          <div>
+            <h5>Địa chỉ</h5>
+            <span>Tỉnh Phú Thọ, Việt Nam</span>
+          </div>
+        </div> -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Footer ── -->
+<footer>
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div style="margin-bottom:4px">
+          <img src="logo-dark.png" alt="Mạnh Quân Media" style="height:90px;object-fit:contain;border-radius:10px;" />
+        </div>
+        <p>Agency TikTok marketing chuyên nghiệp – kết nối thương hiệu với hàng triệu khách hàng tiềm năng thông qua KOL/KOC uy tín và chiến dịch sáng tạo.</p>
+        <div class="footer-socials">
+          <a href="#" class="social-btn">🎵</a>
+          <a href="#" class="social-btn">📘</a>
+          <a href="#" class="social-btn">📸</a>
+          <a href="#" class="social-btn">▶️</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>Dịch vụ</h4>
+        <ul>
+          <li><a href="#services">Booking KOL/KOC</a></li>
+          <li><a href="#services">Sản xuất Video</a></li>
+          <li><a href="#services">TikTok Content</a></li>
+          <li><a href="#services">Chiến lược thương hiệu</a></li>
+          <li><a href="#services">Quản lý kênh</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Công ty</h4>
+        <ul>
+          <li><a href="#why-us">Về chúng tôi</a></li>
+          <li><a href="#process">Quy trình</a></li>
+          <li><a href="#portfolio">Portfolio</a></li>
+          <li><a href="#kol">Mạng lưới KOL</a></li>
+          <li><a href="#contact">Liên hệ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Liên hệ</h4>
+        <ul>
+          <li><a href="#">📞 0912265126</a></li>
+          <li><a href="#">✉️ manhquanmedia@mqsocial.vn</a></li>
+          <li><a href="#">📍 Tỉnh Phú Thọ</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 Mạnh Quân Media. Bảo lưu mọi quyền.</span>
+      <span>Kết nối thương hiệu · Lan tỏa giá trị</span>
+    </div>
+  </div>
+</footer>
+
+<!-- Toast -->
+<div class="toast" id="toast">✅ Gửi thành công! Chúng tôi sẽ liên hệ bạn trong 24 giờ.</div>
+
+<script>
+  // Navbar scroll effect
+  const navbar = document.getElementById('navbar');
+  window.addEventListener('scroll', () => {
+    navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
+
+  // Hamburger menu (mobile)
+  const navLinks = document.querySelector('.nav-links');
+  document.getElementById('hamburger').addEventListener('click', () => {
+    navLinks.classList.toggle('open');
+  });
+  navLinks.querySelectorAll('a').forEach(a => {
+    a.addEventListener('click', () => navLinks.classList.remove('open'));
+  });
+
+  // Fade-up on scroll
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.fade-up').forEach(el => observer.observe(el));
+
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      const id = a.getAttribute('href');
+      if (id === '#') return;
+      const el = document.querySelector(id);
+      if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth' }); }
+    });
+  });
+
+  // Counter animation
+  function animateCounter(el, target, suffix = '') {
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      current += step;
+      if (current >= target) { current = target; clearInterval(timer); }
+      el.textContent = Math.floor(current) + suffix;
+    }, 25);
+  }
+  const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        const strongs = e.target.querySelectorAll('.stat-card strong');
+        strongs.forEach(s => {
+          const text = s.textContent;
+          if (text.includes('M')) animateCounter(s, parseInt(text), 'M+');
+          else if (text.includes('%')) animateCounter(s, parseInt(text), '%');
+          else if (text.includes('+')) animateCounter(s, parseInt(text), '+');
+        });
+        statsObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.3 });
+  const statsGrid = document.querySelector('.stats-grid');
+  if (statsGrid) statsObserver.observe(statsGrid);
+</script>
+</body>
+</html>
