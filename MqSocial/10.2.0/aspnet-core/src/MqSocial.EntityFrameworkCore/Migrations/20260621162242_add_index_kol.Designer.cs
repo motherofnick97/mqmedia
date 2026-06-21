@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MqSocial.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using MqSocial.EntityFrameworkCore;
 namespace MqSocial.Migrations
 {
     [DbContext(typeof(MqSocialDbContext))]
-    partial class MqSocialDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260621162242_add_index_kol")]
+    partial class add_index_kol
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1704,7 +1707,7 @@ namespace MqSocial.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccountId", "Channel")
+                    b.HasIndex("AccountId")
                         .IsUnique();
 
                     b.ToTable("Kols");

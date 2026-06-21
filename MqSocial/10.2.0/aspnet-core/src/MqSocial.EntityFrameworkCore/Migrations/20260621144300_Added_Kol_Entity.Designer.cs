@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MqSocial.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using MqSocial.EntityFrameworkCore;
 namespace MqSocial.Migrations
 {
     [DbContext(typeof(MqSocialDbContext))]
-    partial class MqSocialDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260621144300_Added_Kol_Entity")]
+    partial class Added_Kol_Entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1649,10 +1652,6 @@ namespace MqSocial.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("AccountId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Career")
                         .HasColumnType("int");
 
@@ -1703,9 +1702,6 @@ namespace MqSocial.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId", "Channel")
-                        .IsUnique();
 
                     b.ToTable("Kols");
                 });
