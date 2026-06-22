@@ -1,7 +1,9 @@
 using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
+using MqSocial.Companies;
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MqSocial.Campaigns;
 
@@ -23,7 +25,12 @@ public class Campaign : FullAuditedEntity<int>, IMayHaveTenant
 
     public CampaignStatus Status { get; set; }
 
-    public decimal? Budget { get; set; }
+    public int? Budget { get; set; }
 
     public int? TenantId { get; set; }
+
+    public int? CompanyId { get; set; }
+
+    [ForeignKey("CompanyId")]
+    public Company Company { get; set; }
 }

@@ -1,0 +1,14 @@
+using AutoMapper;
+using MqSocial.Kols;
+
+namespace MqSocial.Kols.ContractKols.Dto;
+
+public class ContractKolMapProfile : Profile
+{
+    public ContractKolMapProfile()
+    {
+        CreateMap<ContractKol, ContractKolDto>();
+        CreateMap<ContractKolDto, ContractKol>();
+        CreateMap<CreateContractKolDto, ContractKol>();
+    }
+}

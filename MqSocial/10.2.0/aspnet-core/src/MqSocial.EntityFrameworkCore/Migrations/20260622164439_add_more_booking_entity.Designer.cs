@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MqSocial.EntityFrameworkCore;
 
@@ -11,9 +12,11 @@ using MqSocial.EntityFrameworkCore;
 namespace MqSocial.Migrations
 {
     [DbContext(typeof(MqSocialDbContext))]
-    partial class MqSocialDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260622164439_add_more_booking_entity")]
+    partial class add_more_booking_entity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -1684,7 +1687,7 @@ namespace MqSocial.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies");
+                    b.ToTable("Company");
                 });
 
             modelBuilder.Entity("MqSocial.Contracts.Contract", b =>
@@ -1739,62 +1742,6 @@ namespace MqSocial.Migrations
                     b.HasIndex("CampaignId");
 
                     b.ToTable("Contracts");
-                });
-
-            modelBuilder.Entity("MqSocial.Kols.ContractKol", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Cash")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContractId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("KolId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Payment")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContractId");
-
-                    b.HasIndex("KolId");
-
-                    b.ToTable("ContractKols");
                 });
 
             modelBuilder.Entity("MqSocial.Kols.Kol", b =>
@@ -2167,23 +2114,6 @@ namespace MqSocial.Migrations
                         .HasForeignKey("CampaignId");
 
                     b.Navigation("Campaign");
-                });
-
-            modelBuilder.Entity("MqSocial.Kols.ContractKol", b =>
-                {
-                    b.HasOne("MqSocial.Contracts.Contract", "Contract")
-                        .WithMany()
-                        .HasForeignKey("ContractId");
-
-                    b.HasOne("MqSocial.Kols.Kol", "Kol")
-                        .WithMany()
-                        .HasForeignKey("KolId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Contract");
-
-                    b.Navigation("Kol");
                 });
 
             modelBuilder.Entity("MqSocial.MultiTenancy.Tenant", b =>
