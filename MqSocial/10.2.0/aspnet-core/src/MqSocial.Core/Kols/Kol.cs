@@ -30,7 +30,7 @@ public class Kol : FullAuditedEntity<int>, IMayHaveTenant
     [Required]
     public ChannelType Channel { get; set; }
 
-    public decimal? GeneralCast { get; set; }
+    public int GeneralCast { get; set; }
 
     public int Follow { get; set; }
 

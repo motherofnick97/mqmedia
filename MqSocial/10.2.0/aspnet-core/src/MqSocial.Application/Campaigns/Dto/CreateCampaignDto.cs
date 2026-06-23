@@ -20,4 +20,5 @@ public class CreateCampaignDto
     public CampaignStatus Status { get; set; } = CampaignStatus.Draft;
 
     public decimal? Budget { get; set; }
+    public int CompanyId { get; set; }
 }

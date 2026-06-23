@@ -21,4 +21,6 @@ public class CampaignDto : EntityDto<int>
     public CampaignStatus Status { get; set; }
 
     public decimal? Budget { get; set; }
+
+    public int? CompanyId { get; set; }
 }

@@ -1,7 +1,7 @@
 using AutoMapper;
 using MqSocial.Kols;
 
-namespace MqSocial.Kols.ContractKols.Dto;
+namespace MqSocial.ContractKols.Dto;
 
 public class ContractKolMapProfile : Profile
 {

@@ -2,7 +2,7 @@ using Abp.Application.Services.Dto;
 using Abp.Runtime.Validation;
 using MqSocial.Kols;
 
-namespace MqSocial.Kols.ContractKols.Dto;
+namespace MqSocial.ContractKols.Dto;
 
 public class PagedContractKolRequestDto : PagedResultRequestDto, IShouldNormalize
 {

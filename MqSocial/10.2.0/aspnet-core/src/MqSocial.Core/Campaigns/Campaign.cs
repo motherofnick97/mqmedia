@@ -29,7 +29,7 @@ public class Campaign : FullAuditedEntity<int>, IMayHaveTenant
 
     public int? TenantId { get; set; }
 
-    public int? CompanyId { get; set; }
+    public int CompanyId { get; set; }
 
     [ForeignKey("CompanyId")]
     public Company Company { get; set; }

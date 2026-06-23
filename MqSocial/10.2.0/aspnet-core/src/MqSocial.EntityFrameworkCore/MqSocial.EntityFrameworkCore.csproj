@@ -26,4 +26,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MqSocial.Core\MqSocial.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Migrations\" />
+  </ItemGroup>
 </Project>

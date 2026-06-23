@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MqSocial.Companies;
 
-[AbpAuthorize(PermissionNames.Pages_Companies)]
+//[AbpAuthorize(PermissionNames.Pages_Companies)]
 public class CompanyAppService : AsyncCrudAppService<Company, CompanyDto, int, PagedCompanyRequestDto, CreateCompanyDto, CompanyDto>, ICompanyAppService
 {
     public CompanyAppService(IRepository<Company, int> repository)

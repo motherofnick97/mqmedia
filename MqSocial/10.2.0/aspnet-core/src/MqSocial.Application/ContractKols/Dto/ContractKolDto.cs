@@ -1,7 +1,7 @@
 using Abp.Application.Services.Dto;
 using MqSocial.Kols;
 
-namespace MqSocial.Kols.ContractKols.Dto;
+namespace MqSocial.ContractKols.Dto;
 
 public class ContractKolDto : EntityDto<int>
 {

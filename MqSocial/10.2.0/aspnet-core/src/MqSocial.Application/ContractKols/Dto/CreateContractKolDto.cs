@@ -1,7 +1,7 @@
 using MqSocial.Kols;
 using System.ComponentModel.DataAnnotations;
 
-namespace MqSocial.Kols.ContractKols.Dto;
+namespace MqSocial.ContractKols.Dto;
 
 public class CreateContractKolDto
 {

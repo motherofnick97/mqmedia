@@ -3,10 +3,11 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
 using MqSocial.Authorization;
-using MqSocial.Kols.ContractKols.Dto;
+using MqSocial.ContractKols.Dto;
+using MqSocial.Kols;
 using System.Linq;
 
-namespace MqSocial.Kols.ContractKols;
+namespace MqSocial.ContractKols;
 
 [AbpAuthorize(PermissionNames.Pages_ContractKols)]
 public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKolDto, int, PagedContractKolRequestDto, CreateContractKolDto, ContractKolDto>, IContractKolAppService

@@ -1594,7 +1594,7 @@ namespace MqSocial.Migrations
                     b.Property<int?>("Budget")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CompanyId")
+                    b.Property<int>("CompanyId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreationTime")
@@ -1833,8 +1833,8 @@ namespace MqSocial.Migrations
                     b.Property<int>("Follow")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("GeneralCast")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<int>("GeneralCast")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
@@ -2155,7 +2155,9 @@ namespace MqSocial.Migrations
                 {
                     b.HasOne("MqSocial.Companies.Company", "Company")
                         .WithMany()
-                        .HasForeignKey("CompanyId");
+                        .HasForeignKey("CompanyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Company");
                 });

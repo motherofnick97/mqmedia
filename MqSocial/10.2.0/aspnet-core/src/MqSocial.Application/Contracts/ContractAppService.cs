@@ -9,7 +9,7 @@ using System.Linq;
 
 namespace MqSocial.Contracts;
 
-[AbpAuthorize(PermissionNames.Pages_Contracts)]
+//[AbpAuthorize(PermissionNames.Pages_Contracts)]
 public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, string, PagedContractRequestDto, CreateContractDto, ContractDto>, IContractAppService
 {
     public ContractAppService(IRepository<Contract, string> repository)

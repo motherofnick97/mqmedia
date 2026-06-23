@@ -1,7 +1,7 @@
 using Abp.Application.Services;
-using MqSocial.Kols.ContractKols.Dto;
+using MqSocial.ContractKols.Dto;
 
-namespace MqSocial.Kols.ContractKols;
+namespace MqSocial.ContractKols;
 
 public interface IContractKolAppService : IAsyncCrudAppService<ContractKolDto, int, PagedContractKolRequestDto, CreateContractKolDto, ContractKolDto>
 {
