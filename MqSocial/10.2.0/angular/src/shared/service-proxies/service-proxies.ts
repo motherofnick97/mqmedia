@@ -4016,7 +4016,6 @@ export class CreateCampaignDto implements ICreateCampaignDto {
     }
 
     toJSON(data?: any) {
-        debugger;
         data = typeof data === 'object' ? data : {};
         data["name"] = this.name;
         data["description"] = this.description;
@@ -4196,8 +4195,6 @@ export class CampaignServiceProxy {
         let url_ = this.baseUrl + "/api/services/app/Campaign/Create";
         url_ = url_.replace(/[?&]$/, "");
         const content_ = JSON.stringify(body);
-
-        debugger;
 
         let options_: any = {
             body: content_,

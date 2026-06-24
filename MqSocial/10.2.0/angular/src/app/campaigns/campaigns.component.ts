@@ -15,14 +15,36 @@ import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
+import { Button } from 'primeng/button';
+import { Select } from 'primeng/select';
+import { Tag } from 'primeng/tag';
+import { Toolbar } from 'primeng/toolbar';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
     templateUrl: './campaigns.component.html',
     animations: [appModuleAnimation()],
     standalone: true,
-    imports: [FormsModule, TableModule, PrimeTemplate, NgIf, PaginatorModule, LocalizePipe],
+    imports: [
+        FormsModule,
+        TableModule,
+        PrimeTemplate,
+        PaginatorModule,
+        DatePipe,
+        LocalizePipe,
+        Button,
+        Select,
+        Tag,
+        Toolbar,
+        IconField,
+        InputIcon,
+        InputText,
+        CommonModule
+    ],
 })
 export class CampaignsComponent extends PagedListingComponentBase<CampaignDto> {
     @ViewChild('dataTable', { static: true }) dataTable: Table;
@@ -85,14 +107,14 @@ export class CampaignsComponent extends PagedListingComponentBase<CampaignDto> {
         return map[status] ?? '';
     }
 
-    getStatusClass(status: CampaignStatus): string {
-        const map = {
-            [CampaignStatus.Draft]: 'badge badge-secondary',
-            [CampaignStatus.Active]: 'badge badge-success',
-            [CampaignStatus.Paused]: 'badge badge-warning',
-            [CampaignStatus.Completed]: 'badge badge-info',
+    getStatusSeverity(status: CampaignStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
+        const map: Record<number, 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast'> = {
+            [CampaignStatus.Draft]: 'secondary',
+            [CampaignStatus.Active]: 'success',
+            [CampaignStatus.Paused]: 'warn',
+            [CampaignStatus.Completed]: 'info',
         };
-        return map[status] ?? 'badge badge-secondary';
+        return map[status] ?? 'secondary';
     }
 
     list(event?: LazyLoadEvent): void {

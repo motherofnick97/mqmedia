@@ -4,14 +4,22 @@ import { AppComponentBase } from '@shared/app-component-base';
 import { CompanyServiceProxy, CompanyDto } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
-import { AbpModalFooterComponent } from '../../../shared/components/modal/abp-modal-footer.component';
 import { AbpValidationSummaryComponent } from '../../../shared/components/validation/abp-validation.summary.component';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
+import { InputText } from 'primeng/inputtext';
+import { Button } from 'primeng/button';
 
 @Component({
     templateUrl: './edit-company-dialog.component.html',
     standalone: true,
-    imports: [FormsModule, AbpModalHeaderComponent, AbpValidationSummaryComponent, AbpModalFooterComponent, LocalizePipe],
+    imports: [
+        FormsModule,
+        AbpModalHeaderComponent,
+        AbpValidationSummaryComponent,
+        LocalizePipe,
+        InputText,
+        Button,
+    ],
 })
 export class EditCompanyDialogComponent extends AppComponentBase implements OnInit {
     @Output() onSave = new EventEmitter<any>();

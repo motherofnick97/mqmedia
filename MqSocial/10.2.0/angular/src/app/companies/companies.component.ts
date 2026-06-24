@@ -10,14 +10,29 @@ import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
-import { NgIf } from '@angular/common';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
+import { Button } from 'primeng/button';
+import { Toolbar } from 'primeng/toolbar';
+import { IconField } from 'primeng/iconfield';
+import { InputIcon } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
 
 @Component({
     templateUrl: './companies.component.html',
     animations: [appModuleAnimation()],
     standalone: true,
-    imports: [FormsModule, TableModule, PrimeTemplate, NgIf, PaginatorModule, LocalizePipe],
+    imports: [
+        FormsModule,
+        TableModule,
+        PrimeTemplate,
+        PaginatorModule,
+        LocalizePipe,
+        Button,
+        Toolbar,
+        IconField,
+        InputIcon,
+        InputText,
+    ],
 })
 export class CompaniesComponent extends PagedListingComponentBase<CompanyDto> {
     @ViewChild('dataTable', { static: true }) dataTable: Table;

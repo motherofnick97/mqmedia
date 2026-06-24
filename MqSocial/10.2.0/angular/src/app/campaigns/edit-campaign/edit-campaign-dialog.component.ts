@@ -10,10 +10,15 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
-import { AbpModalFooterComponent } from '../../../shared/components/modal/abp-modal-footer.component';
 import { AbpValidationSummaryComponent } from '../../../shared/components/validation/abp-validation.summary.component';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import moment from 'moment';
+import { InputText } from 'primeng/inputtext';
+import { Textarea } from 'primeng/textarea';
+import { DatePicker } from 'primeng/datepicker';
+import { Select } from 'primeng/select';
+import { InputNumber } from 'primeng/inputnumber';
+import { Button } from 'primeng/button';
 
 @Component({
     templateUrl: './edit-campaign-dialog.component.html',
@@ -22,8 +27,13 @@ import moment from 'moment';
         FormsModule,
         AbpModalHeaderComponent,
         AbpValidationSummaryComponent,
-        AbpModalFooterComponent,
         LocalizePipe,
+        InputText,
+        Textarea,
+        DatePicker,
+        Select,
+        InputNumber,
+        Button,
     ],
 })
 export class EditCampaignDialogComponent extends AppComponentBase implements OnInit {
@@ -34,8 +44,8 @@ export class EditCampaignDialogComponent extends AppComponentBase implements OnI
     companies: CompanyDto[] = [];
     id: string;
 
-    startDateStr: string = '';
-    endDateStr: string = '';
+    startDate: Date | null = null;
+    endDate: Date | null = null;
 
     campaignStatuses = [
         { value: CampaignStatus.Draft, label: 'Draft' },
@@ -59,8 +69,8 @@ export class EditCampaignDialogComponent extends AppComponentBase implements OnI
             this.companies = companies.items;
             this._campaignService.get(this.id).subscribe((result) => {
                 this.campaign = result;
-                this.startDateStr = result.startDate ? result.startDate.format('YYYY-MM-DD') : '';
-                this.endDateStr = result.endDate ? result.endDate.format('YYYY-MM-DD') : '';
+                this.startDate = result.startDate ? result.startDate.toDate() : null;
+                this.endDate = result.endDate ? result.endDate.toDate() : null;
                 this.cd.detectChanges();
             });
         });
@@ -68,8 +78,8 @@ export class EditCampaignDialogComponent extends AppComponentBase implements OnI
 
     save(): void {
         this.saving = true;
-        this.campaign.startDate = this.startDateStr ? moment(this.startDateStr) : undefined;
-        this.campaign.endDate = this.endDateStr ? moment(this.endDateStr) : undefined;
+        this.campaign.startDate = this.startDate ? moment(this.startDate) : undefined;
+        this.campaign.endDate = this.endDate ? moment(this.endDate) : undefined;
 
         this._campaignService.update(this.campaign).subscribe({
             next: () => {
