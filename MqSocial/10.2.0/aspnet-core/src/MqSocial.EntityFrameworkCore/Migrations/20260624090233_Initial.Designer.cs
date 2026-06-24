@@ -12,8 +12,8 @@ using MqSocial.EntityFrameworkCore;
 namespace MqSocial.Migrations
 {
     [DbContext(typeof(MqSocialDbContext))]
-    [Migration("20260623094521_Init_migrations")]
-    partial class Init_migrations
+    [Migration("20260624090233_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1588,17 +1588,15 @@ namespace MqSocial.Migrations
 
             modelBuilder.Entity("MqSocial.Campaigns.Campaign", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Budget")
                         .HasColumnType("int");
 
-                    b.Property<int>("CompanyId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CompanyId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -1651,11 +1649,9 @@ namespace MqSocial.Migrations
 
             modelBuilder.Entity("MqSocial.Companies.Company", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -1690,16 +1686,168 @@ namespace MqSocial.Migrations
                     b.ToTable("Companies");
                 });
 
+            modelBuilder.Entity("MqSocial.ContractKolResults.ContractKolResult", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int>("ChannelType")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Comment")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ContractKolId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("PostLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PostTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("Save")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Share")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("View")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractKolId");
+
+                    b.ToTable("ContractKolResults");
+                });
+
+            modelBuilder.Entity("MqSocial.ContractKols.ContractKol", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("AirTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Brief")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("BriefLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Caption")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Cash")
+                        .HasColumnType("int");
+
+                    b.Property<Guid>("ContractId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("CreatorUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("DeleterUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<DateTime?>("DeletionTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Feedback")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("HashTag")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<Guid>("KolId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime?>("LastModificationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<long?>("LastModifierUserId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Payment")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Portrait")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ReviewCorner")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SampleName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("SampleQuantity")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SampleReceiveStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("SampleSize")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("TenantId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ContractId");
+
+                    b.HasIndex("KolId");
+
+                    b.ToTable("ContractKols");
+                });
+
             modelBuilder.Entity("MqSocial.Contracts.Contract", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int?>("Budget")
                         .HasColumnType("int");
 
-                    b.Property<int?>("CampaignId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CampaignId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("CreationTime")
                         .HasColumnType("datetime2");
@@ -1744,73 +1892,18 @@ namespace MqSocial.Migrations
                     b.ToTable("Contracts");
                 });
 
-            modelBuilder.Entity("MqSocial.Kols.ContractKol", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Cash")
-                        .HasColumnType("int");
-
-                    b.Property<string>("ContractId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("CreatorUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<long?>("DeleterUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<DateTime?>("DeletionTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("KolId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("LastModificationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<long?>("LastModifierUserId")
-                        .HasColumnType("bigint");
-
-                    b.Property<int>("Payment")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TenantId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ContractId");
-
-                    b.HasIndex("KolId");
-
-                    b.ToTable("ContractKols");
-                });
-
             modelBuilder.Entity("MqSocial.Kols.Kol", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("AccountId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Career")
                         .HasColumnType("int");
@@ -1859,6 +1952,9 @@ namespace MqSocial.Migrations
 
                     b.Property<string>("Note")
                         .HasMaxLength(5000)
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int?>("TenantId")
@@ -2165,20 +2261,24 @@ namespace MqSocial.Migrations
                     b.Navigation("Company");
                 });
 
-            modelBuilder.Entity("MqSocial.Contracts.Contract", b =>
+            modelBuilder.Entity("MqSocial.ContractKolResults.ContractKolResult", b =>
                 {
-                    b.HasOne("MqSocial.Campaigns.Campaign", "Campaign")
+                    b.HasOne("MqSocial.ContractKols.ContractKol", "ContractKol")
                         .WithMany()
-                        .HasForeignKey("CampaignId");
+                        .HasForeignKey("ContractKolId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("Campaign");
+                    b.Navigation("ContractKol");
                 });
 
-            modelBuilder.Entity("MqSocial.Kols.ContractKol", b =>
+            modelBuilder.Entity("MqSocial.ContractKols.ContractKol", b =>
                 {
                     b.HasOne("MqSocial.Contracts.Contract", "Contract")
                         .WithMany()
-                        .HasForeignKey("ContractId");
+                        .HasForeignKey("ContractId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("MqSocial.Kols.Kol", "Kol")
                         .WithMany()
@@ -2189,6 +2289,17 @@ namespace MqSocial.Migrations
                     b.Navigation("Contract");
 
                     b.Navigation("Kol");
+                });
+
+            modelBuilder.Entity("MqSocial.Contracts.Contract", b =>
+                {
+                    b.HasOne("MqSocial.Campaigns.Campaign", "Campaign")
+                        .WithMany()
+                        .HasForeignKey("CampaignId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Campaign");
                 });
 
             modelBuilder.Entity("MqSocial.MultiTenancy.Tenant", b =>

@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Contracts
 {
-    public class Contract : FullAuditedEntity<string>, IMayHaveTenant
+    public class Contract : FullAuditedEntity<Guid>, IMayHaveTenant
     {
         public const int MaxNameLength = 256;
         public const int MaxDescriptionLength = 5000;
@@ -25,7 +25,7 @@ namespace MqSocial.Contracts
         [StringLength(MaxDescriptionLength)]
         public string Note { get; set; }
 
-        public int? CampaignId { get; set; }
+        public Guid CampaignId { get; set; }
 
         [ForeignKey("CampaignId")]
         public Campaign Campaign { get; set; }

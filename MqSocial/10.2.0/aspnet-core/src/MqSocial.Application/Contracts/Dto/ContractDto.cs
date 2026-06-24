@@ -1,10 +1,11 @@
 using Abp.Application.Services.Dto;
 using MqSocial.Contracts;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Contracts.Dto;
 
-public class ContractDto : EntityDto<string>
+public class ContractDto : EntityDto<Guid>
 {
     [Required]
     [StringLength(Contract.MaxNameLength)]
@@ -13,7 +14,7 @@ public class ContractDto : EntityDto<string>
     [StringLength(Contract.MaxDescriptionLength)]
     public string Note { get; set; }
 
-    public int? CampaignId { get; set; }
+    public Guid CampaignId { get; set; }
 
     public ContractStatus Status { get; set; }
 

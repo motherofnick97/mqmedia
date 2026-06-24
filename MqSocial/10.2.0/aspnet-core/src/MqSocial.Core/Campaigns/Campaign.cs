@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MqSocial.Campaigns;
 
-public class Campaign : FullAuditedEntity<int>, IMayHaveTenant
+public class Campaign : FullAuditedEntity<Guid>, IMayHaveTenant
 {
     public const int MaxNameLength = 256;
     public const int MaxDescriptionLength = 5000;
@@ -29,7 +29,7 @@ public class Campaign : FullAuditedEntity<int>, IMayHaveTenant
 
     public int? TenantId { get; set; }
 
-    public int CompanyId { get; set; }
+    public Guid CompanyId { get; set; }
 
     [ForeignKey("CompanyId")]
     public Company Company { get; set; }

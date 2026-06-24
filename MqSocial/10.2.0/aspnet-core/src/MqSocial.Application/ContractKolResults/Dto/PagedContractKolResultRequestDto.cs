@@ -1,18 +1,17 @@
 using Abp.Application.Services.Dto;
 using Abp.Runtime.Validation;
+using MqSocial.Common.Enum;
 using System;
 
-namespace MqSocial.ContractKols.Dto;
+namespace MqSocial.ContractKolResults.Dto;
 
-public class PagedContractKolRequestDto : PagedResultRequestDto, IShouldNormalize
+public class PagedContractKolResultRequestDto : PagedResultRequestDto, IShouldNormalize
 {
     public string Sorting { get; set; }
 
-    public Guid KolId { get; set; }
+    public Guid? ContractKolId { get; set; }
 
-    public Guid ContractId { get; set; }
-
-    public ContractKolStatus? Status { get; set; }
+    public ChannelType? ChannelType { get; set; }
 
     public void Normalize()
     {

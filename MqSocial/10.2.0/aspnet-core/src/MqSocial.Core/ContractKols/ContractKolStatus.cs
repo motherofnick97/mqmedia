@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MqSocial.Kols
+namespace MqSocial.ContractKols
 {
     public enum ContractKolStatus
     {
@@ -15,8 +15,10 @@ namespace MqSocial.Kols
         Approve,
         [Description("Đang tiến hành")]
         Processing,
-        [Description("Duyệt bài")]
-        Ok,
+        [Description("Mkt duyệt")]
+        MktOk,
+        [Description("Quản lý duyệt")]
+        DpmOk,
         [Description("Đã air")]
         OnAir,
         [Description("Theo dõi")]

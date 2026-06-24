@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MqSocial.Migrations
 {
     /// <inheritdoc />
-    public partial class Init_migrations : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -452,8 +452,7 @@ namespace MqSocial.Migrations
                 name: "Companies",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -473,8 +472,7 @@ namespace MqSocial.Migrations
                 name: "Kols",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     Link = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -485,6 +483,8 @@ namespace MqSocial.Migrations
                     Follow = table.Column<int>(type: "int", nullable: false),
                     AccountId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
+                    Address = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Phone = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -821,8 +821,7 @@ namespace MqSocial.Migrations
                 name: "Campaigns",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     StartDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -830,7 +829,7 @@ namespace MqSocial.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     Budget = table.Column<int>(type: "int", nullable: true),
                     TenantId = table.Column<int>(type: "int", nullable: true),
-                    CompanyId = table.Column<int>(type: "int", nullable: false),
+                    CompanyId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -958,10 +957,10 @@ namespace MqSocial.Migrations
                 name: "Contracts",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
-                    CampaignId = table.Column<int>(type: "int", nullable: true),
+                    CampaignId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
                     Budget = table.Column<int>(type: "int", nullable: true),
@@ -980,21 +979,33 @@ namespace MqSocial.Migrations
                         name: "FK_Contracts_Campaigns_CampaignId",
                         column: x => x.CampaignId,
                         principalTable: "Campaigns",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
                 name: "ContractKols",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
-                    KolId = table.Column<int>(type: "int", nullable: false),
-                    ContractId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    KolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Status = table.Column<int>(type: "int", nullable: false),
                     Cash = table.Column<int>(type: "int", nullable: false),
                     Payment = table.Column<int>(type: "int", nullable: false),
+                    Portrait = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ReviewCorner = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SampleSize = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SampleName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SampleQuantity = table.Column<int>(type: "int", nullable: false),
+                    SampleReceiveStatus = table.Column<int>(type: "int", nullable: false),
+                    AirTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    Brief = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    BriefLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Feedback = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Caption = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    HashTag = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1010,11 +1021,45 @@ namespace MqSocial.Migrations
                         name: "FK_ContractKols_Contracts_ContractId",
                         column: x => x.ContractId,
                         principalTable: "Contracts",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ContractKols_Kols_KolId",
                         column: x => x.KolId,
                         principalTable: "Kols",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ContractKolResults",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<int>(type: "int", nullable: true),
+                    ContractKolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PostTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    PostLink = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    View = table.Column<int>(type: "int", nullable: true),
+                    Comment = table.Column<int>(type: "int", nullable: true),
+                    Save = table.Column<int>(type: "int", nullable: true),
+                    Share = table.Column<int>(type: "int", nullable: true),
+                    ChannelType = table.Column<int>(type: "int", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierUserId = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleterUserId = table.Column<long>(type: "bigint", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ContractKolResults", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ContractKolResults_ContractKols_ContractKolId",
+                        column: x => x.ContractKolId,
+                        principalTable: "ContractKols",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1377,6 +1422,11 @@ namespace MqSocial.Migrations
                 column: "CompanyId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ContractKolResults_ContractKolId",
+                table: "ContractKolResults",
+                column: "ContractKolId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ContractKols_ContractId",
                 table: "ContractKols",
                 column: "ContractId");
@@ -1483,7 +1533,7 @@ namespace MqSocial.Migrations
                 name: "AbpWebhookSubscriptions");
 
             migrationBuilder.DropTable(
-                name: "ContractKols");
+                name: "ContractKolResults");
 
             migrationBuilder.DropTable(
                 name: "AbpDynamicEntityProperties");
@@ -1501,10 +1551,7 @@ namespace MqSocial.Migrations
                 name: "AbpWebhookEvents");
 
             migrationBuilder.DropTable(
-                name: "Contracts");
-
-            migrationBuilder.DropTable(
-                name: "Kols");
+                name: "ContractKols");
 
             migrationBuilder.DropTable(
                 name: "AbpDynamicProperties");
@@ -1514,6 +1561,12 @@ namespace MqSocial.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpUsers");
+
+            migrationBuilder.DropTable(
+                name: "Contracts");
+
+            migrationBuilder.DropTable(
+                name: "Kols");
 
             migrationBuilder.DropTable(
                 name: "Campaigns");

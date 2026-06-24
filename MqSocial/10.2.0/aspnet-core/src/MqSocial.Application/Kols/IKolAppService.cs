@@ -1,10 +1,10 @@
 using Abp.Application.Services;
 using MqSocial.Kols.Dto;
+using System;
 using System.Threading.Tasks;
 
 namespace MqSocial.Kols;
 
-public interface IKolAppService : IAsyncCrudAppService<KolDto, int, PagedKolRequestDto, CreateKolDto, KolDto>
+public interface IKolAppService : IAsyncCrudAppService<KolDto, Guid, PagedKolRequestDto, CreateKolDto, KolDto>
 {
-    Task<CreateKolDto> CrawlKolInfoByUrl(CrawlKolInfoInput input);
 }

@@ -11,9 +11,9 @@ using System.Linq;
 namespace MqSocial.Campaigns;
 
 //[AbpAuthorize(PermissionNames.Pages_Campaigns)]
-public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, int, PagedCampaignRequestDto, CreateCampaignDto, CampaignDto>, ICampaignAppService
+public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, Guid, PagedCampaignRequestDto, CreateCampaignDto, CampaignDto>, ICampaignAppService
 {
-    public CampaignAppService(IRepository<Campaign, int> repository)
+    public CampaignAppService(IRepository<Campaign, Guid> repository)
         : base(repository)
     {
     }

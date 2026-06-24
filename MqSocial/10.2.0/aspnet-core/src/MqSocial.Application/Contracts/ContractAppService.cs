@@ -5,14 +5,15 @@ using Abp.Extensions;
 using Abp.Linq.Extensions;
 using MqSocial.Authorization;
 using MqSocial.Contracts.Dto;
+using System;
 using System.Linq;
 
 namespace MqSocial.Contracts;
 
 //[AbpAuthorize(PermissionNames.Pages_Contracts)]
-public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, string, PagedContractRequestDto, CreateContractDto, ContractDto>, IContractAppService
+public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Guid, PagedContractRequestDto, CreateContractDto, ContractDto>, IContractAppService
 {
-    public ContractAppService(IRepository<Contract, string> repository)
+    public ContractAppService(IRepository<Contract, Guid> repository)
         : base(repository)
     {
     }
@@ -23,8 +24,7 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, str
             .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), x =>
                 x.Name.Contains(input.Keyword) ||
                 x.Note.Contains(input.Keyword))
-            .WhereIf(input.Status.HasValue, x => x.Status == input.Status.Value)
-            .WhereIf(input.CampaignId.HasValue, x => x.Campaign.Id == input.CampaignId.Value);
+            .WhereIf(input.Status.HasValue, x => x.Status == input.Status.Value);
     }
 
     protected override IQueryable<Contract> ApplySorting(IQueryable<Contract> query, PagedContractRequestDto input)

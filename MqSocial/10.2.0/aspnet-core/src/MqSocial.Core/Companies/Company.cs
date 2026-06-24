@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Companies
 {
-    public class Company : FullAuditedEntity<int>, IMayHaveTenant
+    public class Company : FullAuditedEntity<Guid>, IMayHaveTenant
     {
         [Required]
         public string Name { get; set; }

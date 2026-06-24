@@ -1,9 +1,9 @@
 using Abp.Application.Services.Dto;
-using MqSocial.Kols;
+using System;
 
 namespace MqSocial.ContractKols.Dto;
 
-public class ContractKolDto : EntityDto<int>
+public class ContractKolDto : EntityDto<Guid>
 {
     public int KolId { get; set; }
 

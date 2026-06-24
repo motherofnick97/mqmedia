@@ -1,6 +1,7 @@
 using Abp.Application.Services.Dto;
 using Abp.Runtime.Validation;
 using MqSocial.Contracts;
+using System;
 
 namespace MqSocial.Contracts.Dto;
 
@@ -12,7 +13,7 @@ public class PagedContractRequestDto : PagedResultRequestDto, IShouldNormalize
 
     public ContractStatus? Status { get; set; }
 
-    public int? CampaignId { get; set; }
+    public Guid CampaignId { get; set; }
 
     public void Normalize()
     {

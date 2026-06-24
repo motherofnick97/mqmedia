@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Kols.Dto;
 
-public class KolDto : EntityDto<int>
+public class KolDto : EntityDto<Guid>
 {
     [Required]
     [StringLength(Kol.MaxNameLength)]

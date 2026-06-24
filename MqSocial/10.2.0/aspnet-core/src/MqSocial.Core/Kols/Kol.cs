@@ -8,7 +8,7 @@ using System.ComponentModel.DataAnnotations;
 namespace MqSocial.Kols;
 
 [Index(nameof(AccountId), nameof(Channel), IsUnique = true)]
-public class Kol : FullAuditedEntity<int>, IMayHaveTenant
+public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
 {
     public const int MaxNameLength = 256;
     public const int MaxDescriptionLength = 5000;
@@ -38,4 +38,9 @@ public class Kol : FullAuditedEntity<int>, IMayHaveTenant
     public string AccountId { get; set; }
 
     public int? TenantId { get; set; }
+
+    public string Address { get; set; }
+
+    public string Phone { get; set; }
+
 }

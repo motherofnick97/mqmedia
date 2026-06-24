@@ -1,4 +1,3 @@
-using MqSocial.Kols;
 using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.ContractKols.Dto;

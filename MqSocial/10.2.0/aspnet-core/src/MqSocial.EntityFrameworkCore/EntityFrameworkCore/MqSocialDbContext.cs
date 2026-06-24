@@ -7,6 +7,8 @@ using MqSocial.Contracts;
 using MqSocial.Kols;
 using MqSocial.MultiTenancy;
 using Microsoft.EntityFrameworkCore;
+using MqSocial.ContractKols;
+using MqSocial.ContractKolResults;
 
 namespace MqSocial.EntityFrameworkCore;
 
@@ -23,6 +25,8 @@ public class MqSocialDbContext : AbpZeroDbContext<Tenant, Role, User, MqSocialDb
     public DbSet<Company> Companies { get; set; }
 
     public DbSet<ContractKol> ContractKols { get; set; }
+
+    public DbSet<ContractKolResult> ContractKolResults { get; set; }
 
     public MqSocialDbContext(DbContextOptions<MqSocialDbContext> options)
         : base(options)

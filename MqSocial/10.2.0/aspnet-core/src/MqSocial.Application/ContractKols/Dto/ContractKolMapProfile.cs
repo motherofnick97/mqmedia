@@ -1,5 +1,4 @@
 using AutoMapper;
-using MqSocial.Kols;
 
 namespace MqSocial.ContractKols.Dto;
 

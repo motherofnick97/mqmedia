@@ -5,14 +5,15 @@ using Abp.Extensions;
 using Abp.Linq.Extensions;
 using MqSocial.Authorization;
 using MqSocial.Companies.Dto;
+using System;
 using System.Linq;
 
 namespace MqSocial.Companies;
 
 //[AbpAuthorize(PermissionNames.Pages_Companies)]
-public class CompanyAppService : AsyncCrudAppService<Company, CompanyDto, int, PagedCompanyRequestDto, CreateCompanyDto, CompanyDto>, ICompanyAppService
+public class CompanyAppService : AsyncCrudAppService<Company, CompanyDto, Guid, PagedCompanyRequestDto, CreateCompanyDto, CompanyDto>, ICompanyAppService
 {
-    public CompanyAppService(IRepository<Company, int> repository)
+    public CompanyAppService(IRepository<Company, Guid> repository)
         : base(repository)
     {
     }

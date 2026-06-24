@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Campaigns.Dto;
 
-public class CampaignDto : EntityDto<int>
+public class CampaignDto : EntityDto<Guid>
 {
     [Required]
     [StringLength(Campaign.MaxNameLength)]
@@ -22,5 +22,5 @@ public class CampaignDto : EntityDto<int>
 
     public decimal? Budget { get; set; }
 
-    public int? CompanyId { get; set; }
+    public Guid? CompanyId { get; set; }
 }
