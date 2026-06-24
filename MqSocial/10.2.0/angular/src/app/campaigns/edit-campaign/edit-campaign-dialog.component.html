@@ -1,0 +1,104 @@
+<form class="form-horizontal" autocomplete="off" #editCampaignModal="ngForm" (ngSubmit)="save()">
+    <abp-modal-header [title]="'EditCampaign' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="name">{{ 'Name' | localize }}</label>
+            <div class="col-md-9">
+                <input
+                    type="text"
+                    class="form-control"
+                    name="name"
+                    id="name"
+                    required
+                    maxlength="256"
+                    [(ngModel)]="campaign.name"
+                    #nameModel="ngModel"
+                    #nameEl />
+                <abp-validation-summary [control]="nameModel" [controlEl]="nameEl"></abp-validation-summary>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="description">{{ 'Description' | localize }}</label>
+            <div class="col-md-9">
+                <textarea
+                    class="form-control"
+                    name="description"
+                    id="description"
+                    rows="3"
+                    maxlength="5000"
+                    [(ngModel)]="campaign.description"></textarea>
+            </div>
+        </div>
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="startDate">{{ 'StartDate' | localize }}</label>
+            <div class="col-md-9">
+                <input
+                    type="date"
+                    class="form-control"
+                    name="startDate"
+                    id="startDate"
+                    required
+                    [(ngModel)]="startDateStr"
+                    #startDateModel="ngModel"
+                    #startDateEl />
+                <abp-validation-summary [control]="startDateModel" [controlEl]="startDateEl"></abp-validation-summary>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="endDate">{{ 'EndDate' | localize }}</label>
+            <div class="col-md-9">
+                <input
+                    type="date"
+                    class="form-control"
+                    name="endDate"
+                    id="endDate"
+                    [(ngModel)]="endDateStr" />
+            </div>
+        </div>
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="status">{{ 'Status' | localize }}</label>
+            <div class="col-md-9">
+                <select class="form-control" name="status" id="status" [(ngModel)]="campaign.status">
+                    @for (s of campaignStatuses; track s.value) {
+                        <option [ngValue]="s.value">{{ s.label }}</option>
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="companyId">{{ 'Company' | localize }}</label>
+            <div class="col-md-9">
+                <select
+                    class="form-control"
+                    name="companyId"
+                    id="companyId"
+                    required
+                    [(ngModel)]="campaign.companyId"
+                    #companyIdModel="ngModel"
+                    #companyIdEl>
+                    <option [ngValue]="undefined" disabled>-- {{ 'SelectCompany' | localize }} --</option>
+                    @for (c of companies; track c.id) {
+                        <option [ngValue]="c.id">{{ c.name }}</option>
+                    }
+                </select>
+                <abp-validation-summary [control]="companyIdModel" [controlEl]="companyIdEl"></abp-validation-summary>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="budget">{{ 'Budget' | localize }}</label>
+            <div class="col-md-9">
+                <input
+                    type="number"
+                    class="form-control"
+                    name="budget"
+                    id="budget"
+                    min="0"
+                    [(ngModel)]="campaign.budget" />
+            </div>
+        </div>
+    </div>
+    <abp-modal-footer
+        [cancelDisabled]="saving"
+        [saveDisabled]="!editCampaignModal.form.valid || saving"
+        (onCancelClick)="bsModalRef.hide()"></abp-modal-footer>
+</form>

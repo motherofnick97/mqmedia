@@ -39,6 +39,16 @@ import { AppComponent } from './app.component';
                         canActivate: [AppRouteGuard],
                     },
                     {
+                        path: 'companies',
+                        loadChildren: () => import('./companies/companies.module').then((m) => m.CompaniesModule),
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
+                        path: 'campaigns',
+                        loadChildren: () => import('./campaigns/campaigns.module').then((m) => m.CampaignsModule),
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
                         path: 'update-password',
                         loadChildren: () => import('./users/users.module').then((m) => m.UsersModule),
                         canActivate: [AppRouteGuard],

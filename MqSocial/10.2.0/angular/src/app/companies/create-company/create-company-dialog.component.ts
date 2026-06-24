@@ -1,0 +1,42 @@
+import { Component, Injector, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
+import { BsModalRef } from 'ngx-bootstrap/modal';
+import { AppComponentBase } from '@shared/app-component-base';
+import { CompanyServiceProxy, CreateCompanyDto } from '@shared/service-proxies/service-proxies';
+import { FormsModule } from '@angular/forms';
+import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
+import { AbpModalFooterComponent } from '../../../shared/components/modal/abp-modal-footer.component';
+import { AbpValidationSummaryComponent } from '../../../shared/components/validation/abp-validation.summary.component';
+import { LocalizePipe } from '@shared/pipes/localize.pipe';
+
+@Component({
+    templateUrl: './create-company-dialog.component.html',
+    standalone: true,
+    imports: [FormsModule, AbpModalHeaderComponent, AbpValidationSummaryComponent, AbpModalFooterComponent, LocalizePipe],
+})
+export class CreateCompanyDialogComponent extends AppComponentBase {
+    @Output() onSave = new EventEmitter<any>();
+
+    saving = false;
+    company = new CreateCompanyDto();
+
+    constructor(
+        injector: Injector,
+        public _companyService: CompanyServiceProxy,
+        public bsModalRef: BsModalRef,
+        private cd: ChangeDetectorRef
+    ) {
+        super(injector);
+    }
+
+    save(): void {
+        this.saving = true;
+        this._companyService.create(this.company).subscribe(
+            () => {
+                this.notify.info(this.l('SavedSuccessfully'));
+                this.bsModalRef.hide();
+                this.onSave.emit();
+            },
+            () => { this.saving = false; }
+        );
+    }
+}
