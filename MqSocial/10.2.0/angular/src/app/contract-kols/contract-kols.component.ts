@@ -9,10 +9,15 @@ import {
     ContractKolDtoPagedResultDto,
     ContractKolStatus,
     ReceiveStatus,
+    ChannelType,
     KolServiceProxy,
     ContractServiceProxy,
+    ContractKolResultServiceProxy,
+    ContractKolResultDto,
+    CreateContractKolResultDto,
 } from '@shared/service-proxies/service-proxies';
 import { CreateContractKolDialogComponent } from './create-contract-kol/create-contract-kol-dialog.component';
+import { ViewContractKolDetailDialogComponent } from './view-contract-kol-detail/view-contract-kol-detail-dialog.component';
 import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
@@ -70,6 +75,14 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     clonedRecords: Record<string, ContractKolDto> = {};
     airTimeDates: Record<string, Date | null> = {};
 
+    // Row expansion — ContractKolResult
+    expandedRows: Record<string, boolean> = {};
+    resultsMap: Record<string, ContractKolResultDto[]> = {};
+    loadingResultsMap: Record<string, boolean> = {};
+    savingResultMap: Record<string, boolean> = {};
+    newResultMap: Record<string, CreateContractKolResultDto> = {};
+    newResultDateMap: Record<string, Date | null> = {};
+
     statusOptions = [
         { value: undefined, label: 'Tất cả' },
         { value: ContractKolStatus.Register, label: 'Đăng ký' },
@@ -115,6 +128,16 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         [ContractKolStatus.Reject]: 'danger',
     };
 
+    channelOptions = [
+        { value: ChannelType.Tiktok, label: 'Tiktok' },
+        { value: ChannelType.Facebook, label: 'Facebook' },
+    ];
+
+    readonly channelLabels: Record<number, string> = {
+        [ChannelType.Tiktok]: 'Tiktok',
+        [ChannelType.Facebook]: 'Facebook',
+    };
+
     receiveStatusOptions = [
         { value: ReceiveStatus.NotShip, label: 'Chưa gửi' },
         { value: ReceiveStatus.Shipping, label: 'Đang gửi' },
@@ -141,6 +164,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         private _contractKolService: ContractKolServiceProxy,
         private _kolService: KolServiceProxy,
         private _contractService: ContractServiceProxy,
+        private _contractKolResultService: ContractKolResultServiceProxy,
         private _modalService: BsModalService,
         cd: ChangeDetectorRef
     ) {
@@ -163,6 +187,92 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     createContractKol(): void {
         const modalRef: BsModalRef = this._modalService.show(CreateContractKolDialogComponent, { class: 'modal-xl' });
         modalRef.content.onSave.subscribe(() => this.refresh());
+    }
+
+    viewDetail(record: ContractKolDto): void {
+        this._modalService.show(ViewContractKolDetailDialogComponent, {
+            class: 'modal-lg',
+            initialState: {
+                record: record,
+                kolName: this.getKolName(record.kolId),
+                contractName: this.getContractName(record.contractId),
+            },
+        });
+    }
+
+    toggleExpand(record: ContractKolDto): void {
+        const id = record.id;
+        if (this.expandedRows[id]) {
+            this.expandedRows[id] = false;
+            delete this.newResultMap[id];
+            delete this.newResultDateMap[id];
+        } else {
+            this.expandedRows[id] = true;
+            if (!this.resultsMap[id]) {
+                this.loadResults(id);
+            }
+            this.initNewResultForm(id);
+        }
+        this.cd.detectChanges();
+    }
+
+    private loadResults(contractKolId: string): void {
+        this.loadingResultsMap[contractKolId] = true;
+        this._contractKolResultService.getAll(contractKolId, undefined, undefined, 0, 500).subscribe({
+            next: (r) => {
+                this.resultsMap[contractKolId] = r.items ?? [];
+                this.loadingResultsMap[contractKolId] = false;
+                this.cd.detectChanges();
+            },
+            error: () => { this.loadingResultsMap[contractKolId] = false; this.cd.detectChanges(); },
+        });
+    }
+
+    private initNewResultForm(contractKolId: string): void {
+        const dto = new CreateContractKolResultDto();
+        dto.contractKolId = contractKolId;
+        dto.channelType = ChannelType.Tiktok;
+        this.newResultMap[contractKolId] = dto;
+        this.newResultDateMap[contractKolId] = null;
+    }
+
+    saveResult(contractKolId: string): void {
+        const dto = this.newResultMap[contractKolId];
+        if (!dto) return;
+        dto.postTime = this.newResultDateMap[contractKolId]
+            ? moment(this.newResultDateMap[contractKolId])
+            : undefined;
+        this.savingResultMap[contractKolId] = true;
+        this._contractKolResultService.create(dto).subscribe({
+            next: (created) => {
+                if (!this.resultsMap[contractKolId]) this.resultsMap[contractKolId] = [];
+                this.resultsMap[contractKolId].push(created);
+                this.initNewResultForm(contractKolId);
+                this.savingResultMap[contractKolId] = false;
+                this.notify.info(this.l('SavedSuccessfully'));
+                this.cd.detectChanges();
+            },
+            error: () => { this.savingResultMap[contractKolId] = false; this.cd.detectChanges(); },
+        });
+    }
+
+    deleteResult(result: ContractKolResultDto): void {
+        abp.message.confirm('Xóa kết quả này?', undefined, (ok: boolean) => {
+            if (!ok) return;
+            this._contractKolResultService.delete(result.id).subscribe(() => {
+                const list = this.resultsMap[result.contractKolId];
+                if (list) {
+                    const idx = list.findIndex(r => r.id === result.id);
+                    if (idx !== -1) list.splice(idx, 1);
+                }
+                abp.notify.success(this.l('SuccessfullyDeleted'));
+                this.cd.detectChanges();
+            });
+        });
+    }
+
+    getChannelLabel(c: ChannelType | undefined): string {
+        return c != null ? (this.channelLabels[c] ?? '') : '—';
     }
 
     initRow(record: ContractKolDto): void {

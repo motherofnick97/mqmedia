@@ -5,6 +5,7 @@ import { ContractKolsRoutingModule } from './contract-kols-routing.module';
 import { ContractKolsComponent } from './contract-kols.component';
 import { CreateContractKolDialogComponent } from './create-contract-kol/create-contract-kol-dialog.component';
 import { EditContractKolDialogComponent } from './edit-contract-kol/edit-contract-kol-dialog.component';
+import { ViewContractKolDetailDialogComponent } from './view-contract-kol-detail/view-contract-kol-detail-dialog.component';
 
 @NgModule({
     imports: [
@@ -14,6 +15,7 @@ import { EditContractKolDialogComponent } from './edit-contract-kol/edit-contrac
         ContractKolsComponent,
         CreateContractKolDialogComponent,
         EditContractKolDialogComponent,
+        ViewContractKolDetailDialogComponent,
     ],
 })
 export class ContractKolsModule {}

@@ -68,7 +68,8 @@
 
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width:160px; position:sticky; left:0; z-index:2; background:#f8f9fa">KOL</th>
+                                    <th style="width:3rem; position:sticky; left:0; z-index:2; background:#f8f9fa"></th>
+                                    <th style="width:160px; position:sticky; left:3rem; z-index:2; background:#f8f9fa">KOL</th>
                                     <th style="width:160px">Hợp đồng</th>
                                     <th style="width:150px">Trạng thái</th>
                                     <th style="width:110px" pSortableColumn="cash">Cash <p-sortIcon field="cash"></p-sortIcon></th>
@@ -92,8 +93,15 @@
                             <ng-template pTemplate="body" let-record="$implicit" let-editing="editing" let-ri="rowIndex">
                                 <tr [pEditableRow]="record">
 
-                                    <!-- KOL (readonly - chỉ đổi trong create) -->
+                                    <!-- Row expander -->
                                     <td style="position:sticky; left:0; z-index:1; background:inherit">
+                                        <button type="button" class="btn btn-sm btn-light border-0" (click)="toggleExpand(record)">
+                                            <i [class]="expandedRows[record.id] ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"></i>
+                                        </button>
+                                    </td>
+
+                                    <!-- KOL (readonly - chỉ đổi trong create) -->
+                                    <td style="position:sticky; left:3rem; z-index:1; background:inherit">
                                         <strong>{{ getKolName(record.kolId) }}</strong>
                                     </td>
 
@@ -297,6 +305,10 @@
                                     <td style="position:sticky; right:0; z-index:1; background:inherit">
                                         <div class="d-flex" style="gap: 0.25rem">
                                             @if (!editing) {
+                                                <p-button icon="pi pi-eye" size="small" severity="info"
+                                                    pTooltip="Xem chi tiết" tooltipPosition="top"
+                                                    (onClick)="viewDetail(record)">
+                                                </p-button>
                                                 <p-button icon="pi pi-pencil" size="small" severity="secondary"
                                                     pTooltip="Sửa" tooltipPosition="top"
                                                     (onClick)="initRow(record)">
@@ -319,6 +331,121 @@
                                     </td>
 
                                 </tr>
+
+                                <!-- ── ContractKolResult expansion ── -->
+                                @if (expandedRows[record.id]) {
+                                <tr>
+                                    <td colspan="19" style="padding: 0.75rem 1rem; background: #f4f6f9">
+
+                                        <!-- Header -->
+                                        <div class="d-flex align-items-center mb-2" style="gap: 0.5rem">
+                                            <span class="font-weight-bold text-primary">Kết quả bài đăng</span>
+                                            @if (loadingResultsMap[record.id]) {
+                                                <i class="pi pi-spin pi-spinner"></i>
+                                            }
+                                        </div>
+
+                                        <!-- Results sub-table -->
+                                        @if (resultsMap[record.id]?.length > 0) {
+                                            <table class="table table-sm table-bordered mb-3" style="background:#fff">
+                                                <thead class="thead-light">
+                                                    <tr>
+                                                        <th>Ngày đăng</th>
+                                                        <th>Kênh</th>
+                                                        <th>Link bài</th>
+                                                        <th class="text-right">View</th>
+                                                        <th class="text-right">Comment</th>
+                                                        <th class="text-right">Save</th>
+                                                        <th class="text-right">Share</th>
+                                                        <th style="width:60px"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @for (r of resultsMap[record.id]; track r.id) {
+                                                        <tr>
+                                                            <td>{{ r.postTime ? (r.postTime | date:'dd/MM/yyyy') : '—' }}</td>
+                                                            <td>{{ getChannelLabel(r.channelType) }}</td>
+                                                            <td>
+                                                                @if (r.postLink) {
+                                                                    <a [href]="r.postLink" target="_blank" rel="noopener" class="text-truncate d-block" style="max-width:200px">{{ r.postLink }}</a>
+                                                                } @else { — }
+                                                            </td>
+                                                            <td class="text-right">{{ r.view | number }}</td>
+                                                            <td class="text-right">{{ r.comment | number }}</td>
+                                                            <td class="text-right">{{ r.save | number }}</td>
+                                                            <td class="text-right">{{ r.share | number }}</td>
+                                                            <td>
+                                                                <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true"
+                                                                    pTooltip="Xóa" tooltipPosition="top"
+                                                                    (onClick)="deleteResult(r)">
+                                                                </p-button>
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        } @else if (!loadingResultsMap[record.id]) {
+                                            <p class="text-muted small mb-3">Chưa có kết quả nào.</p>
+                                        }
+
+                                        <!-- Add new result form -->
+                                        @if (newResultMap[record.id]) {
+                                            <div class="border rounded p-3" style="background:#fff">
+                                                <div class="font-weight-bold mb-2 small text-uppercase text-secondary">Thêm kết quả mới</div>
+                                                <div class="row" style="row-gap: 0.5rem">
+                                                    <div class="col-md-2">
+                                                        <label class="small mb-1 d-block">Ngày đăng</label>
+                                                        <p-datepicker [(ngModel)]="newResultDateMap[record.id]"
+                                                            dateFormat="dd/mm/yy" [showIcon]="true"
+                                                            [fluid]="true" appendTo="body">
+                                                        </p-datepicker>
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        <label class="small mb-1 d-block">Kênh</label>
+                                                        <p-select [(ngModel)]="newResultMap[record.id].channelType"
+                                                            [options]="channelOptions" optionLabel="label" optionValue="value"
+                                                            [fluid]="true" appendTo="body">
+                                                        </p-select>
+                                                    </div>
+                                                    <div class="col-md-4">
+                                                        <label class="small mb-1 d-block">Link bài đăng</label>
+                                                        <input pInputText [(ngModel)]="newResultMap[record.id].postLink"
+                                                            placeholder="https://..." class="w-100" />
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="small mb-1 d-block">View</label>
+                                                        <p-inputnumber [(ngModel)]="newResultMap[record.id].view"
+                                                            [min]="0" [fluid]="true"></p-inputnumber>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="small mb-1 d-block">Comment</label>
+                                                        <p-inputnumber [(ngModel)]="newResultMap[record.id].comment"
+                                                            [min]="0" [fluid]="true"></p-inputnumber>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="small mb-1 d-block">Save</label>
+                                                        <p-inputnumber [(ngModel)]="newResultMap[record.id].save"
+                                                            [min]="0" [fluid]="true"></p-inputnumber>
+                                                    </div>
+                                                    <div class="col-md-1">
+                                                        <label class="small mb-1 d-block">Share</label>
+                                                        <p-inputnumber [(ngModel)]="newResultMap[record.id].share"
+                                                            [min]="0" [fluid]="true"></p-inputnumber>
+                                                    </div>
+                                                </div>
+                                                <div class="mt-2">
+                                                    <p-button label="Thêm" icon="pi pi-plus" size="small"
+                                                        [loading]="savingResultMap[record.id]"
+                                                        (onClick)="saveResult(record.id)">
+                                                    </p-button>
+                                                </div>
+                                            </div>
+                                        }
+
+                                    </td>
+                                </tr>
+                                }
+
                             </ng-template>
 
                         </p-table>

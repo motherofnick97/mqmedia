@@ -8,11 +8,9 @@ import { AbpValidationSummaryComponent } from '../../../shared/components/valida
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
-import { DatePicker } from 'primeng/datepicker';
 import { Select } from 'primeng/select';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
-import moment from 'moment';
 
 @Component({
     templateUrl: './edit-kol-dialog.component.html',
@@ -24,7 +22,6 @@ import moment from 'moment';
         LocalizePipe,
         InputText,
         Textarea,
-        DatePicker,
         Select,
         InputNumber,
         Button,
@@ -36,7 +33,6 @@ export class EditKolDialogComponent extends AppComponentBase implements OnInit {
     saving = false;
     kol = new KolDto();
     id: string;
-    endDate: Date | null = null;
 
     careerOptions = [
         { value: KolCareer.DuocSi, label: 'Dược sĩ' },
@@ -61,15 +57,12 @@ export class EditKolDialogComponent extends AppComponentBase implements OnInit {
     ngOnInit(): void {
         this._kolService.get(this.id).subscribe((result) => {
             this.kol = result;
-            this.endDate = result.endDate ? result.endDate.toDate() : null;
             this.cd.detectChanges();
         });
     }
 
     save(): void {
         this.saving = true;
-        this.kol.endDate = this.endDate ? moment(this.endDate) : undefined;
-
         this._kolService.update(this.kol).subscribe({
             next: () => {
                 this.notify.info(this.l('SavedSuccessfully'));

@@ -10,7 +10,7 @@ import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';

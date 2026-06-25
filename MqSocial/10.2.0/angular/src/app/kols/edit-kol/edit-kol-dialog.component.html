@@ -43,6 +43,22 @@
         </div>
 
         <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="phone">{{ 'Phone' | localize }}</label>
+            <div class="col-md-9">
+                <input pInputText type="text" name="phone" id="phone" maxlength="50"
+                    [(ngModel)]="kol.phone" style="width:100%" />
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="address">{{ 'Address' | localize }}</label>
+            <div class="col-md-9">
+                <input pInputText type="text" name="address" id="address" maxlength="500"
+                    [(ngModel)]="kol.address" style="width:100%" />
+            </div>
+        </div>
+
+        <div class="form-group row">
             <label class="col-md-3 col-form-label" for="follow">Follow</label>
             <div class="col-md-9">
                 <p-inputnumber name="follow" inputId="follow" [(ngModel)]="kol.follow"
@@ -57,15 +73,6 @@
                 <p-inputnumber name="generalCast" inputId="generalCast" [(ngModel)]="kol.generalCast"
                     [min]="0" mode="decimal" [fluid]="true">
                 </p-inputnumber>
-            </div>
-        </div>
-
-        <div class="form-group row">
-            <label class="col-md-3 col-form-label" for="endDate">{{ 'EndDate' | localize }}</label>
-            <div class="col-md-9">
-                <p-datepicker name="endDate" inputId="endDate" [(ngModel)]="endDate"
-                    dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true" [fluid]="true">
-                </p-datepicker>
             </div>
         </div>
 

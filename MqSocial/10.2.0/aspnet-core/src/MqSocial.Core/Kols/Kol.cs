@@ -23,8 +23,6 @@ public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
     [StringLength(MaxNameLength)]
     public string Link { get; set; }
 
-    public DateTime? EndDate { get; set; }
-
     public KolCareer Career { get; set; }
 
     [Required]

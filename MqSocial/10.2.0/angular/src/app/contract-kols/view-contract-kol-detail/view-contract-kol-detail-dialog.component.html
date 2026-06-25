@@ -1,0 +1,106 @@
+<abp-modal-header [title]="'Chi tiết KOL Hợp đồng'" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+<div class="modal-body">
+
+    <!-- Thông tin chung -->
+    <h6 class="text-primary border-bottom pb-1 mb-3">Thông tin chung</h6>
+    <div class="row mb-3">
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">KOL</div>
+            <div class="fw-semibold">{{ kolName }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Hợp đồng</div>
+            <div class="fw-semibold">{{ contractName }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Trạng thái</div>
+            <p-tag [severity]="getStatusSeverity(record.status)" [value]="getStatusLabel(record.status)"></p-tag>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Ngày air</div>
+            <div>{{ record.airTime ? (record.airTime | date: 'dd/MM/yyyy') : '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Chi phí (Cash)</div>
+            <div>{{ record.cash != null ? (record.cash | number) : '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Thanh toán (Payment)</div>
+            <div>{{ record.payment != null ? (record.payment | number) : '—' }}</div>
+        </div>
+    </div>
+
+    <!-- Mẫu sản phẩm -->
+    <h6 class="text-primary border-bottom pb-1 mb-3">Mẫu sản phẩm</h6>
+    <div class="row mb-3">
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Tên mẫu</div>
+            <div>{{ record.sampleName || '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Size</div>
+            <div>{{ record.sampleSize || '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Số lượng</div>
+            <div>{{ record.sampleQuantity != null ? record.sampleQuantity : '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Trạng thái nhận mẫu</div>
+            @if (record.sampleReceiveStatus != null) {
+                <p-tag
+                    [severity]="getReceiveStatusSeverity(record.sampleReceiveStatus)"
+                    [value]="getReceiveStatusLabel(record.sampleReceiveStatus)">
+                </p-tag>
+            } @else {
+                <span>—</span>
+            }
+        </div>
+    </div>
+
+    <!-- Nội dung -->
+    <h6 class="text-primary border-bottom pb-1 mb-3">Nội dung</h6>
+    <div class="row mb-3">
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Brief</div>
+            <div style="white-space: pre-wrap">{{ record.brief || '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Brief Link</div>
+            @if (record.briefLink) {
+                <a [href]="record.briefLink" target="_blank">{{ record.briefLink }}</a>
+            } @else {
+                <span>—</span>
+            }
+        </div>
+        <div class="col-12 mb-2">
+            <div class="text-muted small mb-1">Caption</div>
+            <div style="white-space: pre-wrap">{{ record.caption || '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Hashtag</div>
+            <div>{{ record.hashTag || '—' }}</div>
+        </div>
+        <div class="col-12 mb-2">
+            <div class="text-muted small mb-1">Feedback</div>
+            <div style="white-space: pre-wrap">{{ record.feedback || '—' }}</div>
+        </div>
+    </div>
+
+    <!-- Hình ảnh & Review -->
+    <h6 class="text-primary border-bottom pb-1 mb-3">Hình ảnh & Review</h6>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Portrait</div>
+            <div>{{ record.portrait || '—' }}</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="text-muted small mb-1">Review Corner</div>
+            <div>{{ record.reviewCorner || '—' }}</div>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <p-button [label]="'Close' | localize" severity="secondary" (onClick)="bsModalRef.hide()"></p-button>
+</div>

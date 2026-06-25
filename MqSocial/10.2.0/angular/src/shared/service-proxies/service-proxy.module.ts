@@ -18,6 +18,7 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.KolServiceProxy,
         ApiServiceProxies.ContractServiceProxy,
         ApiServiceProxies.ContractKolServiceProxy,
+        ApiServiceProxies.ContractKolResultServiceProxy,
         { provide: HTTP_INTERCEPTORS, useClass: AbpHttpInterceptor, multi: true },
     ],
 })

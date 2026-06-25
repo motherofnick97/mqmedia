@@ -3906,11 +3906,13 @@ export interface IKolDto {
     name: string | undefined;
     note: string | undefined;
     link: string | undefined;
-    endDate: moment.Moment | undefined;
     career: KolCareer | undefined;
     channel: ChannelType | undefined;
     generalCast: number | undefined;
     follow: number | undefined;
+    accountId: string | undefined;
+    address: string | undefined;
+    phone: string | undefined;
 }
 
 export class KolDto implements IKolDto {
@@ -3918,11 +3920,13 @@ export class KolDto implements IKolDto {
     name: string | undefined;
     note: string | undefined;
     link: string | undefined;
-    endDate: moment.Moment | undefined;
     career: KolCareer | undefined;
     channel: ChannelType | undefined;
     generalCast: number | undefined;
     follow: number | undefined;
+    accountId: string | undefined;
+    address: string | undefined;
+    phone: string | undefined;
 
     constructor(data?: IKolDto) {
         if (data) {
@@ -3939,11 +3943,13 @@ export class KolDto implements IKolDto {
             this.name = _data["name"];
             this.note = _data["note"];
             this.link = _data["link"];
-            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
             this.career = _data["career"];
             this.channel = _data["channel"];
             this.generalCast = _data["generalCast"];
             this.follow = _data["follow"];
+            this.accountId = _data["accountId"];
+            this.address = _data["address"];
+            this.phone = _data["phone"];
         }
     }
 
@@ -3960,11 +3966,13 @@ export class KolDto implements IKolDto {
         data["name"] = this.name;
         data["note"] = this.note;
         data["link"] = this.link;
-        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         data["career"] = this.career;
         data["channel"] = this.channel;
         data["generalCast"] = this.generalCast;
         data["follow"] = this.follow;
+        data["accountId"] = this.accountId;
+        data["address"] = this.address;
+        data["phone"] = this.phone;
         return data;
     }
 
@@ -3980,24 +3988,26 @@ export interface ICreateKolDto {
     name: string | undefined;
     note: string | undefined;
     link: string | undefined;
-    endDate: moment.Moment | undefined;
     career: KolCareer | undefined;
     channel: ChannelType | undefined;
     generalCast: number | undefined;
     follow: number | undefined;
     accountId: string | undefined;
+    address: string | undefined;
+    phone: string | undefined;
 }
 
 export class CreateKolDto implements ICreateKolDto {
     name: string | undefined;
     note: string | undefined;
     link: string | undefined;
-    endDate: moment.Moment | undefined;
     career: KolCareer | undefined;
     channel: ChannelType | undefined;
     generalCast: number | undefined;
     follow: number | undefined = 0;
     accountId: string | undefined;
+    address: string | undefined;
+    phone: string | undefined;
 
     constructor(data?: ICreateKolDto) {
         if (data) {
@@ -4013,12 +4023,13 @@ export class CreateKolDto implements ICreateKolDto {
             this.name = _data["name"];
             this.note = _data["note"];
             this.link = _data["link"];
-            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
             this.career = _data["career"];
             this.channel = _data["channel"];
             this.generalCast = _data["generalCast"];
             this.follow = _data["follow"] ?? 0;
             this.accountId = _data["accountId"];
+            this.address = _data["address"];
+            this.phone = _data["phone"];
         }
     }
 
@@ -4034,12 +4045,13 @@ export class CreateKolDto implements ICreateKolDto {
         data["name"] = this.name;
         data["note"] = this.note;
         data["link"] = this.link;
-        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
         data["career"] = this.career;
         data["channel"] = this.channel;
         data["generalCast"] = this.generalCast;
         data["follow"] = this.follow;
         data["accountId"] = this.accountId;
+        data["address"] = this.address;
+        data["phone"] = this.phone;
         return data;
     }
 
@@ -5611,6 +5623,291 @@ export class ApiException extends Error {
         return obj.isApiException === true;
     }
 }
+
+// ─── ContractKolResult ───────────────────────────────────────────────────────
+
+export interface IContractKolResultDto {
+    id: string;
+    contractKolId: string;
+    postTime: moment.Moment | undefined;
+    postLink: string | undefined;
+    view: number | undefined;
+    comment: number | undefined;
+    save: number | undefined;
+    share: number | undefined;
+    channelType: ChannelType | undefined;
+}
+
+export class ContractKolResultDto implements IContractKolResultDto {
+    id: string;
+    contractKolId: string;
+    postTime: moment.Moment | undefined;
+    postLink: string | undefined;
+    view: number | undefined;
+    comment: number | undefined;
+    save: number | undefined;
+    share: number | undefined;
+    channelType: ChannelType | undefined;
+
+    constructor(data?: IContractKolResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.contractKolId = _data["contractKolId"];
+            this.postTime = _data["postTime"] ? moment(_data["postTime"]) : undefined;
+            this.postLink = _data["postLink"];
+            this.view = _data["view"];
+            this.comment = _data["comment"];
+            this.save = _data["save"];
+            this.share = _data["share"];
+            this.channelType = _data["channelType"];
+        }
+    }
+
+    static fromJS(data: any): ContractKolResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractKolResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["contractKolId"] = this.contractKolId;
+        data["postTime"] = this.postTime ? this.postTime.toISOString() : undefined;
+        data["postLink"] = this.postLink;
+        data["view"] = this.view;
+        data["comment"] = this.comment;
+        data["save"] = this.save;
+        data["share"] = this.share;
+        data["channelType"] = this.channelType;
+        return data;
+    }
+}
+
+export interface ICreateContractKolResultDto {
+    contractKolId: string;
+    postTime: moment.Moment | undefined;
+    postLink: string | undefined;
+    view: number | undefined;
+    comment: number | undefined;
+    save: number | undefined;
+    share: number | undefined;
+    channelType: ChannelType;
+}
+
+export class CreateContractKolResultDto implements ICreateContractKolResultDto {
+    contractKolId: string;
+    postTime: moment.Moment | undefined;
+    postLink: string | undefined;
+    view: number | undefined;
+    comment: number | undefined;
+    save: number | undefined;
+    share: number | undefined;
+    channelType: ChannelType;
+
+    constructor(data?: ICreateContractKolResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.contractKolId = _data["contractKolId"];
+            this.postTime = _data["postTime"] ? moment(_data["postTime"]) : undefined;
+            this.postLink = _data["postLink"];
+            this.view = _data["view"];
+            this.comment = _data["comment"];
+            this.save = _data["save"];
+            this.share = _data["share"];
+            this.channelType = _data["channelType"];
+        }
+    }
+
+    static fromJS(data: any): CreateContractKolResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContractKolResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["contractKolId"] = this.contractKolId;
+        data["postTime"] = this.postTime ? this.postTime.toISOString() : undefined;
+        data["postLink"] = this.postLink;
+        data["view"] = this.view;
+        data["comment"] = this.comment;
+        data["save"] = this.save;
+        data["share"] = this.share;
+        data["channelType"] = this.channelType;
+        return data;
+    }
+}
+
+export class ContractKolResultDtoPagedResultDto {
+    totalCount: number;
+    items: ContractKolResultDto[] | undefined;
+
+    constructor(data?: any) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"]) this.items!.push(ContractKolResultDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContractKolResultDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractKolResultDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+}
+
+@Injectable()
+export class ContractKolResultServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(contractKolId: string | undefined, channelType: ChannelType | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<ContractKolResultDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKolResult/GetAll?";
+        if (contractKolId !== undefined && contractKolId !== null) url_ += "ContractKolId=" + encodeURIComponent("" + contractKolId) + "&";
+        if (channelType !== undefined && channelType !== null) url_ += "ChannelType=" + encodeURIComponent("" + channelType) + "&";
+        if (sorting !== undefined && sorting !== null) url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null) url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null) url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolResultDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolResultDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<ContractKolResultDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolResultDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateContractKolResultDto | undefined): Observable<ContractKolResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKolResult/Create";
+
+        const content_ = JSON.stringify(body ? body.toJSON() : null);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json-patch+json", "Accept": "text/plain" }) };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolResultDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ContractKolResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKolResult/Delete?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({}) };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200 || status === 204) {
+            return _observableOf(null as any);
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): Observable<any> {
     if (result !== null && result !== undefined)

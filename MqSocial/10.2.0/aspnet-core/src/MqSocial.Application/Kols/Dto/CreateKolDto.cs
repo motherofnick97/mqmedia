@@ -17,8 +17,6 @@ public class CreateKolDto
     [StringLength(Kol.MaxNameLength)]
     public string Link { get; set; }
 
-    public DateTime? EndDate { get; set; }
-
     public KolCareer Career { get; set; }
 
     public ChannelType Channel { get; set; }
@@ -28,5 +26,10 @@ public class CreateKolDto
     public int Follow { get; set; }
 
     public string AccountId { get; set; }
+
+    public string Address { get; set; }
+
+    public string Phone { get; set; }
+
 
 }
