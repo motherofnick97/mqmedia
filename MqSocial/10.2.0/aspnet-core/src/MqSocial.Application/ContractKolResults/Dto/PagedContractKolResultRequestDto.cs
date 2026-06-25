@@ -17,7 +17,7 @@ public class PagedContractKolResultRequestDto : PagedResultRequestDto, IShouldNo
     {
         if (string.IsNullOrEmpty(Sorting))
         {
-            Sorting = "Id";
+            Sorting = "CreationTime";
         }
     }
 }

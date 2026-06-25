@@ -12,6 +12,7 @@ using System;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace MqSocial.ContractKols;
 
@@ -35,6 +36,6 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
 
     protected override IQueryable<ContractKol> ApplySorting(IQueryable<ContractKol> query, PagedContractKolRequestDto input)
     {
-        return query.OrderBy(x => x.Id);
+        return query.OrderBy(input.Sorting);
     }
 }

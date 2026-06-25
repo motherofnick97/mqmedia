@@ -20,7 +20,7 @@ public class CampaignDto : EntityDto<Guid>
 
     public CampaignStatus Status { get; set; }
 
-    public decimal? Budget { get; set; }
+    public int? Budget { get; set; }
 
     public Guid? CompanyId { get; set; }
 }

@@ -19,7 +19,7 @@ public class PagedKolRequestDto : PagedResultRequestDto, IShouldNormalize
     {
         if (string.IsNullOrEmpty(Sorting))
         {
-            Sorting = "Name";
+            Sorting = "CreationTime";
         }
 
         Keyword = Keyword?.Trim();

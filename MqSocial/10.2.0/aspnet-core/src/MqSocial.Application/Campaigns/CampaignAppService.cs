@@ -7,6 +7,7 @@ using MqSocial.Authorization;
 using MqSocial.Campaigns.Dto;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace MqSocial.Campaigns;
 
@@ -23,12 +24,11 @@ public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, Gui
         return Repository.GetAll()
             .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), x =>
                 x.Name.Contains(input.Keyword) ||
-                x.Description.Contains(input.Keyword))
-            .WhereIf(input.Status.HasValue, x => x.Status == input.Status.Value);
+                x.Description.Contains(input.Keyword));
     }
 
     protected override IQueryable<Campaign> ApplySorting(IQueryable<Campaign> query, PagedCampaignRequestDto input)
     {
-        return query.OrderBy(x => x.GetType().GetProperty(input.Sorting));
+        return query.OrderBy(input.Sorting);
     }
 }

@@ -7,6 +7,7 @@ using MqSocial.Authorization;
 using MqSocial.Contracts.Dto;
 using System;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 
 namespace MqSocial.Contracts;
 
@@ -29,6 +30,6 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Gui
 
     protected override IQueryable<Contract> ApplySorting(IQueryable<Contract> query, PagedContractRequestDto input)
     {
-        return query.OrderBy(x => x.Name);
+        return query.OrderBy(input.Sorting);
     }
 }

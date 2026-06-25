@@ -21,6 +21,7 @@ using System.Net;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using System.Linq.Dynamic.Core;
 
 namespace MqSocial.Kols;
 
@@ -49,6 +50,6 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
     protected override IQueryable<Kol> ApplySorting(IQueryable<Kol> query, PagedKolRequestDto input)
     {
-        return query.OrderBy(x => x.Name);
+        return query.OrderBy(input.Sorting);
     }
 }
