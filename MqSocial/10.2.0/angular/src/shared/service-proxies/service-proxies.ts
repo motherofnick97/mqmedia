@@ -3890,6 +3890,1282 @@ const responseBlob = response instanceof HttpResponse ? response.body : (respons
     }
 }
 
+export enum KolCareer {
+    DuocSi = 1,
+    BacSi = 2,
+    Mom = 3,
+}
+
+export enum ChannelType {
+    Tiktok = 1,
+    Facebook = 2,
+}
+
+export interface IKolDto {
+    id: string;
+    name: string | undefined;
+    note: string | undefined;
+    link: string | undefined;
+    endDate: moment.Moment | undefined;
+    career: KolCareer | undefined;
+    channel: ChannelType | undefined;
+    generalCast: number | undefined;
+    follow: number | undefined;
+}
+
+export class KolDto implements IKolDto {
+    id: string;
+    name: string | undefined;
+    note: string | undefined;
+    link: string | undefined;
+    endDate: moment.Moment | undefined;
+    career: KolCareer | undefined;
+    channel: ChannelType | undefined;
+    generalCast: number | undefined;
+    follow: number | undefined;
+
+    constructor(data?: IKolDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.note = _data["note"];
+            this.link = _data["link"];
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.career = _data["career"];
+            this.channel = _data["channel"];
+            this.generalCast = _data["generalCast"];
+            this.follow = _data["follow"];
+        }
+    }
+
+    static fromJS(data: any): KolDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KolDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["note"] = this.note;
+        data["link"] = this.link;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["career"] = this.career;
+        data["channel"] = this.channel;
+        data["generalCast"] = this.generalCast;
+        data["follow"] = this.follow;
+        return data;
+    }
+
+    clone(): KolDto {
+        const json = this.toJSON();
+        let result = new KolDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateKolDto {
+    name: string | undefined;
+    note: string | undefined;
+    link: string | undefined;
+    endDate: moment.Moment | undefined;
+    career: KolCareer | undefined;
+    channel: ChannelType | undefined;
+    generalCast: number | undefined;
+    follow: number | undefined;
+    accountId: string | undefined;
+}
+
+export class CreateKolDto implements ICreateKolDto {
+    name: string | undefined;
+    note: string | undefined;
+    link: string | undefined;
+    endDate: moment.Moment | undefined;
+    career: KolCareer | undefined;
+    channel: ChannelType | undefined;
+    generalCast: number | undefined;
+    follow: number | undefined = 0;
+    accountId: string | undefined;
+
+    constructor(data?: ICreateKolDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.note = _data["note"];
+            this.link = _data["link"];
+            this.endDate = _data["endDate"] ? moment(_data["endDate"].toString()) : <any>undefined;
+            this.career = _data["career"];
+            this.channel = _data["channel"];
+            this.generalCast = _data["generalCast"];
+            this.follow = _data["follow"] ?? 0;
+            this.accountId = _data["accountId"];
+        }
+    }
+
+    static fromJS(data: any): CreateKolDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateKolDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["note"] = this.note;
+        data["link"] = this.link;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : <any>undefined;
+        data["career"] = this.career;
+        data["channel"] = this.channel;
+        data["generalCast"] = this.generalCast;
+        data["follow"] = this.follow;
+        data["accountId"] = this.accountId;
+        return data;
+    }
+
+    clone(): CreateKolDto {
+        const json = this.toJSON();
+        let result = new CreateKolDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IKolDtoPagedResultDto {
+    totalCount: number;
+    items: KolDto[] | undefined;
+}
+
+export class KolDtoPagedResultDto implements IKolDtoPagedResultDto {
+    totalCount: number;
+    items: KolDto[] | undefined;
+
+    constructor(data?: IKolDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(KolDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): KolDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KolDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): KolDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new KolDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+@Injectable()
+export class KolServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(keyword: string | undefined, career: KolCareer | undefined, channel: ChannelType | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<KolDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Kol/GetAll?";
+        if (keyword !== undefined && keyword !== null) url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (career !== undefined && career !== null) url_ += "Career=" + encodeURIComponent("" + career) + "&";
+        if (channel !== undefined && channel !== null) url_ += "Channel=" + encodeURIComponent("" + channel) + "&";
+        if (sorting !== undefined && sorting !== null) url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null) url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null) url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<KolDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: string | undefined): Observable<KolDto> {
+        let url_ = this.baseUrl + "/api/services/app/Kol/Get?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGet(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<KolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateKolDto | undefined): Observable<KolDto> {
+        let url_ = this.baseUrl + "/api/services/app/Kol/Create";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<KolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    update(body: KolDto | undefined): Observable<KolDto> {
+        let url_ = this.baseUrl + "/api/services/app/Kol/Update";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processUpdate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<KolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Kol/Delete?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({}) };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export enum ContractKolStatus {
+    Register = 1,
+    Approve = 2,
+    Processing = 3,
+    MktOk = 4,
+    DpmOk = 5,
+    OnAir = 6,
+    Following = 7,
+    Paid = 8,
+    Done = 9,
+    Cancel = 10,
+    Reject = 11,
+}
+
+export enum ReceiveStatus {
+    NotShip = 1,
+    Shipping = 2,
+    Received = 3,
+    NotReceived = 4,
+}
+
+export interface IContractKolDto {
+    id: string;
+    kolId: string | undefined;
+    contractId: string | undefined;
+    status: ContractKolStatus | undefined;
+    cash: number | undefined;
+    payment: number | undefined;
+    tenantId: number | undefined;
+    portrait: string | undefined;
+    reviewCorner: string | undefined;
+    sampleSize: string | undefined;
+    sampleName: string | undefined;
+    sampleQuantity: number | undefined;
+    sampleReceiveStatus: ReceiveStatus | undefined;
+    airTime: moment.Moment | undefined;
+    brief: string | undefined;
+    briefLink: string | undefined;
+    feedback: string | undefined;
+    caption: string | undefined;
+    hashTag: string | undefined;
+}
+
+export class ContractKolDto implements IContractKolDto {
+    id: string;
+    kolId: string | undefined;
+    contractId: string | undefined;
+    status: ContractKolStatus | undefined;
+    cash: number | undefined;
+    payment: number | undefined;
+    tenantId: number | undefined;
+    portrait: string | undefined;
+    reviewCorner: string | undefined;
+    sampleSize: string | undefined;
+    sampleName: string | undefined;
+    sampleQuantity: number | undefined;
+    sampleReceiveStatus: ReceiveStatus | undefined;
+    airTime: moment.Moment | undefined;
+    brief: string | undefined;
+    briefLink: string | undefined;
+    feedback: string | undefined;
+    caption: string | undefined;
+    hashTag: string | undefined;
+
+    constructor(data?: IContractKolDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.kolId = _data["kolId"];
+            this.contractId = _data["contractId"];
+            this.status = _data["status"];
+            this.cash = _data["cash"];
+            this.payment = _data["payment"];
+            this.tenantId = _data["tenantId"];
+            this.portrait = _data["portrait"];
+            this.reviewCorner = _data["reviewCorner"];
+            this.sampleSize = _data["sampleSize"];
+            this.sampleName = _data["sampleName"];
+            this.sampleQuantity = _data["sampleQuantity"];
+            this.sampleReceiveStatus = _data["sampleReceiveStatus"];
+            this.airTime = _data["airTime"] ? moment(_data["airTime"]) : undefined;
+            this.brief = _data["brief"];
+            this.briefLink = _data["briefLink"];
+            this.feedback = _data["feedback"];
+            this.caption = _data["caption"];
+            this.hashTag = _data["hashTag"];
+        }
+    }
+
+    static fromJS(data: any): ContractKolDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractKolDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["kolId"] = this.kolId;
+        data["contractId"] = this.contractId;
+        data["status"] = this.status;
+        data["cash"] = this.cash;
+        data["payment"] = this.payment;
+        data["tenantId"] = this.tenantId;
+        data["portrait"] = this.portrait;
+        data["reviewCorner"] = this.reviewCorner;
+        data["sampleSize"] = this.sampleSize;
+        data["sampleName"] = this.sampleName;
+        data["sampleQuantity"] = this.sampleQuantity;
+        data["sampleReceiveStatus"] = this.sampleReceiveStatus;
+        data["airTime"] = this.airTime ? this.airTime.toISOString() : undefined;
+        data["brief"] = this.brief;
+        data["briefLink"] = this.briefLink;
+        data["feedback"] = this.feedback;
+        data["caption"] = this.caption;
+        data["hashTag"] = this.hashTag;
+        return data;
+    }
+
+    clone(): ContractKolDto {
+        const json = this.toJSON();
+        let result = new ContractKolDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateContractKolDto {
+    kolId: string | undefined;
+    contractId: string | undefined;
+    status: ContractKolStatus | undefined;
+    cash: number | undefined;
+    payment: number | undefined;
+    portrait: string | undefined;
+    reviewCorner: string | undefined;
+    sampleSize: string | undefined;
+    sampleName: string | undefined;
+    sampleQuantity: number | undefined;
+    sampleReceiveStatus: ReceiveStatus | undefined;
+    airTime: moment.Moment | undefined;
+    brief: string | undefined;
+    briefLink: string | undefined;
+    feedback: string | undefined;
+    caption: string | undefined;
+    hashTag: string | undefined;
+}
+
+export class CreateContractKolDto implements ICreateContractKolDto {
+    kolId: string | undefined;
+    contractId: string | undefined;
+    status: ContractKolStatus | undefined = ContractKolStatus.Register;
+    cash: number | undefined = 0;
+    payment: number | undefined = 0;
+    portrait: string | undefined;
+    reviewCorner: string | undefined;
+    sampleSize: string | undefined;
+    sampleName: string | undefined;
+    sampleQuantity: number | undefined = 0;
+    sampleReceiveStatus: ReceiveStatus | undefined;
+    airTime: moment.Moment | undefined;
+    brief: string | undefined;
+    briefLink: string | undefined;
+    feedback: string | undefined;
+    caption: string | undefined;
+    hashTag: string | undefined;
+
+    constructor(data?: ICreateContractKolDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.kolId = _data["kolId"];
+            this.contractId = _data["contractId"];
+            this.status = _data["status"];
+            this.cash = _data["cash"];
+            this.payment = _data["payment"];
+            this.portrait = _data["portrait"];
+            this.reviewCorner = _data["reviewCorner"];
+            this.sampleSize = _data["sampleSize"];
+            this.sampleName = _data["sampleName"];
+            this.sampleQuantity = _data["sampleQuantity"];
+            this.sampleReceiveStatus = _data["sampleReceiveStatus"];
+            this.airTime = _data["airTime"] ? moment(_data["airTime"]) : undefined;
+            this.brief = _data["brief"];
+            this.briefLink = _data["briefLink"];
+            this.feedback = _data["feedback"];
+            this.caption = _data["caption"];
+            this.hashTag = _data["hashTag"];
+        }
+    }
+
+    static fromJS(data: any): CreateContractKolDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContractKolDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["kolId"] = this.kolId;
+        data["contractId"] = this.contractId;
+        data["status"] = this.status;
+        data["cash"] = this.cash;
+        data["payment"] = this.payment;
+        data["portrait"] = this.portrait;
+        data["reviewCorner"] = this.reviewCorner;
+        data["sampleSize"] = this.sampleSize;
+        data["sampleName"] = this.sampleName;
+        data["sampleQuantity"] = this.sampleQuantity;
+        data["sampleReceiveStatus"] = this.sampleReceiveStatus;
+        data["airTime"] = this.airTime ? this.airTime.toISOString() : undefined;
+        data["brief"] = this.brief;
+        data["briefLink"] = this.briefLink;
+        data["feedback"] = this.feedback;
+        data["caption"] = this.caption;
+        data["hashTag"] = this.hashTag;
+        return data;
+    }
+
+    clone(): CreateContractKolDto {
+        const json = this.toJSON();
+        let result = new CreateContractKolDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IContractKolDtoPagedResultDto {
+    totalCount: number;
+    items: ContractKolDto[] | undefined;
+}
+
+export class ContractKolDtoPagedResultDto implements IContractKolDtoPagedResultDto {
+    totalCount: number;
+    items: ContractKolDto[] | undefined;
+
+    constructor(data?: IContractKolDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ContractKolDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContractKolDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractKolDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): ContractKolDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ContractKolDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+@Injectable()
+export class ContractKolServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(kolId: string | undefined, contractId: string | undefined, status: ContractKolStatus | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<ContractKolDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/GetAll?";
+        if (kolId !== undefined && kolId !== null) url_ += "KolId=" + encodeURIComponent("" + kolId) + "&";
+        if (contractId !== undefined && contractId !== null) url_ += "ContractId=" + encodeURIComponent("" + contractId) + "&";
+        if (status !== undefined && status !== null) url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (sorting !== undefined && sorting !== null) url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null) url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null) url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<ContractKolDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: string | undefined): Observable<ContractKolDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/Get?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGet(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContractKolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateContractKolDto | undefined): Observable<ContractKolDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/Create";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ContractKolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    update(body: ContractKolDto | undefined): Observable<ContractKolDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/Update";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processUpdate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractKolDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractKolDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ContractKolDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractKolDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/Delete?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({}) };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+export enum ContractStatus {
+    Prepare = 1,
+    Processing = 2,
+    Complete = 3,
+    Pause = 4,
+    Cancel = 5,
+}
+
+export interface IContractDto {
+    id: string;
+    name: string | undefined;
+    note: string | undefined;
+    campaignId: string | undefined;
+    status: ContractStatus | undefined;
+    budget: number | undefined;
+    tenantId: number | undefined;
+}
+
+export class ContractDto implements IContractDto {
+    id: string;
+    name: string | undefined;
+    note: string | undefined;
+    campaignId: string | undefined;
+    status: ContractStatus | undefined;
+    budget: number | undefined;
+    tenantId: number | undefined;
+
+    constructor(data?: IContractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.note = _data["note"];
+            this.campaignId = _data["campaignId"];
+            this.status = _data["status"];
+            this.budget = _data["budget"];
+            this.tenantId = _data["tenantId"];
+        }
+    }
+
+    static fromJS(data: any): ContractDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["note"] = this.note;
+        data["campaignId"] = this.campaignId;
+        data["status"] = this.status;
+        data["budget"] = this.budget;
+        data["tenantId"] = this.tenantId;
+        return data;
+    }
+
+    clone(): ContractDto {
+        const json = this.toJSON();
+        let result = new ContractDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateContractDto {
+    name: string | undefined;
+    note: string | undefined;
+    campaignId: string | undefined;
+    status: ContractStatus | undefined;
+    budget: number | undefined;
+}
+
+export class CreateContractDto implements ICreateContractDto {
+    name: string | undefined;
+    note: string | undefined;
+    campaignId: string | undefined;
+    status: ContractStatus | undefined = ContractStatus.Prepare;
+    budget: number | undefined;
+
+    constructor(data?: ICreateContractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.note = _data["note"];
+            this.campaignId = _data["campaignId"];
+            this.status = _data["status"];
+            this.budget = _data["budget"];
+        }
+    }
+
+    static fromJS(data: any): CreateContractDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContractDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["note"] = this.note;
+        data["campaignId"] = this.campaignId;
+        data["status"] = this.status;
+        data["budget"] = this.budget;
+        return data;
+    }
+
+    clone(): CreateContractDto {
+        const json = this.toJSON();
+        let result = new CreateContractDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IContractDtoPagedResultDto {
+    totalCount: number;
+    items: ContractDto[] | undefined;
+}
+
+export class ContractDtoPagedResultDto implements IContractDtoPagedResultDto {
+    totalCount: number;
+    items: ContractDto[] | undefined;
+
+    constructor(data?: IContractDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ContractDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContractDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): ContractDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ContractDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+@Injectable()
+export class ContractServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(keyword: string | undefined, status: ContractStatus | undefined, campaignId: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<ContractDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contract/GetAll?";
+        if (keyword !== undefined && keyword !== null) url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (status !== undefined && status !== null) url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (campaignId !== undefined && campaignId !== null) url_ += "CampaignId=" + encodeURIComponent("" + campaignId) + "&";
+        if (sorting !== undefined && sorting !== null) url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null) url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null) url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<ContractDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: string | undefined): Observable<ContractDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contract/Get?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({ "Accept": "text/plain" }) };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGet(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContractDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateContractDto | undefined): Observable<ContractDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contract/Create";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ContractDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    update(body: ContractDto | undefined): Observable<ContractDto> {
+        let url_ = this.baseUrl + "/api/services/app/Contract/Update";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+        let options_: any = { body: content_, observe: "response", responseType: "blob", headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" }) };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processUpdate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ContractDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/Contract/Delete?";
+        if (id !== undefined && id !== null) url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+        let options_: any = { observe: "response", responseType: "blob", headers: new HttpHeaders({}) };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export enum CampaignStatus {
     Draft = 0,
     Active = 1,

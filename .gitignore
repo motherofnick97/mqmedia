@@ -1,0 +1,6 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/MqSocial/10.2.0/aspnet-core/src/MqSocial.Web.Host/appsettings.json
+/MqSocial/10.2.0/aspnet-core/src/MqSocial.Migrator/appsettings.json

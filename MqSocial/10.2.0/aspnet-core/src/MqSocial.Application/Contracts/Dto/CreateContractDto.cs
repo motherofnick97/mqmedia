@@ -1,4 +1,5 @@
 using MqSocial.Contracts;
+using System;
 using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Contracts.Dto;
@@ -12,7 +13,7 @@ public class CreateContractDto
     [StringLength(Contract.MaxDescriptionLength)]
     public string Note { get; set; }
 
-    public int? CampaignId { get; set; }
+    public Guid? CampaignId { get; set; }
 
     public ContractStatus Status { get; set; } = ContractStatus.Prepare;
 

@@ -52,4 +52,37 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     {
         return query.OrderBy(input.Sorting);
     }
+
+    public async Task CrawlUserInfo(string uniqueId)
+    {
+        var client = new HttpClient();
+        var request = new HttpRequestMessage
+        {
+            Method = HttpMethod.Get,
+            RequestUri = new Uri("https://tiktok-api23.p.rapidapi.com/api/user/info?uniqueId=" + uniqueId),
+            Headers =
+            {
+                { "x-rapidapi-key", "63fb251e9emsh10eab69a0126292p15c65cjsn4f2df599110c" },
+                { "x-rapidapi-host", "tiktok-api23.p.rapidapi.com" },
+            },
+        };
+        var response = await client.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var body = await response.Content.ReadAsStringAsync();
+        var json = JObject.Parse(body);
+
+        var name = json["userInfo"]["user"]["nickname"].ToString();
+        var followers = json["userInfo"]["stats"]["followerCount"].Value<int>();
+        var likes = json["userInfo"]["stats"]["heartCount"].Value<int>();
+
+        var id =await Repository.InsertAndGetIdAsync(new Kol()
+        {
+            Name = name,
+            AccountId = uniqueId,
+            Channel = ChannelType.Tiktok,
+            Follow = followers
+        });
+
+        return;
+    }
 }

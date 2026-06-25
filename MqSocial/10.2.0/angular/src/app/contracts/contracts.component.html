@@ -1,10 +1,10 @@
 <div [@routerTransition]>
     <p-toolbar styleClass="mb-3">
         <ng-template pTemplate="start">
-            <h1 class="m-0">{{ 'Campaigns' | localize }}</h1>
+            <h1 class="m-0">{{ 'Contracts' | localize }}</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createCampaign()"></p-button>
+            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createContract()"></p-button>
         </ng-template>
     </p-toolbar>
 
@@ -45,7 +45,7 @@
                                     <p-select
                                         [(ngModel)]="filterStatus"
                                         name="filterStatus"
-                                        [options]="campaignStatuses"
+                                        [options]="contractStatuses"
                                         optionLabel="label"
                                         optionValue="value"
                                         [fluid]="true">
@@ -53,16 +53,8 @@
                                 </div>
                             </div>
                             <div class="d-flex mt-3" style="gap: 0.5rem">
-                                <p-button
-                                    icon="pi pi-search"
-                                    [label]="'Search' | localize"
-                                    (onClick)="list()">
-                                </p-button>
-                                <p-button
-                                    [label]="'Clear' | localize"
-                                    severity="secondary"
-                                    (onClick)="clearFilters()">
-                                </p-button>
+                                <p-button icon="pi pi-search" [label]="'Search' | localize" (onClick)="list()"></p-button>
+                                <p-button [label]="'Clear' | localize" severity="secondary" (onClick)="clearFilters()"></p-button>
                             </div>
                         </div>
                     }
@@ -81,28 +73,14 @@
                             [tableStyle]="{ 'min-width': '50rem' }">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="min-width: 200px" pSortableColumn="name">
-                                        {{ 'Name' | localize }}
-                                        <p-sortIcon field="name"></p-sortIcon>
+                                    <th pSortableColumn="name">
+                                        {{ 'Name' | localize }}<p-sortIcon field="name"></p-sortIcon>
                                     </th>
-                                    <th style="min-width: 100px">
-                                        {{ 'Status' | localize }}
+                                    <th style="width: 160px">{{ 'Status' | localize }}</th>
+                                    <th style="width: 130px" pSortableColumn="budget">
+                                        {{ 'Budget' | localize }}<p-sortIcon field="budget"></p-sortIcon>
                                     </th>
-                                    <th style="min-width: 130px" pSortableColumn="startDate">
-                                        {{ 'StartDate' | localize }}
-                                        <p-sortIcon field="startDate"></p-sortIcon>
-                                    </th>
-                                    <th style="min-width: 130px" pSortableColumn="endDate">
-                                        {{ 'EndDate' | localize }}
-                                        <p-sortIcon field="endDate"></p-sortIcon>
-                                    </th>
-                                    <th style="min-width: 120px" pSortableColumn="budget">
-                                        {{ 'Budget' | localize }}
-                                        <p-sortIcon field="budget"></p-sortIcon>
-                                    </th>
-                                    <th style="min-width: 160px">
-                                        {{ 'Actions' | localize }}
-                                    </th>
+                                    <th style="width: 210px">{{ 'Actions' | localize }}</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-record="$implicit">
@@ -114,17 +92,22 @@
                                             [value]="getStatusLabel(record.status)">
                                         </p-tag>
                                     </td>
-                                    <td>{{ record.startDate | date: 'dd/MM/yyyy' }}</td>
-                                    <td>{{ record.endDate | date: 'dd/MM/yyyy' }}</td>
                                     <td>{{ record.budget | number }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
+                                            <p-button
+                                                icon="pi pi-users"
+                                                label="KOLs"
+                                                size="small"
+                                                severity="info"
+                                                (onClick)="manageKols(record)">
+                                            </p-button>
                                             <p-button
                                                 icon="pi pi-pencil"
                                                 [label]="'Edit' | localize"
                                                 size="small"
                                                 severity="secondary"
-                                                (onClick)="editCampaign(record)">
+                                                (onClick)="editContract(record)">
                                             </p-button>
                                             <p-button
                                                 icon="pi pi-trash"

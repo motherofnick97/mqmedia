@@ -1,10 +1,10 @@
 <div [@routerTransition]>
     <p-toolbar styleClass="mb-3">
         <ng-template pTemplate="start">
-            <h1 class="m-0">{{ 'Campaigns' | localize }}</h1>
+            <h1 class="m-0">{{ 'Kols' | localize }}</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createCampaign()"></p-button>
+            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createKol()"></p-button>
         </ng-template>
     </p-toolbar>
 
@@ -41,11 +41,22 @@
                         <div class="mt-2 pt-3 border-top">
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label">{{ 'Status' | localize }}</label>
+                                    <label class="form-label">{{ 'Channel' | localize }}</label>
                                     <p-select
-                                        [(ngModel)]="filterStatus"
-                                        name="filterStatus"
-                                        [options]="campaignStatuses"
+                                        [(ngModel)]="filterChannel"
+                                        name="filterChannel"
+                                        [options]="channelOptions"
+                                        optionLabel="label"
+                                        optionValue="value"
+                                        [fluid]="true">
+                                    </p-select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">{{ 'Career' | localize }}</label>
+                                    <p-select
+                                        [(ngModel)]="filterCareer"
+                                        name="filterCareer"
+                                        [options]="careerOptions"
                                         optionLabel="label"
                                         optionValue="value"
                                         [fluid]="true">
@@ -78,45 +89,42 @@
                             rows="{{ primengTableHelper.defaultRecordsCountPerPage }}"
                             [paginator]="false"
                             [lazy]="true"
-                            [tableStyle]="{ 'min-width': '50rem' }">
+                            [tableStyle]="{ 'min-width': '55rem' }">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="min-width: 200px" pSortableColumn="name">
-                                        {{ 'Name' | localize }}
-                                        <p-sortIcon field="name"></p-sortIcon>
+                                    <th pSortableColumn="name">
+                                        {{ 'Name' | localize }}<p-sortIcon field="name"></p-sortIcon>
                                     </th>
-                                    <th style="min-width: 100px">
-                                        {{ 'Status' | localize }}
+                                    <th style="width: 110px">{{ 'Channel' | localize }}</th>
+                                    <th style="width: 110px">{{ 'Career' | localize }}</th>
+                                    <th style="width: 120px" pSortableColumn="follow">
+                                        Follow<p-sortIcon field="follow"></p-sortIcon>
                                     </th>
-                                    <th style="min-width: 130px" pSortableColumn="startDate">
-                                        {{ 'StartDate' | localize }}
-                                        <p-sortIcon field="startDate"></p-sortIcon>
+                                    <th style="width: 130px" pSortableColumn="generalCast">
+                                        General Cast<p-sortIcon field="generalCast"></p-sortIcon>
                                     </th>
-                                    <th style="min-width: 130px" pSortableColumn="endDate">
-                                        {{ 'EndDate' | localize }}
-                                        <p-sortIcon field="endDate"></p-sortIcon>
-                                    </th>
-                                    <th style="min-width: 120px" pSortableColumn="budget">
-                                        {{ 'Budget' | localize }}
-                                        <p-sortIcon field="budget"></p-sortIcon>
-                                    </th>
-                                    <th style="min-width: 160px">
-                                        {{ 'Actions' | localize }}
-                                    </th>
+                                    <th style="width: 160px">{{ 'Actions' | localize }}</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-record="$implicit">
                                 <tr>
-                                    <td>{{ record.name }}</td>
+                                    <td>
+                                        <span>{{ record.name }}</span>
+                                        @if (record.link) {
+                                            <a [href]="record.link" target="_blank" class="ml-1">
+                                                <i class="pi pi-external-link" style="font-size: 0.75rem"></i>
+                                            </a>
+                                        }
+                                    </td>
                                     <td>
                                         <p-tag
-                                            [severity]="getStatusSeverity(record.status)"
-                                            [value]="getStatusLabel(record.status)">
+                                            [severity]="getChannelSeverity(record.channel)"
+                                            [value]="getChannelLabel(record.channel)">
                                         </p-tag>
                                     </td>
-                                    <td>{{ record.startDate | date: 'dd/MM/yyyy' }}</td>
-                                    <td>{{ record.endDate | date: 'dd/MM/yyyy' }}</td>
-                                    <td>{{ record.budget | number }}</td>
+                                    <td>{{ getCareerLabel(record.career) }}</td>
+                                    <td>{{ record.follow | number }}</td>
+                                    <td>{{ record.generalCast | number }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
                                             <p-button
@@ -124,7 +132,7 @@
                                                 [label]="'Edit' | localize"
                                                 size="small"
                                                 severity="secondary"
-                                                (onClick)="editCampaign(record)">
+                                                (onClick)="editKol(record)">
                                             </p-button>
                                             <p-button
                                                 icon="pi pi-trash"

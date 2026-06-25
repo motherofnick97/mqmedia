@@ -1,0 +1,132 @@
+<form class="form-horizontal" autocomplete="off" #createForm="ngForm" (ngSubmit)="save()">
+    <abp-modal-header title="Thêm KOL vào hợp đồng" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
+
+        <div class="row g-3">
+            <!-- Hợp đồng -->
+            <div class="col-md-6">
+                <label class="form-label required">Hợp đồng</label>
+                <p-select name="contract" required [(ngModel)]="entry.contractId"
+                    [options]="contracts" optionLabel="name" optionValue="id"
+                    [placeholder]="'-- Chọn hợp đồng --'" [fluid]="true"
+                    #contractModel="ngModel" #contractEl>
+                </p-select>
+                <abp-validation-summary [control]="contractModel" [controlEl]="contractEl"></abp-validation-summary>
+            </div>
+
+            <!-- KOL -->
+            <div class="col-md-6">
+                <label class="form-label required">KOL</label>
+                <p-select name="kol" required [(ngModel)]="entry.kolId"
+                    [options]="kols" optionLabel="name" optionValue="id"
+                    [placeholder]="'-- Chọn KOL --'" [fluid]="true"
+                    #kolModel="ngModel" #kolEl>
+                </p-select>
+                <abp-validation-summary [control]="kolModel" [controlEl]="kolEl"></abp-validation-summary>
+            </div>
+
+            <!-- Trạng thái -->
+            <div class="col-md-4">
+                <label class="form-label">Trạng thái</label>
+                <p-select name="status" [(ngModel)]="entry.status"
+                    [options]="statusOptions" optionLabel="label" optionValue="value"
+                    [fluid]="true">
+                </p-select>
+            </div>
+
+            <!-- Cash -->
+            <div class="col-md-4">
+                <label class="form-label">Cash</label>
+                <p-inputnumber name="cash" [(ngModel)]="entry.cash" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
+            </div>
+
+            <!-- Payment -->
+            <div class="col-md-4">
+                <label class="form-label">Payment</label>
+                <p-inputnumber name="payment" [(ngModel)]="entry.payment" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
+            </div>
+
+            <!-- Air Time -->
+            <div class="col-md-4">
+                <label class="form-label">Air Time</label>
+                <p-datepicker name="airTime" [(ngModel)]="airTime"
+                    dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true" [fluid]="true">
+                </p-datepicker>
+            </div>
+
+            <!-- Sample Receive -->
+            <div class="col-md-4">
+                <label class="form-label">Nhận mẫu</label>
+                <p-select name="sampleReceiveStatus" [(ngModel)]="entry.sampleReceiveStatus"
+                    [options]="receiveStatusOptions" optionLabel="label" optionValue="value"
+                    [placeholder]="'-- Chọn --'" [fluid]="true">
+                </p-select>
+            </div>
+
+            <!-- Sample Qty -->
+            <div class="col-md-4">
+                <label class="form-label">Số lượng mẫu</label>
+                <p-inputnumber name="sampleQuantity" [(ngModel)]="entry.sampleQuantity" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
+            </div>
+
+            <!-- Sample Name -->
+            <div class="col-md-6">
+                <label class="form-label">Tên mẫu</label>
+                <input pInputText type="text" name="sampleName" [(ngModel)]="entry.sampleName" style="width:100%" />
+            </div>
+
+            <!-- Sample Size -->
+            <div class="col-md-6">
+                <label class="form-label">Size mẫu</label>
+                <input pInputText type="text" name="sampleSize" [(ngModel)]="entry.sampleSize" style="width:100%" />
+            </div>
+
+            <!-- Portrait -->
+            <div class="col-md-6">
+                <label class="form-label">Portrait</label>
+                <input pInputText type="text" name="portrait" [(ngModel)]="entry.portrait" style="width:100%" />
+            </div>
+
+            <!-- Review Corner -->
+            <div class="col-md-6">
+                <label class="form-label">Review Corner</label>
+                <input pInputText type="text" name="reviewCorner" [(ngModel)]="entry.reviewCorner" style="width:100%" />
+            </div>
+
+            <!-- Brief Link -->
+            <div class="col-md-12">
+                <label class="form-label">Brief Link</label>
+                <input pInputText type="text" name="briefLink" [(ngModel)]="entry.briefLink" style="width:100%" />
+            </div>
+
+            <!-- Brief -->
+            <div class="col-md-12">
+                <label class="form-label">Brief</label>
+                <textarea pTextarea name="brief" rows="2" [(ngModel)]="entry.brief" style="width:100%"></textarea>
+            </div>
+
+            <!-- Caption -->
+            <div class="col-md-6">
+                <label class="form-label">Caption</label>
+                <textarea pTextarea name="caption" rows="2" [(ngModel)]="entry.caption" style="width:100%"></textarea>
+            </div>
+
+            <!-- HashTag -->
+            <div class="col-md-6">
+                <label class="form-label">HashTag</label>
+                <textarea pTextarea name="hashTag" rows="2" [(ngModel)]="entry.hashTag" style="width:100%"></textarea>
+            </div>
+
+            <!-- Feedback -->
+            <div class="col-md-12">
+                <label class="form-label">Feedback</label>
+                <textarea pTextarea name="feedback" rows="2" [(ngModel)]="entry.feedback" style="width:100%"></textarea>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <p-button [label]="'Cancel' | localize" severity="secondary" [disabled]="saving" (onClick)="bsModalRef.hide()"></p-button>
+        <p-button [label]="'Save' | localize" [disabled]="!createForm.form.valid || saving" [loading]="saving" (onClick)="save()"></p-button>
+    </div>
+</form>
