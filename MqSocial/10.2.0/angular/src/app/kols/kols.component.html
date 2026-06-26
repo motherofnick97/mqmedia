@@ -1,10 +1,27 @@
 <div [@routerTransition]>
+    <!-- Hidden file input cho import -->
+    <input
+        #fileInput
+        type="file"
+        accept=".xlsx"
+        style="display: none"
+        (change)="onFileSelected($event)" />
+
     <p-toolbar styleClass="mb-3">
         <ng-template pTemplate="start">
             <h1 class="m-0">{{ 'Kols' | localize }}</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createKol()"></p-button>
+            <div class="d-flex" style="gap: 0.5rem">
+                <p-button
+                    icon="pi pi-upload"
+                    label="Import Excel"
+                    severity="secondary"
+                    [loading]="importLoading"
+                    (onClick)="openImportDialog()">
+                </p-button>
+                <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createKol()"></p-button>
+            </div>
         </ng-template>
     </p-toolbar>
 
@@ -188,3 +205,47 @@
         </div>
     </section>
 </div>
+
+<!-- Dialog kết quả import -->
+<p-dialog
+    header="Kết quả Import Excel"
+    [(visible)]="showImportResult"
+    [modal]="true"
+    [style]="{ width: '600px' }"
+    [closable]="true"
+    (onHide)="closeImportResult()">
+
+    @if (importResult) {
+        <div class="mb-3 d-flex" style="gap: 1rem">
+            <div class="d-flex align-items-center" style="gap: 0.4rem">
+                <i class="pi pi-check-circle text-success"></i>
+                <span>Thành công: <strong>{{ importResult.successCount }}</strong></span>
+            </div>
+            <div class="d-flex align-items-center" style="gap: 0.4rem">
+                <i class="pi pi-times-circle text-danger"></i>
+                <span>Lỗi: <strong>{{ importResult.failCount }}</strong></span>
+            </div>
+        </div>
+
+        @if (importResult.errors.length > 0) {
+            <p-table [value]="importResult.errors" [scrollable]="true" scrollHeight="300px">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 80px">Dòng</th>
+                        <th>Lỗi</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-err>
+                    <tr>
+                        <td>{{ err.row }}</td>
+                        <td class="text-danger">{{ err.message }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        }
+    }
+
+    <ng-template pTemplate="footer">
+        <p-button label="Đóng" icon="pi pi-times" severity="secondary" (onClick)="closeImportResult()"></p-button>
+    </ng-template>
+</p-dialog>

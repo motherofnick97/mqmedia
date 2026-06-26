@@ -1,4 +1,4 @@
-import { ChangeDetectorRef, Component, Injector, ViewChild } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, Injector, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -10,7 +10,7 @@ import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
 import { FormsModule } from '@angular/forms';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
@@ -19,6 +19,20 @@ import { Toolbar } from 'primeng/toolbar';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { Dialog } from 'primeng/dialog';
+import { HttpClient } from '@angular/common/http';
+import { AppConsts } from '@shared/AppConsts';
+
+interface ImportKolError {
+    row: number;
+    message: string;
+}
+
+interface ImportKolResult {
+    successCount: number;
+    failCount: number;
+    errors: ImportKolError[];
+}
 
 @Component({
     templateUrl: './kols.component.html',
@@ -38,16 +52,22 @@ import { InputText } from 'primeng/inputtext';
         InputIcon,
         InputText,
         CommonModule,
+        Dialog,
     ],
 })
 export class KolsComponent extends PagedListingComponentBase<KolDto> {
     @ViewChild('dataTable', { static: true }) dataTable: Table;
     @ViewChild('paginator', { static: true }) paginator: Paginator;
+    @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
     keyword = '';
     filterCareer: KolCareer | undefined = undefined;
     filterChannel: ChannelType | undefined = undefined;
     advancedFiltersVisible = false;
+
+    importLoading = false;
+    importResult: ImportKolResult | null = null;
+    showImportResult = false;
 
     careerOptions = [
         { value: undefined, label: 'Tất cả' },
@@ -66,6 +86,7 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         injector: Injector,
         private _kolService: KolServiceProxy,
         private _modalService: BsModalService,
+        private _http: HttpClient,
         cd: ChangeDetectorRef
     ) {
         super(injector, cd);
@@ -89,6 +110,46 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         this.filterCareer = undefined;
         this.filterChannel = undefined;
         this.list();
+    }
+
+    openImportDialog(): void {
+        this.fileInput.nativeElement.value = '';
+        this.fileInput.nativeElement.click();
+    }
+
+    onFileSelected(event: Event): void {
+        const input = event.target as HTMLInputElement;
+        const file = input.files?.[0];
+        if (!file) return;
+
+        this.importLoading = true;
+        const formData = new FormData();
+        formData.append('file', file);
+
+        const url = `${AppConsts.remoteServiceBaseUrl}/api/services/app/Kol/ImportFromExcel`;
+        this._http.post<{ result: ImportKolResult }>(url, formData).subscribe({
+            next: (response) => {
+                this.importLoading = false;
+                this.importResult = response.result;
+                if (response.result.failCount === 0) {
+                    this.notify.success(`Import thành công ${response.result.successCount} KOL`);
+                    this.refresh();
+                } else {
+                    this.showImportResult = true;
+                    this.refresh();
+                }
+                this.cd.detectChanges();
+            },
+            error: () => {
+                this.importLoading = false;
+                this.cd.detectChanges();
+            },
+        });
+    }
+
+    closeImportResult(): void {
+        this.showImportResult = false;
+        this.importResult = null;
     }
 
     getChannelSeverity(channel: ChannelType): 'danger' | 'info' {

@@ -2,6 +2,7 @@
 using Abp.Modules;
 using Abp.Reflection.Extensions;
 using MqSocial.Authorization;
+using OfficeOpenXml;
 
 namespace MqSocial;
 
@@ -17,6 +18,8 @@ public class MqSocialApplicationModule : AbpModule
 
     public override void Initialize()
     {
+        ExcelPackage.License.SetNonCommercialPersonal("MqSocial");
+
         var thisAssembly = typeof(MqSocialApplicationModule).GetAssembly();
 
         IocManager.RegisterAssemblyByConvention(thisAssembly);

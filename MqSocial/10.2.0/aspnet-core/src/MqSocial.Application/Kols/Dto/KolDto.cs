@@ -26,6 +26,8 @@ public class KolDto : EntityDto<Guid>
 
     public int Follow { get; set; }
 
+    public string AccountId { get; set; }
+
     public string Address { get; set; }
 
     public string Phone { get; set; }

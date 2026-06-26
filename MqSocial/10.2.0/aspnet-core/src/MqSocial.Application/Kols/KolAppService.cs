@@ -1,4 +1,4 @@
-using Abp.Application.Services;
+﻿using Abp.Application.Services;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
@@ -22,6 +22,7 @@ using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
+using OfficeOpenXml;
 
 namespace MqSocial.Kols;
 
@@ -85,4 +86,83 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
         return;
     }
+
+    public async Task<ImportKolResultDto> ImportFromExcel([FromForm] ImportKolDto input)
+    {
+        if (input.File == null || input.File.Length == 0)
+            throw new UserFriendlyException("File không được để trống");
+
+        var result = new ImportKolResultDto();
+
+        using var stream = input.File.OpenReadStream();
+        using var package = new ExcelPackage(stream);
+        var sheet = package.Workbook.Worksheets[0];
+
+        if (sheet == null)
+            throw new UserFriendlyException("File Excel không có sheet nào");
+
+        var rowCount = sheet.Dimension.Rows;
+
+        // Đọc từ dòng 2 (dòng 1 là header)
+        for (int row = 2; row <= rowCount; row++)
+        {
+            try
+            {
+                var name = sheet.Cells[row, 1].Text?.Trim();
+                var accountId = sheet.Cells[row, 2].Text?.Trim();
+                var channelText = sheet.Cells[row, 3].Text?.Trim();
+                var followText = sheet.Cells[row, 4].Text?.Trim();
+                var note = sheet.Cells[row, 5].Text?.Trim();
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Tên không được để trống" });
+                    result.FailCount++;
+                    continue;
+                }
+
+                // Parse channel
+                ChannelType? channel = null;
+                if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
+                    channel = ch;
+
+                // Parse follow
+                int.TryParse(followText, out var follow);
+
+                // Check trung AccountId + Channel
+                if (!string.IsNullOrEmpty(accountId) && channel.HasValue)
+                {
+                    var exists = await Repository.GetAll()
+                        .AnyAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
+                    if (exists)
+                    {
+                        result.Errors.Add(new ImportKolErrorDto { Row = row, Message = $"KOL '{accountId}' đã tồn tại" });
+                        result.FailCount++;
+                        continue;
+                    }
+                }
+
+                await CrawlUserInfo(accountId);
+
+                //await Repository.InsertAsync(new Kol
+                //{
+                //    Name = name,
+                //    AccountId = accountId,
+                //    Channel = channel ?? ChannelType.Tiktok,
+                //    Follow = follow,
+                //    Note = note
+                //});
+
+                result.SuccessCount++;
+            }
+            catch (Exception ex)
+            {
+                result.Errors.Add(new ImportKolErrorDto { Row = row, Message = ex.Message });
+                result.FailCount++;
+            }
+        }
+
+        return result;
+    }
+
 }
