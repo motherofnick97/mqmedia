@@ -10,6 +10,7 @@ namespace MqSocial.Common.Enum
     public enum ChannelType
     {
         Tiktok = 1,
-        Facebook = 2
+        Facebook = 2,
+        Khac
     }
 }

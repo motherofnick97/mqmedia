@@ -129,13 +129,15 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     };
 
     channelOptions = [
-        { value: ChannelType.Tiktok, label: 'Tiktok' },
+        { value: ChannelType.Tiktok, label: 'TikTok' },
         { value: ChannelType.Facebook, label: 'Facebook' },
+        { value: ChannelType.Khac, label: 'Khác' },
     ];
 
     readonly channelLabels: Record<number, string> = {
-        [ChannelType.Tiktok]: 'Tiktok',
+        [ChannelType.Tiktok]: 'TikTok',
         [ChannelType.Facebook]: 'Facebook',
+        [ChannelType.Khac]: 'Khác',
     };
 
     receiveStatusOptions = [

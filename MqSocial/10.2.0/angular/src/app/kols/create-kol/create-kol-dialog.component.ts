@@ -34,6 +34,7 @@ export class CreateKolDialogComponent extends AppComponentBase implements OnInit
     kol = new CreateKolDto();
 
     careerOptions = [
+        { value: KolCareer.Other, label: 'Khác' },
         { value: KolCareer.DuocSi, label: 'Dược sĩ' },
         { value: KolCareer.BacSi, label: 'Bác sĩ' },
         { value: KolCareer.Mom, label: 'Mẹ bé' },
@@ -42,6 +43,7 @@ export class CreateKolDialogComponent extends AppComponentBase implements OnInit
     channelOptions = [
         { value: ChannelType.Tiktok, label: 'TikTok' },
         { value: ChannelType.Facebook, label: 'Facebook' },
+        { value: ChannelType.Khac, label: 'Khác' },
     ];
 
     constructor(

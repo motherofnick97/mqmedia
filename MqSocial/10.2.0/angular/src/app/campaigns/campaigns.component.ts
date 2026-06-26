@@ -24,6 +24,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
 
 @Component({
     templateUrl: './campaigns.component.html',
@@ -43,6 +44,7 @@ import { InputText } from 'primeng/inputtext';
         IconField,
         InputIcon,
         InputText,
+        Tooltip,
         CommonModule
     ],
 })

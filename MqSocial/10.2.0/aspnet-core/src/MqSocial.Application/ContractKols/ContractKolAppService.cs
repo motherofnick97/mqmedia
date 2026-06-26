@@ -31,6 +31,8 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
     protected override IQueryable<ContractKol> CreateFilteredQuery(PagedContractKolRequestDto input)
     {
         return Repository.GetAll()
+            .WhereIf(input.KolId.HasValue, x => x.KolId == input.KolId.Value)
+            .WhereIf(input.ContractId.HasValue, x => x.ContractId == input.ContractId.Value)
             .WhereIf(input.Status.HasValue, x => x.Status == input.Status.Value);
     }
 

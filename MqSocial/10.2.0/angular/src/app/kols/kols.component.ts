@@ -6,6 +6,7 @@ import { PagedListingComponentBase } from 'shared/paged-listing-component-base';
 import { KolServiceProxy, KolDto, KolDtoPagedResultDto, KolCareer, ChannelType } from '@shared/service-proxies/service-proxies';
 import { CreateKolDialogComponent } from './create-kol/create-kol-dialog.component';
 import { EditKolDialogComponent } from './edit-kol/edit-kol-dialog.component';
+import { AddKolToContractsDialogComponent } from './add-to-contracts/add-kol-to-contracts-dialog.component';
 import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
@@ -19,6 +20,7 @@ import { Toolbar } from 'primeng/toolbar';
 import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
+import { Tooltip } from 'primeng/tooltip';
 import { Dialog } from 'primeng/dialog';
 import { HttpClient } from '@angular/common/http';
 import { AppConsts } from '@shared/AppConsts';
@@ -51,6 +53,7 @@ interface ImportKolResult {
         IconField,
         InputIcon,
         InputText,
+        Tooltip,
         CommonModule,
         Dialog,
     ],
@@ -71,6 +74,7 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
 
     careerOptions = [
         { value: undefined, label: 'Tất cả' },
+        { value: KolCareer.Other, label: 'Khác' },
         { value: KolCareer.DuocSi, label: 'Dược sĩ' },
         { value: KolCareer.BacSi, label: 'Bác sĩ' },
         { value: KolCareer.Mom, label: 'Mẹ bé' },
@@ -80,6 +84,7 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         { value: undefined, label: 'Tất cả' },
         { value: ChannelType.Tiktok, label: 'TikTok' },
         { value: ChannelType.Facebook, label: 'Facebook' },
+        { value: ChannelType.Khac, label: 'Khác' },
     ];
 
     constructor(
@@ -95,6 +100,13 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
     createKol(): void {
         const modalRef: BsModalRef = this._modalService.show(CreateKolDialogComponent, { class: 'modal-lg' });
         modalRef.content.onSave.subscribe(() => this.refresh());
+    }
+
+    addToContracts(kol: KolDto): void {
+        this._modalService.show(AddKolToContractsDialogComponent, {
+            class: 'modal-lg',
+            initialState: { kolId: kol.id, kolName: kol.name ?? kol.id },
+        });
     }
 
     editKol(kol: KolDto): void {
@@ -115,6 +127,13 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
     openImportDialog(): void {
         this.fileInput.nativeElement.value = '';
         this.fileInput.nativeElement.click();
+    }
+
+    downloadTemplate(): void {
+        const a = document.createElement('a');
+        a.href = '/assets/templates/Danh sách KOL.xlsx';
+        a.download = 'Danh sách KOL.xlsx';
+        a.click();
     }
 
     onFileSelected(event: Event): void {
@@ -152,16 +171,20 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         this.importResult = null;
     }
 
-    getChannelSeverity(channel: ChannelType): 'danger' | 'info' {
-        return channel === ChannelType.Tiktok ? 'danger' : 'info';
+    getChannelSeverity(channel: ChannelType): 'danger' | 'info' | 'secondary' {
+        if (channel === ChannelType.Tiktok) return 'danger';
+        if (channel === ChannelType.Facebook) return 'info';
+        return 'secondary';
     }
 
     getChannelLabel(channel: ChannelType): string {
-        return channel === ChannelType.Tiktok ? 'TikTok' : 'Facebook';
+        if (channel === ChannelType.Tiktok) return 'TikTok';
+        if (channel === ChannelType.Facebook) return 'Facebook';
+        return 'Khác';
     }
 
     getCareerLabel(career: KolCareer): string {
-        const map = { [KolCareer.DuocSi]: 'Dược sĩ', [KolCareer.BacSi]: 'Bác sĩ', [KolCareer.Mom]: 'Mẹ bé' };
+        const map = { [KolCareer.Other]: 'Khác', [KolCareer.DuocSi]: 'Dược sĩ', [KolCareer.BacSi]: 'Bác sĩ', [KolCareer.Mom]: 'Mẹ bé' };
         return map[career] ?? '';
     }
 

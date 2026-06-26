@@ -23,6 +23,7 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Linq.Dynamic.Core;
 using OfficeOpenXml;
+using MqSocial.CommonFunc;
 
 namespace MqSocial.Kols;
 
@@ -54,7 +55,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return query.OrderBy(input.Sorting);
     }
 
-    public async Task CrawlUserInfo(string uniqueId)
+    private async Task<KolDto> CrawlUserInfo(string uniqueId)
     {
         var client = new HttpClient();
         var request = new HttpRequestMessage
@@ -76,15 +77,12 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         var followers = json["userInfo"]["stats"]["followerCount"].Value<int>();
         var likes = json["userInfo"]["stats"]["heartCount"].Value<int>();
 
-        var id =await Repository.InsertAndGetIdAsync(new Kol()
+        return new KolDto()
         {
-            Name = name,
             AccountId = uniqueId,
-            Channel = ChannelType.Tiktok,
-            Follow = followers
-        });
-
-        return;
+            Follow = followers,
+            Name = name
+        };
     }
 
     public async Task<ImportKolResultDto> ImportFromExcel([FromForm] ImportKolDto input)
@@ -107,16 +105,18 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         for (int row = 2; row <= rowCount; row++)
         {
             try
-            {
-                var name = sheet.Cells[row, 1].Text?.Trim();
-                var accountId = sheet.Cells[row, 2].Text?.Trim();
-                var channelText = sheet.Cells[row, 3].Text?.Trim();
-                var followText = sheet.Cells[row, 4].Text?.Trim();
-                var note = sheet.Cells[row, 5].Text?.Trim();
+            {//Tài khoản	Kênh	Nghề nghiệp	Follow	SĐT	Địa chỉ	Ghi chú
+                var accountId = sheet.Cells[row, 1].Text?.Trim();
+                var channelText = sheet.Cells[row, 2].Text?.Trim();
+                var careerText = sheet.Cells[row, 3].Text?.Trim();
+                var follow = sheet.Cells[row, 4].Text?.Trim();
+                var phone = sheet.Cells[row, 5].Text?.Trim();
+                var address = sheet.Cells[row, 6].Text?.Trim();
+                var note = sheet.Cells[row, 7].Text?.Trim();
 
-                if (string.IsNullOrEmpty(name))
+                if (string.IsNullOrEmpty(accountId))
                 {
-                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Tên không được để trống" });
+                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Mã tài khoản không được để trống" });
                     result.FailCount++;
                     continue;
                 }
@@ -126,32 +126,40 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
                     channel = ch;
 
-                // Parse follow
-                int.TryParse(followText, out var follow);
+                // Parse Career
+                KolCareer? career = CommonFunction.ParseEnumByDescription<KolCareer>(careerText);
+
+                // Nếu muốn fallback thử parse theo tên enum luôn
+                if (career == null && Enum.TryParse<KolCareer>(careerText, true, out var c))
+                    career = c;
+
+                KolDto kolDto = await CrawlUserInfo(accountId);
 
                 // Check trung AccountId + Channel
-                if (!string.IsNullOrEmpty(accountId) && channel.HasValue)
+                var exists = await Repository.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
+                if (exists != null)
                 {
-                    var exists = await Repository.GetAll()
-                        .AnyAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
-                    if (exists)
-                    {
-                        result.Errors.Add(new ImportKolErrorDto { Row = row, Message = $"KOL '{accountId}' đã tồn tại" });
-                        result.FailCount++;
-                        continue;
-                    }
+                    exists.Follow = kolDto.Follow;
+                    exists.Name = kolDto.Name;
+                    exists.Address = address;
+                    exists.Note = note;
+                    exists.Phone = phone;
+                    exists.Career = career ?? KolCareer.Other;
+                    result.SuccessCount++;
+                    continue;
                 }
 
-                await CrawlUserInfo(accountId);
-
-                //await Repository.InsertAsync(new Kol
-                //{
-                //    Name = name,
-                //    AccountId = accountId,
-                //    Channel = channel ?? ChannelType.Tiktok,
-                //    Follow = follow,
-                //    Note = note
-                //});
+                await Repository.InsertAsync(new Kol
+                {
+                    Name = kolDto.Name,
+                    AccountId = accountId,
+                    Channel = channel ?? ChannelType.Khac,
+                    Follow = kolDto.Follow,
+                    Note = note,
+                    Address = address,
+                    Phone = phone,
+                    Career = career ?? KolCareer.Other
+                });
 
                 result.SuccessCount++;
             }

@@ -8,9 +8,9 @@ public class PagedContractKolRequestDto : PagedResultRequestDto, IShouldNormaliz
 {
     public string Sorting { get; set; }
 
-    public Guid KolId { get; set; }
+    public Guid? KolId { get; set; }
 
-    public Guid ContractId { get; set; }
+    public Guid? ContractId { get; set; }
 
     public ContractKolStatus? Status { get; set; }
 

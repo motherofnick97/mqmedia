@@ -3891,6 +3891,7 @@ const responseBlob = response instanceof HttpResponse ? response.body : (respons
 }
 
 export enum KolCareer {
+    Other = 0,
     DuocSi = 1,
     BacSi = 2,
     Mom = 3,
@@ -3899,6 +3900,7 @@ export enum KolCareer {
 export enum ChannelType {
     Tiktok = 1,
     Facebook = 2,
+    Khac = 3,
 }
 
 export interface IKolDto {

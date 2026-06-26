@@ -27,10 +27,11 @@
                                         (keyup.enter)="list()"
                                         style="width: 100%" />
                                 </p-iconfield>
-                                <p-button icon="pi pi-search" (onClick)="list()"></p-button>
+                                <p-button icon="pi pi-search" pTooltip="Tìm kiếm" tooltipPosition="top" (onClick)="list()"></p-button>
                                 <p-button
                                     [icon]="advancedFiltersVisible ? 'pi pi-angle-up' : 'pi pi-angle-down'"
                                     severity="secondary"
+                                    pTooltip="Bộ lọc nâng cao" tooltipPosition="top"
                                     (onClick)="advancedFiltersVisible = !advancedFiltersVisible">
                                 </p-button>
                             </div>
@@ -119,18 +120,12 @@
                                     <td>{{ record.budget | number }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
-                                            <p-button
-                                                icon="pi pi-pencil"
-                                                [label]="'Edit' | localize"
-                                                size="small"
-                                                severity="secondary"
+                                            <p-button icon="pi pi-pencil" size="small" severity="secondary"
+                                                pTooltip="Sửa" tooltipPosition="top"
                                                 (onClick)="editCampaign(record)">
                                             </p-button>
-                                            <p-button
-                                                icon="pi pi-trash"
-                                                [label]="'Delete' | localize"
-                                                size="small"
-                                                severity="danger"
+                                            <p-button icon="pi pi-trash" size="small" severity="danger"
+                                                pTooltip="Xóa" tooltipPosition="top"
                                                 (onClick)="delete(record)">
                                             </p-button>
                                         </div>
@@ -148,7 +143,7 @@
                 <div class="card-footer table-card-footer bg-white border-top">
                     <div class="row align-items-center">
                         <div class="col-sm-4 col-12 text-sm-left text-center">
-                            <p-button icon="pi pi-refresh" severity="secondary" (onClick)="refresh()"></p-button>
+                            <p-button icon="pi pi-refresh" severity="secondary" pTooltip="Làm mới" tooltipPosition="top" (onClick)="refresh()"></p-button>
                         </div>
                         <div class="col-sm-8 col-12">
                             <div class="float-sm-right m-auto">
