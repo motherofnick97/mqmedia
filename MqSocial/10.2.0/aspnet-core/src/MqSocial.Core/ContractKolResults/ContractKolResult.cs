@@ -32,6 +32,8 @@ namespace MqSocial.ContractKolResults
 
         public int? Share { get; set; }
 
+        public int? Like { get; set; }
+
         public ChannelType ChannelType { get; set; }
     }
 }

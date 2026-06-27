@@ -336,7 +336,8 @@
                                 <!-- ── ContractKolResult expansion ── -->
                                 @if (expandedRows[record.id]) {
                                 <tr>
-                                    <td colspan="19" style="padding: 0.75rem 1rem; background: #f4f6f9">
+                                    <td colspan="19" style="padding: 0; background: #f4f6f9">
+                                    <div style="position: sticky; left: 0; width: calc(100vw - 300px); padding: 0.75rem 1rem; box-sizing: border-box; overflow-x: auto;">
 
                                         <!-- Header -->
                                         <div class="d-flex align-items-center mb-2" style="gap: 0.5rem">
@@ -356,6 +357,7 @@
                                                         <th>Link bài</th>
                                                         <th class="text-right">View</th>
                                                         <th class="text-right">Comment</th>
+                                                        <th class="text-right">Like</th>
                                                         <th class="text-right">Save</th>
                                                         <th class="text-right">Share</th>
                                                         <th style="width:60px"></th>
@@ -373,6 +375,7 @@
                                                             </td>
                                                             <td class="text-right">{{ r.view | number }}</td>
                                                             <td class="text-right">{{ r.comment | number }}</td>
+                                                            <td class="text-right">{{ r.like | number }}</td>
                                                             <td class="text-right">{{ r.save | number }}</td>
                                                             <td class="text-right">{{ r.share | number }}</td>
                                                             <td>
@@ -393,42 +396,47 @@
                                         @if (newResultMap[record.id]) {
                                             <div class="border rounded p-3" style="background:#fff">
                                                 <div class="font-weight-bold mb-2 small text-uppercase text-secondary">Thêm kết quả mới</div>
-                                                <div class="row" style="row-gap: 0.5rem">
-                                                    <div class="col-md-2">
+                                                <div class="d-flex flex-wrap" style="gap: 0.5rem; align-items: flex-end">
+                                                    <div style="width:144px">
                                                         <label class="small mb-1 d-block">Ngày đăng</label>
                                                         <p-datepicker [(ngModel)]="newResultDateMap[record.id]"
                                                             dateFormat="dd/mm/yy" [showIcon]="true"
                                                             [fluid]="true" appendTo="body">
                                                         </p-datepicker>
                                                     </div>
-                                                    <div class="col-md-2">
+                                                    <div style="width:144px">
                                                         <label class="small mb-1 d-block">Kênh</label>
                                                         <p-select [(ngModel)]="newResultMap[record.id].channelType"
                                                             [options]="channelOptions" optionLabel="label" optionValue="value"
                                                             [fluid]="true" appendTo="body">
                                                         </p-select>
                                                     </div>
-                                                    <div class="col-md-4">
+                                                    <div style="width:270px">
                                                         <label class="small mb-1 d-block">Link bài đăng</label>
                                                         <input pInputText [(ngModel)]="newResultMap[record.id].postLink"
-                                                            placeholder="https://..." class="w-100" />
+                                                            placeholder="https://..." style="width:100%" />
                                                     </div>
-                                                    <div class="col-md-1">
+                                                    <div style="width:108px">
                                                         <label class="small mb-1 d-block">View</label>
                                                         <p-inputnumber [(ngModel)]="newResultMap[record.id].view"
                                                             [min]="0" [fluid]="true"></p-inputnumber>
                                                     </div>
-                                                    <div class="col-md-1">
+                                                    <div style="width:108px">
                                                         <label class="small mb-1 d-block">Comment</label>
                                                         <p-inputnumber [(ngModel)]="newResultMap[record.id].comment"
                                                             [min]="0" [fluid]="true"></p-inputnumber>
                                                     </div>
-                                                    <div class="col-md-1">
+                                                    <div style="width:108px">
+                                                        <label class="small mb-1 d-block">Like</label>
+                                                        <p-inputnumber [(ngModel)]="newResultMap[record.id].like"
+                                                            [min]="0" [fluid]="true"></p-inputnumber>
+                                                    </div>
+                                                    <div style="width:108px">
                                                         <label class="small mb-1 d-block">Save</label>
                                                         <p-inputnumber [(ngModel)]="newResultMap[record.id].save"
                                                             [min]="0" [fluid]="true"></p-inputnumber>
                                                     </div>
-                                                    <div class="col-md-1">
+                                                    <div style="width:108px">
                                                         <label class="small mb-1 d-block">Share</label>
                                                         <p-inputnumber [(ngModel)]="newResultMap[record.id].share"
                                                             [min]="0" [fluid]="true"></p-inputnumber>
@@ -443,6 +451,7 @@
                                             </div>
                                         }
 
+                                    </div>
                                     </td>
                                 </tr>
                                 }

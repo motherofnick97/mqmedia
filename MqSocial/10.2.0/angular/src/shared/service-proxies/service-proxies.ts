@@ -5635,6 +5635,7 @@ export interface IContractKolResultDto {
     postLink: string | undefined;
     view: number | undefined;
     comment: number | undefined;
+    like: number | undefined;
     save: number | undefined;
     share: number | undefined;
     channelType: ChannelType | undefined;
@@ -5647,6 +5648,7 @@ export class ContractKolResultDto implements IContractKolResultDto {
     postLink: string | undefined;
     view: number | undefined;
     comment: number | undefined;
+    like: number | undefined;
     save: number | undefined;
     share: number | undefined;
     channelType: ChannelType | undefined;
@@ -5668,6 +5670,7 @@ export class ContractKolResultDto implements IContractKolResultDto {
             this.postLink = _data["postLink"];
             this.view = _data["view"];
             this.comment = _data["comment"];
+            this.like = _data["like"];
             this.save = _data["save"];
             this.share = _data["share"];
             this.channelType = _data["channelType"];
@@ -5689,6 +5692,7 @@ export class ContractKolResultDto implements IContractKolResultDto {
         data["postLink"] = this.postLink;
         data["view"] = this.view;
         data["comment"] = this.comment;
+        data["like"] = this.like;
         data["save"] = this.save;
         data["share"] = this.share;
         data["channelType"] = this.channelType;
@@ -5702,6 +5706,7 @@ export interface ICreateContractKolResultDto {
     postLink: string | undefined;
     view: number | undefined;
     comment: number | undefined;
+    like: number | undefined;
     save: number | undefined;
     share: number | undefined;
     channelType: ChannelType;
@@ -5713,6 +5718,7 @@ export class CreateContractKolResultDto implements ICreateContractKolResultDto {
     postLink: string | undefined;
     view: number | undefined;
     comment: number | undefined;
+    like: number | undefined;
     save: number | undefined;
     share: number | undefined;
     channelType: ChannelType;
@@ -5733,6 +5739,7 @@ export class CreateContractKolResultDto implements ICreateContractKolResultDto {
             this.postLink = _data["postLink"];
             this.view = _data["view"];
             this.comment = _data["comment"];
+            this.like = _data["like"];
             this.save = _data["save"];
             this.share = _data["share"];
             this.channelType = _data["channelType"];
@@ -5753,6 +5760,7 @@ export class CreateContractKolResultDto implements ICreateContractKolResultDto {
         data["postLink"] = this.postLink;
         data["view"] = this.view;
         data["comment"] = this.comment;
+        data["like"] = this.like;
         data["save"] = this.save;
         data["share"] = this.share;
         data["channelType"] = this.channelType;
