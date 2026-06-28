@@ -6,9 +6,10 @@ import { PagedListingComponentBase } from 'shared/paged-listing-component-base';
 import {
     ContractServiceProxy,
     ContractDto,
-    ContractDtoPagedResultDto,
     ContractStatus,
+    KolDuplicateContractServiceProxy,
 } from '@shared/service-proxies/service-proxies';
+import { forkJoin } from 'rxjs';
 import { CreateContractDialogComponent } from './create-contract/create-contract-dialog.component';
 import { EditContractDialogComponent } from './edit-contract/edit-contract-dialog.component';
 import { ManageContractKolsDialogComponent } from './contract-kols/manage-contract-kols-dialog.component';
@@ -56,6 +57,10 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
     filterStatus: ContractStatus | undefined = undefined;
     advancedFiltersVisible = false;
 
+    // contractId -> tên các contract không cho trùng KOL
+    duplicateMap: Record<string, string[]> = {};
+    private _allContractNames: Record<string, string> = {};
+
     contractStatuses = [
         { value: undefined, label: 'Tất cả' },
         { value: ContractStatus.Prepare, label: 'Chuẩn bị' },
@@ -68,6 +73,7 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
     constructor(
         injector: Injector,
         private _contractService: ContractServiceProxy,
+        private _kolDuplicateContractService: KolDuplicateContractServiceProxy,
         private _modalService: BsModalService,
         cd: ChangeDetectorRef
     ) {
@@ -125,22 +131,42 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
 
         this.primengTableHelper.showLoadingIndicator();
 
-        this._contractService
-            .getAll(
+        forkJoin({
+            contracts: this._contractService.getAll(
                 this.keyword,
                 this.filterStatus,
                 undefined,
                 this.primengTableHelper.getSorting(this.dataTable),
                 this.primengTableHelper.getSkipCount(this.paginator, event),
                 this.primengTableHelper.getMaxResultCount(this.paginator, event)
-            )
-            .pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator()))
-            .subscribe((result: ContractDtoPagedResultDto) => {
-                this.primengTableHelper.records = result.items;
-                this.primengTableHelper.totalRecordsCount = result.totalCount;
-                this.primengTableHelper.hideLoadingIndicator();
-                this.cd.detectChanges();
-            });
+            ),
+            allContracts: this._contractService.getAll(undefined, undefined, undefined, undefined, 0, 1000),
+            duplicates: this._kolDuplicateContractService.getAll(undefined, undefined, 0, 1000),
+        })
+        .pipe(finalize(() => this.primengTableHelper.hideLoadingIndicator()))
+        .subscribe(({ contracts, allContracts, duplicates }) => {
+            this.primengTableHelper.records = contracts.items ?? [];
+            this.primengTableHelper.totalRecordsCount = contracts.totalCount;
+
+            this._allContractNames = {};
+            for (const c of allContracts.items ?? []) {
+                this._allContractNames[c.id] = c.name ?? '';
+            }
+
+            this.duplicateMap = {};
+            for (const d of duplicates.items ?? []) {
+                const a = d.firstContractId;
+                const b = d.secondContractId;
+                if (!a || !b) continue;
+                if (!this.duplicateMap[a]) this.duplicateMap[a] = [];
+                if (!this.duplicateMap[b]) this.duplicateMap[b] = [];
+                this.duplicateMap[a].push(this._allContractNames[b] ?? b);
+                this.duplicateMap[b].push(this._allContractNames[a] ?? a);
+            }
+
+            this.primengTableHelper.hideLoadingIndicator();
+            this.cd.detectChanges();
+        });
     }
 
     manageKols(contract: ContractDto): void {

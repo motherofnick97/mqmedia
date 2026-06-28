@@ -35,11 +35,11 @@
         <div class="form-group row">
             <label class="col-md-3 col-form-label" for="career">{{ 'Career' | localize }}</label>
             <div class="col-md-9">
-                <p-select name="career" inputId="career" [(ngModel)]="kol.career"
-                    [options]="careerOptions" optionLabel="label" optionValue="value"
-                    [placeholder]="'-- Chọn nghề nghiệp --'"
+                <p-multiselect name="career" inputId="career" [(ngModel)]="kol.careerIds"
+                    [options]="careers" optionLabel="name" optionValue="id"
+                    placeholder="-- Chọn nghề nghiệp --"
                     [style]="{'width':'100%'}">
-                </p-select>
+                </p-multiselect>
             </div>
         </div>
 

@@ -49,6 +49,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem(this.l('Kols'), '/app/kols', 'fas fa-star'),
             new MenuItem(this.l('Companies'), '/app/companies', 'fas fa-building'),
             new MenuItem(this.l('Campaigns'), '/app/campaigns', 'fas fa-bullhorn'),
+            new MenuItem('Nghề nghiệp', '/app/careers', 'fas fa-briefcase'),
             new MenuItem(this.l('Roles'), '/app/roles', 'fas fa-theater-masks', 'Pages.Roles'),
             new MenuItem(this.l('Tenants'), '/app/tenants', 'fas fa-building', 'Pages.Tenants'),
             new MenuItem(this.l('Users'), '/app/users', 'fas fa-users', 'Pages.Users'),

@@ -42,6 +42,40 @@
         </div>
 
         <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="request">Request</label>
+            <div class="col-md-9">
+                <textarea pTextarea name="request" id="request" rows="3"
+                    [(ngModel)]="contract.request" style="width:100%"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="script">Script</label>
+            <div class="col-md-9">
+                <textarea pTextarea name="script" id="script" rows="3"
+                    [(ngModel)]="contract.script" style="width:100%"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label">Không trùng KOL với</label>
+            <div class="col-md-9">
+                <p-multiselect
+                    [(ngModel)]="duplicateContractIds"
+                    name="duplicateContracts"
+                    [options]="contracts"
+                    optionLabel="name"
+                    optionValue="id"
+                    [filter]="true"
+                    filterPlaceholder="Tìm hợp đồng..."
+                    placeholder="-- Chọn hợp đồng --"
+                    [style]="{'width':'100%'}">
+                </p-multiselect>
+                <small class="text-muted">KOL đã có trong các hợp đồng này sẽ không được thêm vào hợp đồng mới.</small>
+            </div>
+        </div>
+
+        <div class="form-group row">
             <label class="col-md-3 col-form-label" for="note">{{ 'Note' | localize }}</label>
             <div class="col-md-9">
                 <textarea pTextarea name="note" id="note" rows="3" maxlength="5000"

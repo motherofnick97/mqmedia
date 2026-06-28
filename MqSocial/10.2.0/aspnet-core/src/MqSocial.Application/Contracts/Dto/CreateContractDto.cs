@@ -18,4 +18,8 @@ public class CreateContractDto
     public ContractStatus Status { get; set; } = ContractStatus.Prepare;
 
     public int? Budget { get; set; }
+
+    public string Request { get; set; }
+
+    public string Script { get; set; }
 }

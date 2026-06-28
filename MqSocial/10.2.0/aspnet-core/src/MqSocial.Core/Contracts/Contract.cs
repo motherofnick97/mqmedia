@@ -34,5 +34,9 @@ namespace MqSocial.Contracts
         public int? TenantId { get; set; }
 
         public int? Budget { get; set; }
+
+        public string Request { get; set; }
+
+        public string Script { get; set; }
     }
 }

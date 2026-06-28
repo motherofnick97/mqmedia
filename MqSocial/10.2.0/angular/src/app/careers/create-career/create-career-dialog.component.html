@@ -1,0 +1,19 @@
+<form class="form-horizontal" autocomplete="off" #createCareerModal="ngForm" (ngSubmit)="save()">
+    <abp-modal-header title="Tạo nghề nghiệp mới" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
+
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="name">Tên</label>
+            <div class="col-md-9">
+                <input pInputText type="text" name="name" id="name" required maxlength="256"
+                    [(ngModel)]="career.name" #nameModel="ngModel" #nameEl style="width:100%" />
+                <abp-validation-summary [control]="nameModel" [controlEl]="nameEl"></abp-validation-summary>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <p-button label="Hủy" severity="secondary" [disabled]="saving" (onClick)="bsModalRef.hide()"></p-button>
+        <p-button label="Lưu" [disabled]="!createCareerModal.form.valid || saving" [loading]="saving" (onClick)="save()"></p-button>
+    </div>
+</form>

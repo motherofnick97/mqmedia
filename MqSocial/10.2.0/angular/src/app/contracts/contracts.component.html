@@ -81,6 +81,7 @@
                                     <th style="width: 130px" pSortableColumn="budget">
                                         {{ 'Budget' | localize }}<p-sortIcon field="budget"></p-sortIcon>
                                     </th>
+                                    <th>Không trùng KOL với</th>
                                     <th style="width: 210px">{{ 'Actions' | localize }}</th>
                                 </tr>
                             </ng-template>
@@ -94,6 +95,17 @@
                                         </p-tag>
                                     </td>
                                     <td>{{ record.budget | number }}</td>
+                                    <td>
+                                        @if (duplicateMap[record.id]?.length) {
+                                            <div class="d-flex flex-wrap" style="gap: 0.25rem">
+                                                @for (name of duplicateMap[record.id]; track name) {
+                                                    <p-tag [value]="name" severity="warn"></p-tag>
+                                                }
+                                            </div>
+                                        } @else {
+                                            <span class="text-muted">—</span>
+                                        }
+                                    </td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
                                             <p-button icon="pi pi-users" label="KOLs" size="small" severity="info"

@@ -1,6 +1,7 @@
 using MqSocial.Common.Enum;
 using MqSocial.Kols;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Kols.Dto;
@@ -17,7 +18,7 @@ public class CreateKolDto
     [StringLength(Kol.MaxNameLength)]
     public string Link { get; set; }
 
-    public KolCareer Career { get; set; }
+    public List<Guid> CareerIds { get; set; } = new();
 
     public ChannelType Channel { get; set; }
 

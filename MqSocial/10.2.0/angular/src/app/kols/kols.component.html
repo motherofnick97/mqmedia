@@ -7,6 +7,69 @@
         style="display: none"
         (change)="onFileSelected($event)" />
 
+    <!-- Dialog chọn Career trước khi import -->
+    <p-dialog
+        header="Import KOL từ Excel"
+        [(visible)]="showImportDialog"
+        [modal]="true"
+        [style]="{ width: '480px' }"
+        [closable]="!importLoading"
+        (onHide)="cancelImportDialog()">
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Nghề nghiệp áp dụng cho tất cả KOL</label>
+            <p-multiselect
+                [(ngModel)]="importCareerIds"
+                [options]="careers"
+                optionLabel="name"
+                optionValue="id"
+                placeholder="-- Chọn nghề nghiệp (không bắt buộc) --"
+                [style]="{ width: '100%' }">
+            </p-multiselect>
+            <small class="text-muted">Nếu không chọn, hệ thống sẽ đọc nghề nghiệp từ cột trong file Excel.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">Hợp đồng</label>
+            <p-select
+                [(ngModel)]="importContractId"
+                [options]="contracts"
+                optionLabel="name"
+                optionValue="id"
+                [showClear]="true"
+                placeholder="-- Chọn hợp đồng (không bắt buộc) --"
+                [style]="{ width: '100%' }">
+            </p-select>
+            <small class="text-muted">Tất cả KOL trong file sẽ được thêm vào hợp đồng này.</small>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label fw-semibold">File Excel</label>
+            <div class="d-flex align-items-center" style="gap: 0.5rem">
+                <p-button icon="pi pi-file-excel" label="Chọn file..." severity="secondary"
+                    (onClick)="pickImportFile()">
+                </p-button>
+                @if (pendingImportFile) {
+                    <span class="text-success">
+                        <i class="pi pi-check me-1"></i>{{ pendingImportFile.name }}
+                    </span>
+                } @else {
+                    <span class="text-muted">Chưa chọn file</span>
+                }
+            </div>
+        </div>
+
+        <ng-template pTemplate="footer">
+            <p-button label="Hủy" severity="secondary" [disabled]="importLoading"
+                (onClick)="cancelImportDialog()">
+            </p-button>
+            <p-button label="Import" icon="pi pi-upload" [loading]="importLoading"
+                [disabled]="!pendingImportFile || importLoading"
+                (onClick)="submitImport()">
+            </p-button>
+        </ng-template>
+    </p-dialog>
+
     <p-toolbar styleClass="mb-3">
         <ng-template pTemplate="start">
             <h1 class="m-0">{{ 'Danh sách Kols' | localize }}</h1>
@@ -78,11 +141,13 @@
                                 <div class="col-md-6">
                                     <label class="form-label">{{ 'Career' | localize }}</label>
                                     <p-select
-                                        [(ngModel)]="filterCareer"
-                                        name="filterCareer"
-                                        [options]="careerOptions"
-                                        optionLabel="label"
-                                        optionValue="value"
+                                        [(ngModel)]="filterCareerId"
+                                        name="filterCareerId"
+                                        [options]="careers"
+                                        optionLabel="name"
+                                        optionValue="id"
+                                        [showClear]="true"
+                                        placeholder="-- Tất cả --"
                                         [fluid]="true">
                                     </p-select>
                                 </div>
@@ -153,7 +218,7 @@
                                             [value]="getChannelLabel(record.channel)">
                                         </p-tag>
                                     </td>
-                                    <td>{{ getCareerLabel(record.career) }}</td>
+                                    <td>{{ record.careerNames?.join(', ') }}</td>
                                     <td>{{ record.follow | number }}</td>
                                     <td>{{ record.generalCast | number }}</td>
                                     <td>{{ record.phone }}</td>

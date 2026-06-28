@@ -2,6 +2,7 @@ using Abp.Application.Services.Dto;
 using MqSocial.Common.Enum;
 using MqSocial.Kols;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace MqSocial.Kols.Dto;
@@ -18,7 +19,9 @@ public class KolDto : EntityDto<Guid>
     [StringLength(Kol.MaxNameLength)]
     public string Link { get; set; }
 
-    public KolCareer Career { get; set; }
+    public List<Guid> CareerIds { get; set; } = new();
+
+    public List<string> CareerNames { get; set; } = new();
 
     public ChannelType Channel { get; set; }
 

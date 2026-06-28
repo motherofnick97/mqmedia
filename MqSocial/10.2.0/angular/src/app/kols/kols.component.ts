@@ -3,7 +3,7 @@ import { finalize } from 'rxjs/operators';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase } from 'shared/paged-listing-component-base';
-import { KolServiceProxy, KolDto, KolDtoPagedResultDto, KolCareer, ChannelType } from '@shared/service-proxies/service-proxies';
+import { KolServiceProxy, KolDto, KolDtoPagedResultDto, ChannelType, CareerServiceProxy, CareerDto, ContractServiceProxy, ContractDto } from '@shared/service-proxies/service-proxies';
 import { CreateKolDialogComponent } from './create-kol/create-kol-dialog.component';
 import { EditKolDialogComponent } from './edit-kol/edit-kol-dialog.component';
 import { AddKolToContractsDialogComponent } from './add-to-contracts/add-kol-to-contracts-dialog.component';
@@ -22,6 +22,7 @@ import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { Tooltip } from 'primeng/tooltip';
 import { Dialog } from 'primeng/dialog';
+import { MultiSelect } from 'primeng/multiselect';
 import { HttpClient } from '@angular/common/http';
 import { AppConsts } from '@shared/AppConsts';
 
@@ -56,6 +57,7 @@ interface ImportKolResult {
         Tooltip,
         CommonModule,
         Dialog,
+        MultiSelect,
     ],
 })
 export class KolsComponent extends PagedListingComponentBase<KolDto> {
@@ -64,7 +66,7 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
     @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
 
     keyword = '';
-    filterCareer: KolCareer | undefined = undefined;
+    filterCareerId: string | undefined = undefined;
     filterChannel: ChannelType | undefined = undefined;
     advancedFiltersVisible = false;
 
@@ -72,13 +74,13 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
     importResult: ImportKolResult | null = null;
     showImportResult = false;
 
-    careerOptions = [
-        { value: undefined, label: 'Tất cả' },
-        { value: KolCareer.Other, label: 'Khác' },
-        { value: KolCareer.DuocSi, label: 'Dược sĩ' },
-        { value: KolCareer.BacSi, label: 'Bác sĩ' },
-        { value: KolCareer.Mom, label: 'Mẹ bé' },
-    ];
+    showImportDialog = false;
+    importCareerIds: string[] = [];
+    importContractId: string | null = null;
+    pendingImportFile: File | null = null;
+
+    careers: CareerDto[] = [];
+    contracts: ContractDto[] = [];
 
     channelOptions = [
         { value: undefined, label: 'Tất cả' },
@@ -90,11 +92,24 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
     constructor(
         injector: Injector,
         private _kolService: KolServiceProxy,
+        private _careerService: CareerServiceProxy,
+        private _contractService: ContractServiceProxy,
         private _modalService: BsModalService,
         private _http: HttpClient,
         cd: ChangeDetectorRef
     ) {
         super(injector, cd);
+    }
+
+    ngOnInit(): void {
+        this._careerService.getAll(undefined, 'Name', 0, 1000).subscribe((r) => {
+            this.careers = r.items ?? [];
+            this.cd.detectChanges();
+        });
+        this._contractService.getAll(undefined, undefined, undefined, 'Name', 0, 1000).subscribe((r) => {
+            this.contracts = r.items ?? [];
+            this.cd.detectChanges();
+        });
     }
 
     createKol(): void {
@@ -119,13 +134,28 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
 
     clearFilters(): void {
         this.keyword = '';
-        this.filterCareer = undefined;
+        this.filterCareerId = undefined;
         this.filterChannel = undefined;
         this.list();
     }
 
     openImportDialog(): void {
+        this.importCareerIds = [];
+        this.importContractId = null;
+        this.pendingImportFile = null;
         this.fileInput.nativeElement.value = '';
+        this.showImportDialog = true;
+    }
+
+    cancelImportDialog(): void {
+        this.showImportDialog = false;
+        this.pendingImportFile = null;
+        this.importCareerIds = [];
+        this.importContractId = null;
+        this.fileInput.nativeElement.value = '';
+    }
+
+    pickImportFile(): void {
         this.fileInput.nativeElement.click();
     }
 
@@ -140,15 +170,31 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         const input = event.target as HTMLInputElement;
         const file = input.files?.[0];
         if (!file) return;
+        this.pendingImportFile = file;
+        this.cd.detectChanges();
+    }
+
+    submitImport(): void {
+        if (!this.pendingImportFile) return;
 
         this.importLoading = true;
         const formData = new FormData();
-        formData.append('file', file);
+        formData.append('file', this.pendingImportFile);
+        for (const id of this.importCareerIds) {
+            formData.append('CareerIds', id);
+        }
+        if (this.importContractId) {
+            formData.append('ContractId', this.importContractId);
+        }
 
         const url = `${AppConsts.remoteServiceBaseUrl}/api/services/app/Kol/ImportFromExcel`;
         this._http.post<{ result: ImportKolResult }>(url, formData).subscribe({
             next: (response) => {
                 this.importLoading = false;
+                this.showImportDialog = false;
+                this.pendingImportFile = null;
+                this.importCareerIds = [];
+                this.importContractId = null;
                 this.importResult = response.result;
                 if (response.result.failCount === 0) {
                     this.notify.success(`Import thành công ${response.result.successCount} KOL`);
@@ -183,11 +229,6 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         return 'Khác';
     }
 
-    getCareerLabel(career: KolCareer): string {
-        const map = { [KolCareer.Other]: 'Khác', [KolCareer.DuocSi]: 'Dược sĩ', [KolCareer.BacSi]: 'Bác sĩ', [KolCareer.Mom]: 'Mẹ bé' };
-        return map[career] ?? '';
-    }
-
     list(event?: LazyLoadEvent): void {
         if (this.primengTableHelper.shouldResetPaging(event)) {
             this.paginator.changePage(0);
@@ -201,7 +242,7 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
         this._kolService
             .getAll(
                 this.keyword,
-                this.filterCareer,
+                this.filterCareerId,
                 this.filterChannel,
                 this.primengTableHelper.getSorting(this.dataTable),
                 this.primengTableHelper.getSkipCount(this.paginator, event),

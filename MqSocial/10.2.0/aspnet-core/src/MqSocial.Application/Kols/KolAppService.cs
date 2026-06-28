@@ -1,29 +1,32 @@
-﻿using Abp.Application.Services;
+using Abp.Application.Services;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Castle.Core.Logging;
-using HtmlAgilityPack;
+using Castle.MicroKernel.Registration;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
-using MqSocial.Authorization.Roles;
+using MqSocial.Careers;
 using MqSocial.Common.Enum;
+using MqSocial.CommonFunc;
+using MqSocial.ContractKols;
+using MqSocial.KolCareers;
 using MqSocial.Kols.Dto;
-using MqSocial.MultiTenancy;
+using MqSocial.Roles.Dto;
 using Newtonsoft.Json.Linq;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
-using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
+using System.Threading.Channels;
 using System.Threading.Tasks;
-using System.Linq.Dynamic.Core;
-using OfficeOpenXml;
-using MqSocial.CommonFunc;
 
 namespace MqSocial.Kols;
 
@@ -33,20 +36,32 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     public ILogger Logger { get; set; }
 
     private readonly IHttpClientFactory _httpClientFactory;
+    private readonly IRepository<Career, Guid> _careerRepository;
+    private readonly IRepository<KolCarrer, Guid> _kolCareerRepository;
+    private readonly IRepository<ContractKol, Guid> _contractKolRepository;
 
-    public KolAppService(IRepository<Kol, Guid> repository, IHttpClientFactory httpClientFactory)
+    public KolAppService(
+        IRepository<Kol, Guid> repository,
+        IHttpClientFactory httpClientFactory,
+        IRepository<Career, Guid> careerRepository,
+        IRepository<KolCarrer, Guid> kolCareerRepository,
+        IRepository<ContractKol, Guid> contractKolRepository)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
+        _careerRepository = careerRepository;
+        _kolCareerRepository = kolCareerRepository;
+        _contractKolRepository = contractKolRepository;
     }
 
     protected override IQueryable<Kol> CreateFilteredQuery(PagedKolRequestDto input)
     {
         return Repository.GetAll()
+            .Include(x => x.KolCareers).ThenInclude(x => x.Career)
             .WhereIf(!input.Keyword.IsNullOrWhiteSpace(), x =>
                 x.Name.Contains(input.Keyword) ||
                 x.Note.Contains(input.Keyword))
-            .WhereIf(input.Career.HasValue, x => x.Career == input.Career.Value)
+            .WhereIf(input.CareerId.HasValue, x => x.KolCareers.Any(k => k.CareerId == input.CareerId.Value))
             .WhereIf(input.Channel.HasValue, x => x.Channel == input.Channel.Value);
     }
 
@@ -55,34 +70,92 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return query.OrderBy(input.Sorting);
     }
 
+    public override async Task<KolDto> CreateAsync(CreateKolDto input)
+    {
+        CheckCreatePermission();
+
+        var kol = MapToEntity(input);
+        await Repository.InsertAsync(kol);
+        //await CurrentUnitOfWork.SaveChangesAsync();
+
+        foreach (var careerId in input.CareerIds ?? new List<Guid>())
+        {
+            await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
+        }
+
+        //await CurrentUnitOfWork.SaveChangesAsync();
+
+        var reloaded = await Repository.GetAll()
+            .Include(x => x.KolCareers).ThenInclude(x => x.Career)
+            .FirstOrDefaultAsync(x => x.Id == kol.Id);
+
+        return MapToEntityDto(reloaded);
+    }
+
+    public override async Task<KolDto> UpdateAsync(KolDto input)
+    {
+        CheckUpdatePermission();
+
+        var kol = await Repository.GetAsync(input.Id);
+        MapToEntity(input, kol);
+        await Repository.UpdateAsync(kol);
+
+        // Xóa KolCareer cũ, chèn mới
+        var existing = await _kolCareerRepository.GetAll()
+            .Where(x => x.KolId == kol.Id)
+            .ToListAsync();
+        foreach (var item in existing)
+            await _kolCareerRepository.DeleteAsync(item);
+
+        foreach (var careerId in input.CareerIds ?? new List<Guid>())
+        {
+            await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
+        }
+
+        //await CurrentUnitOfWork.SaveChangesAsync();
+
+        var reloaded = await Repository.GetAll()
+            .Include(x => x.KolCareers).ThenInclude(x => x.Career)
+            .FirstOrDefaultAsync(x => x.Id == kol.Id);
+
+        return MapToEntityDto(reloaded);
+    }
+
     private async Task<KolDto> CrawlUserInfo(string uniqueId)
     {
-        var client = new HttpClient();
-        var request = new HttpRequestMessage
+        try
         {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri("https://tiktok-api23.p.rapidapi.com/api/user/info?uniqueId=" + uniqueId),
-            Headers =
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://tiktok-api23.p.rapidapi.com/api/user/info?uniqueId=" + uniqueId),
+                Headers =
             {
                 { "x-rapidapi-key", "63fb251e9emsh10eab69a0126292p15c65cjsn4f2df599110c" },
                 { "x-rapidapi-host", "tiktok-api23.p.rapidapi.com" },
             },
-        };
-        var response = await client.SendAsync(request);
-        response.EnsureSuccessStatusCode();
-        var body = await response.Content.ReadAsStringAsync();
-        var json = JObject.Parse(body);
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            var body = await response.Content.ReadAsStringAsync();
+            var json = JObject.Parse(body);
 
-        var name = json["userInfo"]["user"]["nickname"].ToString();
-        var followers = json["userInfo"]["stats"]["followerCount"].Value<int>();
-        var likes = json["userInfo"]["stats"]["heartCount"].Value<int>();
+            var name = json["userInfo"]["user"]["nickname"].ToString();
+            var followers = json["userInfo"]["stats"]["followerCount"].Value<int>();
 
-        return new KolDto()
+            return new KolDto()
+            {
+                AccountId = uniqueId,
+                Follow = followers,
+                Name = name
+            };
+        }
+        catch (Exception)
         {
-            AccountId = uniqueId,
-            Follow = followers,
-            Name = name
-        };
+            return null;
+        }
+        
     }
 
     public async Task<ImportKolResultDto> ImportFromExcel([FromForm] ImportKolDto input)
@@ -101,11 +174,10 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
         var rowCount = sheet.Dimension.Rows;
 
-        // Đọc từ dòng 2 (dòng 1 là header)
         for (int row = 2; row <= rowCount; row++)
         {
             try
-            {//Tài khoản	Kênh	Nghề nghiệp	Follow	SĐT	Địa chỉ	Ghi chú
+            {
                 var accountId = sheet.Cells[row, 1].Text?.Trim();
                 var channelText = sheet.Cells[row, 2].Text?.Trim();
                 var careerText = sheet.Cells[row, 3].Text?.Trim();
@@ -121,45 +193,39 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                     continue;
                 }
 
-                // Parse channel
                 ChannelType? channel = null;
                 if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
                     channel = ch;
 
-                // Parse Career
-                KolCareer? career = CommonFunction.ParseEnumByDescription<KolCareer>(careerText);
-
-                // Nếu muốn fallback thử parse theo tên enum luôn
-                if (career == null && Enum.TryParse<KolCareer>(careerText, true, out var c))
-                    career = c;
+                // Dùng CareerIds từ FE nếu có, không thì lookup từ cột Excel
+                var effectiveCareerIds = new List<Guid>();
+                if (input.CareerIds != null && input.CareerIds.Count > 0)
+                {
+                    effectiveCareerIds = input.CareerIds;
+                }
+                else if (!string.IsNullOrEmpty(careerText))
+                {
+                    var careerEntity = await _careerRepository.GetAll().FirstOrDefaultAsync(x => x.Name == careerText);
+                    if (careerEntity != null) effectiveCareerIds.Add(careerEntity.Id);
+                }
 
                 KolDto kolDto = await CrawlUserInfo(accountId);
 
-                // Check trung AccountId + Channel
-                var exists = await Repository.GetAll().FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
-                if (exists != null)
+                if (kolDto == null)
                 {
-                    exists.Follow = kolDto.Follow;
-                    exists.Name = kolDto.Name;
-                    exists.Address = address;
-                    exists.Note = note;
-                    exists.Phone = phone;
-                    exists.Career = career ?? KolCareer.Other;
-                    result.SuccessCount++;
+                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Fail when crawl data" });
+                    result.FailCount++;
                     continue;
                 }
 
-                await Repository.InsertAsync(new Kol
+                Guid kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, effectiveCareerIds);
+
+                if (input.ContractId.HasValue)
                 {
-                    Name = kolDto.Name,
-                    AccountId = accountId,
-                    Channel = channel ?? ChannelType.Khac,
-                    Follow = kolDto.Follow,
-                    Note = note,
-                    Address = address,
-                    Phone = phone,
-                    Career = career ?? KolCareer.Other
-                });
+                    await HanleContractKolFromExcel(kolId, input.ContractId.Value);
+                    var contractKolExists = await _contractKolRepository.GetAll()
+                        .AnyAsync(x => x.KolId == kolId && x.ContractId == input.ContractId.Value);
+                }
 
                 result.SuccessCount++;
             }
@@ -173,4 +239,59 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return result;
     }
 
+    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType? channel, string address, string note, string phone, List<Guid> effectiveCareerIds)
+    {
+        Guid kolId = new Guid();
+
+        var exists = await Repository.GetAll()
+                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
+        if (exists != null)
+        {
+            kolId = exists.Id;
+
+            exists.Follow = kolDto.Follow;
+            exists.Name = kolDto.Name;
+            exists.Address = address;
+            exists.Note = note;
+            exists.Phone = phone;
+
+            foreach (var careerId in effectiveCareerIds)
+            {
+                var alreadyLinked = await _kolCareerRepository.GetAll()
+                    .AnyAsync(x => x.KolId == exists.Id && x.CareerId == careerId);
+                if (!alreadyLinked)
+                    await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = exists.Id, CareerId = careerId });
+            }
+        }
+        else
+        {
+            var newKol = await Repository.InsertAsync(new Kol
+            {
+                Name = kolDto.Name,
+                AccountId = accountId,
+                Channel = channel ?? ChannelType.Khac,
+                Follow = kolDto.Follow,
+                Note = note,
+                Address = address,
+                Phone = phone,
+            });
+
+            foreach (var careerId in effectiveCareerIds)
+                kolId = await _kolCareerRepository.InsertAndGetIdAsync(new KolCarrer { KolId = newKol.Id, CareerId = careerId });
+        }
+        return kolId;
+    }
+
+    private async Task HanleContractKolFromExcel(Guid kolId, Guid contractId)
+    {
+        var contractKolExists = await _contractKolRepository.GetAll()
+                       .AnyAsync(x => x.KolId == kolId && x.ContractId == contractId);
+        if (!contractKolExists)
+            await _contractKolRepository.InsertAsync(new ContractKol
+            {
+                KolId = kolId,
+                ContractId = contractId,
+                Status = ContractKolStatus.Register
+            });
+    }
 }

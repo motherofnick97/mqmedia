@@ -53,7 +53,7 @@ public class UpdateContractKolResultJob
             inner join 
             	Contracts C
             on 
-            	B.ContractId = A.Id
+            	B.ContractId = C.Id
             WHERE 
             	A.IsDeleted = 0 and B.IsDeleted = 0 and C.IsDeleted = 0
             	AND PostLink IS NOT NULL

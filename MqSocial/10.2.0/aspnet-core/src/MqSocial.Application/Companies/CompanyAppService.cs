@@ -28,4 +28,7 @@ public class CompanyAppService : AsyncCrudAppService<Company, CompanyDto, Guid, 
     {
         return query.OrderBy(x => x.Name);
     }
+
+
+
 }

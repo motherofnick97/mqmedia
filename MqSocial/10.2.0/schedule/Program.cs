@@ -37,7 +37,7 @@ var jobManager = host.Services.GetRequiredService<IRecurringJobManager>();
 jobManager.AddOrUpdate<UpdateContractKolResultJob>(
     "update-contract-kol-result",
     job => job.Execute(),
-    Cron.Daily(6));
+    Cron.Minutely);
 
 Console.WriteLine("MqScheduler đang chạy. Ctrl+C để dừng.");
 await host.WaitForShutdownAsync();

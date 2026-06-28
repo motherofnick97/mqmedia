@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace MqSocial.Migrations
 {
     /// <inheritdoc />
-    public partial class Initial : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -449,6 +449,26 @@ namespace MqSocial.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Careers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<int>(type: "int", nullable: true),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierUserId = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleterUserId = table.Column<long>(type: "bigint", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Careers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Companies",
                 columns: table => new
                 {
@@ -469,6 +489,27 @@ namespace MqSocial.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "KolDuplicateContracts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<int>(type: "int", nullable: true),
+                    FirstContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SecondContractId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierUserId = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleterUserId = table.Column<long>(type: "bigint", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KolDuplicateContracts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Kols",
                 columns: table => new
                 {
@@ -476,8 +517,6 @@ namespace MqSocial.Migrations
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
                     Note = table.Column<string>(type: "nvarchar(max)", maxLength: 5000, nullable: true),
                     Link = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EndDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Career = table.Column<int>(type: "int", nullable: false),
                     Channel = table.Column<int>(type: "int", nullable: false),
                     GeneralCast = table.Column<int>(type: "int", nullable: false),
                     Follow = table.Column<int>(type: "int", nullable: false),
@@ -850,6 +889,39 @@ namespace MqSocial.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "KolCareers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    TenantId = table.Column<int>(type: "int", nullable: true),
+                    CareerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    KolId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
+                    LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastModifierUserId = table.Column<long>(type: "bigint", nullable: true),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
+                    DeleterUserId = table.Column<long>(type: "bigint", nullable: true),
+                    DeletionTime = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_KolCareers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_KolCareers_Careers_CareerId",
+                        column: x => x.CareerId,
+                        principalTable: "Careers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_KolCareers_Kols_KolId",
+                        column: x => x.KolId,
+                        principalTable: "Kols",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AbpDynamicEntityPropertyValues",
                 columns: table => new
                 {
@@ -964,6 +1036,8 @@ namespace MqSocial.Migrations
                     Status = table.Column<int>(type: "int", nullable: false),
                     TenantId = table.Column<int>(type: "int", nullable: true),
                     Budget = table.Column<int>(type: "int", nullable: true),
+                    Request = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Script = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
                     LastModificationTime = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -1044,6 +1118,7 @@ namespace MqSocial.Migrations
                     Comment = table.Column<int>(type: "int", nullable: true),
                     Save = table.Column<int>(type: "int", nullable: true),
                     Share = table.Column<int>(type: "int", nullable: true),
+                    Like = table.Column<int>(type: "int", nullable: true),
                     ChannelType = table.Column<int>(type: "int", nullable: false),
                     CreationTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     CreatorUserId = table.Column<long>(type: "bigint", nullable: true),
@@ -1442,6 +1517,16 @@ namespace MqSocial.Migrations
                 column: "CampaignId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_KolCareers_CareerId",
+                table: "KolCareers",
+                column: "CareerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_KolCareers_KolId",
+                table: "KolCareers",
+                column: "KolId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Kols_AccountId_Channel",
                 table: "Kols",
                 columns: new[] { "AccountId", "Channel" },
@@ -1536,6 +1621,12 @@ namespace MqSocial.Migrations
                 name: "ContractKolResults");
 
             migrationBuilder.DropTable(
+                name: "KolCareers");
+
+            migrationBuilder.DropTable(
+                name: "KolDuplicateContracts");
+
+            migrationBuilder.DropTable(
                 name: "AbpDynamicEntityProperties");
 
             migrationBuilder.DropTable(
@@ -1552,6 +1643,9 @@ namespace MqSocial.Migrations
 
             migrationBuilder.DropTable(
                 name: "ContractKols");
+
+            migrationBuilder.DropTable(
+                name: "Careers");
 
             migrationBuilder.DropTable(
                 name: "AbpDynamicProperties");

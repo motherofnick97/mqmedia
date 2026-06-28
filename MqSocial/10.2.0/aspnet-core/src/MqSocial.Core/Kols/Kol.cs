@@ -2,8 +2,11 @@ using Abp.Domain.Entities;
 using Abp.Domain.Entities.Auditing;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Common.Enum;
+using MqSocial.KolCareers;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MqSocial.Kols;
 
@@ -23,8 +26,6 @@ public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
     [StringLength(MaxNameLength)]
     public string Link { get; set; }
 
-    public KolCareer Career { get; set; }
-
     [Required]
     public ChannelType Channel { get; set; }
 
@@ -41,4 +42,5 @@ public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
 
     public string Phone { get; set; }
 
+    public ICollection<KolCarrer> KolCareers { get; set; }
 }

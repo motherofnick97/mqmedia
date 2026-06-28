@@ -10,6 +10,10 @@ namespace MqSocial.Kols.Dto
     public class ImportKolDto
     {
         public IFormFile File { get; set; }
+
+        public List<Guid> CareerIds { get; set; } = new();
+
+        public Guid? ContractId { get; set; }
     }
 
     public class ImportKolResultDto

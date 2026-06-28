@@ -20,5 +20,9 @@ public class ContractDto : EntityDto<Guid>
 
     public int? Budget { get; set; }
 
+    public string Request { get; set; }
+
+    public string Script { get; set; }
+
     public int? TenantId { get; set; }
 }

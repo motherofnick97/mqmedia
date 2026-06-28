@@ -1,7 +1,7 @@
 using Abp.Application.Services.Dto;
 using Abp.Runtime.Validation;
 using MqSocial.Common.Enum;
-using MqSocial.Kols;
+using System;
 
 namespace MqSocial.Kols.Dto;
 
@@ -11,7 +11,7 @@ public class PagedKolRequestDto : PagedResultRequestDto, IShouldNormalize
 
     public string Sorting { get; set; }
 
-    public KolCareer? Career { get; set; }
+    public Guid? CareerId { get; set; }
 
     public ChannelType? Channel { get; set; }
 

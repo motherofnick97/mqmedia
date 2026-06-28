@@ -1,7 +1,7 @@
 import { Component, Injector, OnInit, EventEmitter, Output, ChangeDetectorRef } from '@angular/core';
 import { BsModalRef } from 'ngx-bootstrap/modal';
 import { AppComponentBase } from '@shared/app-component-base';
-import { KolServiceProxy, KolDto, KolCareer, ChannelType } from '@shared/service-proxies/service-proxies';
+import { KolServiceProxy, KolDto, ChannelType, CareerServiceProxy, CareerDto } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
 import { AbpValidationSummaryComponent } from '../../../shared/components/validation/abp-validation.summary.component';
@@ -9,6 +9,7 @@ import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { InputText } from 'primeng/inputtext';
 import { Textarea } from 'primeng/textarea';
 import { Select } from 'primeng/select';
+import { MultiSelect } from 'primeng/multiselect';
 import { InputNumber } from 'primeng/inputnumber';
 import { Button } from 'primeng/button';
 
@@ -23,6 +24,7 @@ import { Button } from 'primeng/button';
         InputText,
         Textarea,
         Select,
+        MultiSelect,
         InputNumber,
         Button,
     ],
@@ -33,13 +35,7 @@ export class EditKolDialogComponent extends AppComponentBase implements OnInit {
     saving = false;
     kol = new KolDto();
     id: string;
-
-    careerOptions = [
-        { value: KolCareer.Other, label: 'Khác' },
-        { value: KolCareer.DuocSi, label: 'Dược sĩ' },
-        { value: KolCareer.BacSi, label: 'Bác sĩ' },
-        { value: KolCareer.Mom, label: 'Mẹ bé' },
-    ];
+    careers: CareerDto[] = [];
 
     channelOptions = [
         { value: ChannelType.Tiktok, label: 'TikTok' },
@@ -50,6 +46,7 @@ export class EditKolDialogComponent extends AppComponentBase implements OnInit {
     constructor(
         injector: Injector,
         public _kolService: KolServiceProxy,
+        private _careerService: CareerServiceProxy,
         public bsModalRef: BsModalRef,
         private cd: ChangeDetectorRef
     ) {
@@ -57,6 +54,10 @@ export class EditKolDialogComponent extends AppComponentBase implements OnInit {
     }
 
     ngOnInit(): void {
+        this._careerService.getAll(undefined, 'Name', 0, 1000).subscribe((r) => {
+            this.careers = r.items ?? [];
+            this.cd.detectChanges();
+        });
         this._kolService.get(this.id).subscribe((result) => {
             this.kol = result;
             this.cd.detectChanges();
