@@ -276,8 +276,10 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 Phone = phone,
             });
 
+            kolId = newKol.Id;
+
             foreach (var careerId in effectiveCareerIds)
-                kolId = await _kolCareerRepository.InsertAndGetIdAsync(new KolCarrer { KolId = newKol.Id, CareerId = careerId });
+                await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = newKol.Id, CareerId = careerId });
         }
         return kolId;
     }
