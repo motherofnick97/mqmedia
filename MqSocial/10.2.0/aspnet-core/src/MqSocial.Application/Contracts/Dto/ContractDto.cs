@@ -24,5 +24,7 @@ public class ContractDto : EntityDto<Guid>
 
     public string Script { get; set; }
 
+    public int MaxReviewTime { get; set; }
+
     public int? TenantId { get; set; }
 }

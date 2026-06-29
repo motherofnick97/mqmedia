@@ -70,6 +70,20 @@ export class EditContractDialogComponent extends AppComponentBase implements OnI
     }
 
     save(): void {
+        if (this.contract.status === ContractStatus.Complete) {
+            abp.message.confirm(
+                'Tất cả ContractKol liên quan sẽ được chuyển sang trạng thái Hoàn thành. Bạn có chắc chắn?',
+                'Hoàn tất Hợp đồng',
+                (confirmed: boolean) => {
+                    if (confirmed) this._doSave();
+                }
+            );
+        } else {
+            this._doSave();
+        }
+    }
+
+    private _doSave(): void {
         this.saving = true;
         this._contractService.update(this.contract).subscribe({
             next: () => {

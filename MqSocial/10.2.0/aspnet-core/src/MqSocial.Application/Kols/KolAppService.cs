@@ -13,7 +13,9 @@ using MqSocial.Careers;
 using MqSocial.Common.Enum;
 using MqSocial.CommonFunc;
 using MqSocial.ContractKols;
+using MqSocial.Contracts;
 using MqSocial.KolCareers;
+using MqSocial.KolDuplicateContracts;
 using MqSocial.Kols.Dto;
 using MqSocial.Roles.Dto;
 using Newtonsoft.Json.Linq;
@@ -24,6 +26,7 @@ using System.Linq;
 using System.Linq.Dynamic.Core;
 using System.Net;
 using System.Net.Http;
+using System.Net.WebSockets;
 using System.Runtime.CompilerServices;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -39,19 +42,63 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     private readonly IRepository<Career, Guid> _careerRepository;
     private readonly IRepository<KolCarrer, Guid> _kolCareerRepository;
     private readonly IRepository<ContractKol, Guid> _contractKolRepository;
+    private readonly IRepository<KolDuplicateContract, Guid> _kolDuplicateContractRepository;
+    private readonly IRepository<Contract, Guid> _contractRepository;
 
     public KolAppService(
         IRepository<Kol, Guid> repository,
         IHttpClientFactory httpClientFactory,
         IRepository<Career, Guid> careerRepository,
         IRepository<KolCarrer, Guid> kolCareerRepository,
-        IRepository<ContractKol, Guid> contractKolRepository)
+        IRepository<ContractKol, Guid> contractKolRepository,
+        IRepository<KolDuplicateContract, Guid> kolDuplicateContractRepository,
+        IRepository<Contract, Guid> contractRepository)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
         _careerRepository = careerRepository;
         _kolCareerRepository = kolCareerRepository;
         _contractKolRepository = contractKolRepository;
+        _kolDuplicateContractRepository = kolDuplicateContractRepository;
+        _contractRepository = contractRepository;
+    }
+
+    // Trả về: KolId → danh sách tên contract bị duplicate với contractId đầu vào
+    private async Task<Dictionary<Guid, List<string>>> GetKolDuplicateContractNamesAsync(Guid? contractId)
+    {
+        if (contractId == null)
+            return new Dictionary<Guid, List<string>>();
+
+        var duplicateContractIds = await _kolDuplicateContractRepository.GetAll()
+            .Where(x => x.FirstContractId == contractId || x.SecondContractId == contractId)
+            .Select(x => x.FirstContractId == contractId ? x.SecondContractId : x.FirstContractId)
+            .ToListAsync();
+
+        if (!duplicateContractIds.Any())
+            return new Dictionary<Guid, List<string>>();
+
+        var contractNames = await _contractRepository.GetAll()
+            .Where(x => duplicateContractIds.Contains(x.Id))
+            .Select(x => new { x.Id, x.Name })
+            .ToDictionaryAsync(x => x.Id, x => x.Name);
+
+        var contractKols = await _contractKolRepository.GetAll()
+            .Where(x => duplicateContractIds.Contains(x.ContractId))
+            .Select(x => new { x.KolId, x.ContractId })
+            .ToListAsync();
+
+        var result = new Dictionary<Guid, List<string>>();
+        foreach (var ck in contractKols)
+        {
+            if (!result.ContainsKey(ck.KolId))
+                result[ck.KolId] = new List<string>();
+
+            var name = contractNames.TryGetValue(ck.ContractId, out var n) ? n : ck.ContractId.ToString();
+            if (!result[ck.KolId].Contains(name))
+                result[ck.KolId].Add(name);
+        }
+
+        return result;
     }
 
     protected override IQueryable<Kol> CreateFilteredQuery(PagedKolRequestDto input)
@@ -74,16 +121,22 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     {
         CheckCreatePermission();
 
+        if (!string.IsNullOrWhiteSpace(input.AccountId))
+        {
+            var existing = await Repository.GetAll()
+                .FirstOrDefaultAsync(x => x.AccountId == input.AccountId && x.Channel == input.Channel);
+
+            if (existing != null)
+                throw new UserFriendlyException($"KOL với AccountId '{input.AccountId}' trên kênh '{input.Channel}' đã tồn tại");
+        }
+
         var kol = MapToEntity(input);
         await Repository.InsertAsync(kol);
-        //await CurrentUnitOfWork.SaveChangesAsync();
 
         foreach (var careerId in input.CareerIds ?? new List<Guid>())
         {
             await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
         }
-
-        //await CurrentUnitOfWork.SaveChangesAsync();
 
         var reloaded = await Repository.GetAll()
             .Include(x => x.KolCareers).ThenInclude(x => x.Career)
@@ -174,6 +227,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
         var rowCount = sheet.Dimension.Rows;
 
+        var dupKolContractNames = await GetKolDuplicateContractNamesAsync(input.ContractId);
+
         for (int row = 2; row <= rowCount; row++)
         {
             try
@@ -222,9 +277,17 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
                 if (input.ContractId.HasValue)
                 {
-                    await HanleContractKolFromExcel(kolId, input.ContractId.Value);
-                    var contractKolExists = await _contractKolRepository.GetAll()
-                        .AnyAsync(x => x.KolId == kolId && x.ContractId == input.ContractId.Value);
+                    if (dupKolContractNames.TryGetValue(kolId, out var conflictingContracts))
+                    {
+                        var names = string.Join(", ", conflictingContracts);
+                        result.Duplicates.Add(new ImportKolErrorDto { Row = row, Message = $"KOL đã nằm trong hợp đồng: {names}" });
+                        result.DuplicateCount++;
+                        continue;
+                    }
+                    else
+                    {
+                        await HanleContractKolFromExcel(kolId, input.ContractId.Value);
+                    }
                 }
 
                 result.SuccessCount++;
@@ -286,6 +349,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
     private async Task HanleContractKolFromExcel(Guid kolId, Guid contractId)
     {
+
         var contractKolExists = await _contractKolRepository.GetAll()
                        .AnyAsync(x => x.KolId == kolId && x.ContractId == contractId);
         if (!contractKolExists)

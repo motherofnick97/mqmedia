@@ -22,4 +22,6 @@ public class CreateContractDto
     public string Request { get; set; }
 
     public string Script { get; set; }
+
+    public int MaxReviewTime { get; set; }
 }

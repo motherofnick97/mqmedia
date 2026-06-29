@@ -42,6 +42,16 @@
         </div>
 
         <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="maxReviewTime">Số lần review tối đa</label>
+            <div class="col-md-9">
+                <p-inputnumber name="maxReviewTime" inputId="maxReviewTime" [(ngModel)]="contract.maxReviewTime"
+                    [min]="0" mode="decimal" [fluid]="true">
+                </p-inputnumber>
+                <small class="text-muted">Số lần tối đa có thể cập nhật kết quả review cho mỗi KOL trong hợp đồng này.</small>
+            </div>
+        </div>
+
+        <div class="form-group row">
             <label class="col-md-3 col-form-label" for="request">Request</label>
             <div class="col-md-9">
                 <textarea pTextarea name="request" id="request" rows="3"

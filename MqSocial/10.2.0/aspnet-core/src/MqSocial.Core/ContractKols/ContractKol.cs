@@ -55,5 +55,7 @@ namespace MqSocial.ContractKols
 
         public string HashTag { get; set; }
 
+        public string ReviewResult { get; set; }
+
     }
 }

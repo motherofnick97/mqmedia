@@ -3,20 +3,28 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
+using MqSocial.ContractKols;
 using MqSocial.Contracts.Dto;
 using System;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Threading.Tasks;
 
 namespace MqSocial.Contracts;
 
 //[AbpAuthorize(PermissionNames.Pages_Contracts)]
 public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Guid, PagedContractRequestDto, CreateContractDto, ContractDto>, IContractAppService
 {
-    public ContractAppService(IRepository<Contract, Guid> repository)
+    private readonly IRepository<ContractKol, Guid> _contractKolRepository;
+
+    public ContractAppService(
+        IRepository<Contract, Guid> repository,
+        IRepository<ContractKol, Guid> contractKolRepository)
         : base(repository)
     {
+        _contractKolRepository = contractKolRepository;
     }
 
     protected override IQueryable<Contract> CreateFilteredQuery(PagedContractRequestDto input)
@@ -31,5 +39,25 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Gui
     protected override IQueryable<Contract> ApplySorting(IQueryable<Contract> query, PagedContractRequestDto input)
     {
         return query.OrderBy(input.Sorting);
+    }
+
+    public override async Task<ContractDto> UpdateAsync(ContractDto input)
+    {
+        var result = await base.UpdateAsync(input);
+
+        if (input.Status == ContractStatus.Complete)
+        {
+            var contractKols = await _contractKolRepository.GetAll()
+                .Where(x => x.ContractId == input.Id)
+                .ToListAsync();
+
+            foreach (var ck in contractKols)
+            {
+                ck.Status = ContractKolStatus.Done;
+                await _contractKolRepository.UpdateAsync(ck);
+            }
+        }
+
+        return result;
     }
 }

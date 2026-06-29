@@ -192,14 +192,15 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     viewDetail(record: ContractKolDto): void {
-        this._modalService.show(ViewContractKolDetailDialogComponent, {
-            class: 'modal-lg',
+        const modalRef = this._modalService.show(ViewContractKolDetailDialogComponent, {
+            class: 'modal-xl',
             initialState: {
-                record: record,
                 kolName: this.getKolName(record.kolId),
                 contractName: this.getContractName(record.contractId),
             },
         });
+        modalRef.content.setRecord(record);
+        modalRef.content.onSave.subscribe(() => this.refresh());
     }
 
     toggleExpand(record: ContractKolDto): void {

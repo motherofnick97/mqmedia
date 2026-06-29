@@ -77,6 +77,20 @@ export class EditCampaignDialogComponent extends AppComponentBase implements OnI
     }
 
     save(): void {
+        if (this.campaign.status === CampaignStatus.Completed) {
+            abp.message.confirm(
+                'Tất cả Contract và ContractKol liên quan sẽ được chuyển sang trạng thái Hoàn thành. Bạn có chắc chắn?',
+                'Hoàn tất Campaign',
+                (confirmed: boolean) => {
+                    if (confirmed) this._doSave();
+                }
+            );
+        } else {
+            this._doSave();
+        }
+    }
+
+    private _doSave(): void {
         this.saving = true;
         this.campaign.startDate = this.startDate ? moment(this.startDate) : undefined;
         this.campaign.endDate = this.endDate ? moment(this.endDate) : undefined;

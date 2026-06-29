@@ -288,10 +288,14 @@
     (onHide)="closeImportResult()">
 
     @if (importResult) {
-        <div class="mb-3 d-flex" style="gap: 1rem">
+        <div class="mb-3 d-flex flex-wrap" style="gap: 1rem">
             <div class="d-flex align-items-center" style="gap: 0.4rem">
                 <i class="pi pi-check-circle text-success"></i>
                 <span>Thành công: <strong>{{ importResult.successCount }}</strong></span>
+            </div>
+            <div class="d-flex align-items-center" style="gap: 0.4rem">
+                <i class="pi pi-exclamation-triangle" style="color: var(--yellow-500)"></i>
+                <span>Trùng KOL: <strong>{{ importResult.duplicateCount }}</strong></span>
             </div>
             <div class="d-flex align-items-center" style="gap: 0.4rem">
                 <i class="pi pi-times-circle text-danger"></i>
@@ -299,8 +303,31 @@
             </div>
         </div>
 
+        @if (importResult.duplicates.length > 0) {
+            <div class="mb-2 fw-semibold" style="color: var(--yellow-700)">
+                <i class="pi pi-exclamation-triangle me-1"></i>KOL bị bỏ qua do trùng với hợp đồng khác
+            </div>
+            <p-table [value]="importResult.duplicates" [scrollable]="true" scrollHeight="200px" styleClass="mb-3">
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th style="width: 80px">Dòng</th>
+                        <th>KOL</th>
+                    </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-dup>
+                    <tr>
+                        <td>{{ dup.row }}</td>
+                        <td style="color: var(--yellow-700)">{{ dup.message }}</td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        }
+
         @if (importResult.errors.length > 0) {
-            <p-table [value]="importResult.errors" [scrollable]="true" scrollHeight="300px">
+            <div class="mb-2 fw-semibold text-danger">
+                <i class="pi pi-times-circle me-1"></i>Lỗi import
+            </div>
+            <p-table [value]="importResult.errors" [scrollable]="true" scrollHeight="200px">
                 <ng-template pTemplate="header">
                     <tr>
                         <th style="width: 80px">Dòng</th>

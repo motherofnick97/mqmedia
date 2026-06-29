@@ -4985,6 +4985,7 @@ export interface IContractKolDto {
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
+    reviewResult: string | undefined;
 }
 
 export class ContractKolDto implements IContractKolDto {
@@ -5007,6 +5008,7 @@ export class ContractKolDto implements IContractKolDto {
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
+    reviewResult: string | undefined;
 
     constructor(data?: IContractKolDto) {
         if (data) {
@@ -5038,6 +5040,7 @@ export class ContractKolDto implements IContractKolDto {
             this.feedback = _data["feedback"];
             this.caption = _data["caption"];
             this.hashTag = _data["hashTag"];
+            this.reviewResult = _data["reviewResult"];
         }
     }
 
@@ -5069,6 +5072,7 @@ export class ContractKolDto implements IContractKolDto {
         data["feedback"] = this.feedback;
         data["caption"] = this.caption;
         data["hashTag"] = this.hashTag;
+        data["reviewResult"] = this.reviewResult;
         return data;
     }
 
@@ -5098,6 +5102,7 @@ export interface ICreateContractKolDto {
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
+    reviewResult: string | undefined;
 }
 
 export class CreateContractKolDto implements ICreateContractKolDto {
@@ -5118,6 +5123,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
+    reviewResult: string | undefined;
 
     constructor(data?: ICreateContractKolDto) {
         if (data) {
@@ -5147,6 +5153,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
             this.feedback = _data["feedback"];
             this.caption = _data["caption"];
             this.hashTag = _data["hashTag"];
+            this.reviewResult = _data["reviewResult"];
         }
     }
 
@@ -5176,6 +5183,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
         data["feedback"] = this.feedback;
         data["caption"] = this.caption;
         data["hashTag"] = this.hashTag;
+        data["reviewResult"] = this.reviewResult;
         return data;
     }
 
@@ -5451,6 +5459,7 @@ export interface IContractDto {
     request: string | undefined;
     script: string | undefined;
     tenantId: number | undefined;
+    maxReviewTime: number | undefined;
 }
 
 export class ContractDto implements IContractDto {
@@ -5463,6 +5472,7 @@ export class ContractDto implements IContractDto {
     request: string | undefined;
     script: string | undefined;
     tenantId: number | undefined;
+    maxReviewTime: number | undefined;
 
     constructor(data?: IContractDto) {
         if (data) {
@@ -5484,6 +5494,7 @@ export class ContractDto implements IContractDto {
             this.request = _data["request"];
             this.script = _data["script"];
             this.tenantId = _data["tenantId"];
+            this.maxReviewTime = _data["maxReviewTime"];
         }
     }
 
@@ -5505,6 +5516,7 @@ export class ContractDto implements IContractDto {
         data["request"] = this.request;
         data["script"] = this.script;
         data["tenantId"] = this.tenantId;
+        data["maxReviewTime"] = this.maxReviewTime;
         return data;
     }
 
@@ -5524,6 +5536,7 @@ export interface ICreateContractDto {
     budget: number | undefined;
     request: string | undefined;
     script: string | undefined;
+    maxReviewTime: number | undefined;
 }
 
 export class CreateContractDto implements ICreateContractDto {
@@ -5534,6 +5547,7 @@ export class CreateContractDto implements ICreateContractDto {
     budget: number | undefined;
     request: string | undefined;
     script: string | undefined;
+    maxReviewTime: number | undefined = 0;
 
     constructor(data?: ICreateContractDto) {
         if (data) {
@@ -5553,6 +5567,7 @@ export class CreateContractDto implements ICreateContractDto {
             this.budget = _data["budget"];
             this.request = _data["request"];
             this.script = _data["script"];
+            this.maxReviewTime = _data["maxReviewTime"];
         }
     }
 
@@ -5572,6 +5587,7 @@ export class CreateContractDto implements ICreateContractDto {
         data["budget"] = this.budget;
         data["request"] = this.request;
         data["script"] = this.script;
+        data["maxReviewTime"] = this.maxReviewTime;
         return data;
     }
 

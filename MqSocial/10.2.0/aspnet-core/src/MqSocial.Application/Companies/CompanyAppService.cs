@@ -3,10 +3,13 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Abp.UI;
+using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
 using MqSocial.Companies.Dto;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace MqSocial.Companies;
 
@@ -29,6 +32,14 @@ public class CompanyAppService : AsyncCrudAppService<Company, CompanyDto, Guid, 
         return query.OrderBy(x => x.Name);
     }
 
+    public override async Task<CompanyDto> CreateAsync(CreateCompanyDto input)
+    {
+        var existing = await Repository.GetAll()
+            .FirstOrDefaultAsync(x => x.Name == input.Name);
 
+        if (existing != null)
+            throw new UserFriendlyException($"Công ty '{input.Name}' đã tồn tại");
 
+        return await base.CreateAsync(input);
+    }
 }

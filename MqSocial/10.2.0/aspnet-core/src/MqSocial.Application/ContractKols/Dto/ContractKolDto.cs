@@ -40,4 +40,6 @@ public class ContractKolDto : EntityDto<Guid>
     public string Caption { get; set; }
 
     public string HashTag { get; set; }
+
+    public string ReviewResult { get; set; }
 }

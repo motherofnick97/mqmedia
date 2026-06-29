@@ -33,8 +33,10 @@ interface ImportKolError {
 
 interface ImportKolResult {
     successCount: number;
+    duplicateCount: number;
     failCount: number;
     errors: ImportKolError[];
+    duplicates: ImportKolError[];
 }
 
 @Component({

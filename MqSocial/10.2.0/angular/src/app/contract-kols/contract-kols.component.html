@@ -64,7 +64,7 @@
                             rows="{{ primengTableHelper.defaultRecordsCountPerPage }}"
                             [paginator]="false"
                             [lazy]="true"
-                            [tableStyle]="{ 'min-width': '2600px' }"
+                            [tableStyle]="{ 'min-width': '2800px' }"
                             styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines">
 
                             <ng-template pTemplate="header">
@@ -87,6 +87,7 @@
                                     <th style="width:200px">Caption</th>
                                     <th style="width:160px">HashTag</th>
                                     <th style="width:200px">Feedback</th>
+                                    <th style="width:200px">Kết quả review</th>
                                     <th style="width:110px; position:sticky; right:0; z-index:2; background:#f8f9fa">{{ 'Actions' | localize }}</th>
                                 </tr>
                             </ng-template>
@@ -302,6 +303,21 @@
                                         </p-cellEditor>
                                     </td>
 
+                                    <!-- Kết quả review -->
+                                    <td>
+                                        <p-cellEditor>
+                                            <ng-template pTemplate="output">
+                                                <span [pTooltip]="record.reviewResult" tooltipPosition="top"
+                                                      style="display:block; max-width:180px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap">
+                                                    {{ record.reviewResult || '—' }}
+                                                </span>
+                                            </ng-template>
+                                            <ng-template pTemplate="input">
+                                                <textarea pInputText [(ngModel)]="record.reviewResult" rows="2" style="width:100%"></textarea>
+                                            </ng-template>
+                                        </p-cellEditor>
+                                    </td>
+
                                     <!-- Actions -->
                                     <td style="position:sticky; right:0; z-index:1; background:inherit">
                                         <div class="d-flex" style="gap: 0.25rem">
@@ -336,7 +352,7 @@
                                 <!-- ── ContractKolResult expansion ── -->
                                 @if (expandedRows[record.id]) {
                                 <tr>
-                                    <td colspan="19" style="padding: 0; background: #f4f6f9">
+                                    <td colspan="20" style="padding: 0; background: #f4f6f9">
                                     <div style="position: sticky; left: 0; width: calc(100vw - 300px); padding: 0.75rem 1rem; box-sizing: border-box; overflow-x: auto;">
 
                                         <!-- Header -->

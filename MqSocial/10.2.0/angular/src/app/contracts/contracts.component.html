@@ -81,6 +81,7 @@
                                     <th style="width: 130px" pSortableColumn="budget">
                                         {{ 'Budget' | localize }}<p-sortIcon field="budget"></p-sortIcon>
                                     </th>
+                                    <th style="width: 120px">Số lần review</th>
                                     <th>Không trùng KOL với</th>
                                     <th style="width: 210px">{{ 'Actions' | localize }}</th>
                                 </tr>
@@ -95,6 +96,7 @@
                                         </p-tag>
                                     </td>
                                     <td>{{ record.budget | number }}</td>
+                                    <td class="text-center">{{ record.maxReviewTime ?? 0 }}</td>
                                     <td>
                                         @if (duplicateMap[record.id]?.length) {
                                             <div class="d-flex flex-wrap" style="gap: 0.25rem">

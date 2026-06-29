@@ -19,8 +19,15 @@ namespace MqSocial.Kols.Dto
     public class ImportKolResultDto
     {
         public int SuccessCount { get; set; }
+
+        public int DuplicateCount { get; set; }
+
         public int FailCount { get; set; }
+
         public List<ImportKolErrorDto> Errors { get; set; } = new();
+
+        public List<ImportKolErrorDto> Duplicates { get; set; } = new();
+
     }
 
     public class ImportKolErrorDto
