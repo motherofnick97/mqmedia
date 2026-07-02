@@ -1,6 +1,8 @@
 import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
+import { forkJoin } from 'rxjs';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
+import * as XLSX from 'xlsx';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
 import { PagedListingComponentBase } from 'shared/paged-listing-component-base';
 import {
@@ -15,6 +17,8 @@ import {
     ContractKolResultServiceProxy,
     ContractKolResultDto,
     CreateContractKolResultDto,
+    EmailServiceProxy,
+    SendEmailDto,
 } from '@shared/service-proxies/service-proxies';
 import { CreateContractKolDialogComponent } from './create-contract-kol/create-contract-kol-dialog.component';
 import { ViewContractKolDetailDialogComponent } from './view-contract-kol-detail/view-contract-kol-detail-dialog.component';
@@ -34,6 +38,8 @@ import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
 import { DatePicker } from 'primeng/datepicker';
 import { Tooltip } from 'primeng/tooltip';
+import { Dialog } from 'primeng/dialog';
+import { Textarea } from 'primeng/textarea';
 import moment from 'moment';
 
 @Component({
@@ -56,6 +62,8 @@ import moment from 'moment';
         InputNumber,
         DatePicker,
         Tooltip,
+        Dialog,
+        Textarea,
         CommonModule,
     ],
 })
@@ -74,6 +82,8 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     editingRowKeys: { [s: string]: boolean } = {};
     clonedRecords: Record<string, ContractKolDto> = {};
     airTimeDates: Record<string, Date | null> = {};
+
+    exporting = false;
 
     // Row expansion — ContractKolResult
     expandedRows: Record<string, boolean> = {};
@@ -161,12 +171,20 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         [ReceiveStatus.NotReceived]: 'danger',
     };
 
+    // Email dialog
+    emailDialogVisible = false;
+    emailToText = '';
+    emailSubject = 'Danh sách KOL Hợp đồng';
+    emailBody = 'Vui lòng xem file đính kèm.';
+    sending = false;
+
     constructor(
         injector: Injector,
         private _contractKolService: ContractKolServiceProxy,
         private _kolService: KolServiceProxy,
         private _contractService: ContractServiceProxy,
         private _contractKolResultService: ContractKolResultServiceProxy,
+        private _emailService: EmailServiceProxy,
         private _modalService: BsModalService,
         cd: ChangeDetectorRef
     ) {
@@ -376,6 +394,169 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
                 this.primengTableHelper.hideLoadingIndicator();
                 this.cd.detectChanges();
             });
+    }
+
+    openSendEmailDialog(): void {
+        this.emailToText = '';
+        this.emailSubject = 'Danh sách KOL Hợp đồng';
+        this.emailBody = 'Vui lòng xem file đính kèm.';
+        this.emailDialogVisible = true;
+    }
+
+    sendEmail(): void {
+        const recipients = this.emailToText.split(',').map(e => e.trim()).filter(e => !!e);
+        if (!recipients.length) {
+            abp.message.warn('Vui lòng nhập ít nhất một địa chỉ email.');
+            return;
+        }
+        this.sending = true;
+        forkJoin({
+            kols: this._contractKolService.getAll(undefined, this.filterContractId, this.filterStatus, undefined, 0, 10000),
+            results: this._contractKolResultService.getAll(undefined, undefined, undefined, 0, 50000),
+        })
+        .pipe(finalize(() => { this.sending = false; this.cd.detectChanges(); }))
+        .subscribe(({ kols, results }) => {
+            const allKols = kols.items ?? [];
+            const resultsByKolId: Record<string, ContractKolResultDto[]> = {};
+            (results.items ?? []).forEach(r => {
+                if (!resultsByKolId[r.contractKolId]) resultsByKolId[r.contractKolId] = [];
+                resultsByKolId[r.contractKolId].push(r);
+            });
+
+            const dto = new SendEmailDto();
+            dto.to = recipients;
+            dto.subject = this.emailSubject;
+            dto.body = this.buildEmailHtml(allKols, resultsByKolId);
+            dto.isBodyHtml = true;
+            dto.attachments = [];
+
+            this._emailService.send(dto).subscribe({
+                next: () => {
+                    this.emailDialogVisible = false;
+                    this.notify.success('Email đã được gửi thành công!');
+                },
+                error: () => { this.cd.detectChanges(); },
+            });
+        });
+    }
+
+    private buildEmailHtml(kols: ContractKolDto[], resultsByKolId: Record<string, ContractKolResultDto[]>): string {
+        const th = (t: string) => `<th style="border:1px solid #ccc;padding:6px 10px;background:#f0f0f0;white-space:nowrap">${t}</th>`;
+        const td = (t: any) => `<td style="border:1px solid #ccc;padding:5px 10px;vertical-align:top">${t ?? '—'}</td>`;
+
+        let html = `
+<html><body style="font-family:Arial,sans-serif;font-size:13px">
+<h2 style="color:#333">${this.emailSubject}</h2>
+<table style="border-collapse:collapse;width:100%;font-size:12px">
+<thead><tr>
+  ${th('KOL')}${th('Hợp đồng')}${th('Trạng thái')}${th('Cash')}${th('Payment')}
+  ${th('Air Time')}${th('Tên mẫu')}${th('Nhận mẫu')}${th('Brief Link')}
+  ${th('Caption')}${th('Hashtag')}${th('Kết quả review')}
+  ${th('Ngày đăng')}${th('Kênh')}${th('Link bài')}
+  ${th('View')}${th('Comment')}${th('Like')}${th('Save')}${th('Share')}
+</tr></thead>
+<tbody>`;
+
+        for (const kol of kols) {
+            const kolResults = resultsByKolId[kol.id] ?? [];
+            const baseFields = [
+                td(this.getKolName(kol.kolId)),
+                td(this.getContractName(kol.contractId)),
+                td(kol.status != null ? this.getStatusLabel(kol.status) : ''),
+                td(kol.cash?.toLocaleString()),
+                td(kol.payment?.toLocaleString()),
+                td(kol.airTime ? kol.airTime.format('DD/MM/YYYY') : ''),
+                td(kol.sampleName),
+                td(kol.sampleReceiveStatus != null ? this.getReceiveStatusLabel(kol.sampleReceiveStatus) : ''),
+                td(kol.briefLink ? `<a href="${kol.briefLink}">Link</a>` : '—'),
+                td(kol.caption),
+                td(kol.hashTag),
+                td(kol.reviewResult),
+            ].join('');
+
+            if (kolResults.length === 0) {
+                html += `<tr>${baseFields}${td('')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('')}${td('')}</tr>`;
+            } else {
+                for (const r of kolResults) {
+                    html += `<tr>${baseFields}
+                        ${td(r.postTime ? r.postTime.format('DD/MM/YYYY') : '')}
+                        ${td(this.getChannelLabel(r.channelType))}
+                        ${td(r.postLink ? `<a href="${r.postLink}">Link</a>` : '—')}
+                        ${td(r.view?.toLocaleString())}
+                        ${td(r.comment?.toLocaleString())}
+                        ${td(r.like?.toLocaleString())}
+                        ${td(r.save?.toLocaleString())}
+                        ${td(r.share?.toLocaleString())}
+                    </tr>`;
+                }
+            }
+        }
+
+        html += '</tbody></table></body></html>';
+        return html;
+    }
+
+    exportExcel(): void {
+        this.exporting = true;
+        forkJoin({
+            kols: this._contractKolService.getAll(undefined, this.filterContractId, this.filterStatus, undefined, 0, 10000),
+            results: this._contractKolResultService.getAll(undefined, undefined, undefined, 0, 50000),
+        })
+        .pipe(finalize(() => { this.exporting = false; this.cd.detectChanges(); }))
+        .subscribe(({ kols, results }) => {
+            const allKols = kols.items ?? [];
+            const resultsByKolId: Record<string, ContractKolResultDto[]> = {};
+            (results.items ?? []).forEach(r => {
+                if (!resultsByKolId[r.contractKolId]) resultsByKolId[r.contractKolId] = [];
+                resultsByKolId[r.contractKolId].push(r);
+            });
+
+            const rows: any[] = [];
+            for (const kol of allKols) {
+                const kolResults = resultsByKolId[kol.id] ?? [];
+                if (kolResults.length === 0) {
+                    rows.push(this.buildExportRow(kol, null));
+                } else {
+                    kolResults.forEach(r => rows.push(this.buildExportRow(kol, r)));
+                }
+            }
+
+            const ws = XLSX.utils.json_to_sheet(rows);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'ContractKols');
+            XLSX.writeFile(wb, `ContractKols_${new Date().toISOString().slice(0, 10)}.xlsx`);
+        });
+    }
+
+    private buildExportRow(kol: ContractKolDto, result: ContractKolResultDto | null): any {
+        return {
+            'KOL': this.getKolName(kol.kolId),
+            'Hợp đồng': this.getContractName(kol.contractId),
+            'Trạng thái': kol.status != null ? this.getStatusLabel(kol.status) : '',
+            'Cash': kol.cash ?? 0,
+            'Payment': kol.payment ?? 0,
+            'Air Time': kol.airTime ? kol.airTime.format('DD/MM/YYYY') : '',
+            'Brief Link': kol.briefLink ?? '',
+            'Brief': kol.brief ?? '',
+            'Feedback': kol.feedback ?? '',
+            'Caption': kol.caption ?? '',
+            'Hashtag': kol.hashTag ?? '',
+            'Portrait': kol.portrait ?? '',
+            'Review Corner': kol.reviewCorner ?? '',
+            'Tên mẫu': kol.sampleName ?? '',
+            'Size mẫu': kol.sampleSize ?? '',
+            'SL mẫu': kol.sampleQuantity ?? 0,
+            'Nhận mẫu': kol.sampleReceiveStatus != null ? this.getReceiveStatusLabel(kol.sampleReceiveStatus) : '',
+            'Kết quả review': kol.reviewResult ?? '',
+            'Ngày đăng (Result)': result?.postTime ? result.postTime.format('DD/MM/YYYY') : '',
+            'Kênh (Result)': result ? this.getChannelLabel(result.channelType) : '',
+            'Link bài': result?.postLink ?? '',
+            'View': result?.view ?? '',
+            'Comment': result?.comment ?? '',
+            'Like': result?.like ?? '',
+            'Save': result?.save ?? '',
+            'Share': result?.share ?? '',
+        };
     }
 
     delete(ck: ContractKolDto): void {

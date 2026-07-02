@@ -4,7 +4,15 @@
             <h1 class="m-0">Quản lý KOL Hợp đồng</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createContractKol()"></p-button>
+            <div class="d-flex" style="gap: 0.5rem">
+                <p-button icon="pi pi-file-excel" label="Xuất Excel" severity="success"
+                    [loading]="exporting" (onClick)="exportExcel()">
+                </p-button>
+                <p-button icon="pi pi-envelope" label="Gửi Mail" severity="info"
+                    (onClick)="openSendEmailDialog()">
+                </p-button>
+                <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createContractKol()"></p-button>
+            </div>
         </ng-template>
     </p-toolbar>
 
@@ -508,3 +516,31 @@
         </div>
     </section>
 </div>
+
+<!-- Email dialog -->
+<p-dialog header="Gửi email đính kèm Excel" [(visible)]="emailDialogVisible"
+    [modal]="true" [style]="{'width':'480px'}" [closable]="true">
+    <div class="d-flex flex-column" style="gap: 1rem">
+        <div>
+            <label class="form-label">Người nhận <span class="text-danger">*</span></label>
+            <input pInputText [(ngModel)]="emailToText" placeholder="email1@gmail.com, email2@gmail.com" style="width:100%" />
+            <small class="text-muted">Nhiều địa chỉ cách nhau bằng dấu phẩy.</small>
+        </div>
+        <div>
+            <label class="form-label">Tiêu đề</label>
+            <input pInputText [(ngModel)]="emailSubject" style="width:100%" />
+        </div>
+        <div>
+            <label class="form-label">Nội dung</label>
+            <textarea pTextarea [(ngModel)]="emailBody" rows="4" style="width:100%"></textarea>
+        </div>
+    </div>
+    <ng-template pTemplate="footer">
+        <p-button label="Hủy" severity="secondary" [disabled]="sending"
+            (onClick)="emailDialogVisible = false">
+        </p-button>
+        <p-button label="Gửi" icon="pi pi-send" [loading]="sending"
+            (onClick)="sendEmail()">
+        </p-button>
+    </ng-template>
+</p-dialog>

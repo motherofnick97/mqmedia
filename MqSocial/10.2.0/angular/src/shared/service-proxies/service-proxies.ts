@@ -6584,6 +6584,95 @@ export class ContractKolResultServiceProxy {
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+export interface IEmailAttachmentDto {
+    fileName: string;
+    content: string; // base64
+    contentType: string | undefined;
+}
+
+export class EmailAttachmentDto implements IEmailAttachmentDto {
+    fileName: string;
+    content: string;
+    contentType: string | undefined = 'application/octet-stream';
+
+    constructor(data?: IEmailAttachmentDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data['fileName'] = this.fileName;
+        data['content'] = this.content;
+        data['contentType'] = this.contentType;
+        return data;
+    }
+}
+
+export interface ISendEmailDto {
+    to: string[];
+    cc: string[] | undefined;
+    subject: string;
+    body: string;
+    isBodyHtml: boolean | undefined;
+    attachments: IEmailAttachmentDto[] | undefined;
+}
+
+export class SendEmailDto implements ISendEmailDto {
+    to: string[] = [];
+    cc: string[] | undefined = [];
+    subject: string;
+    body: string;
+    isBodyHtml: boolean | undefined = true;
+    attachments: EmailAttachmentDto[] | undefined = [];
+
+    constructor(data?: ISendEmailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data['to'] = this.to;
+        data['cc'] = this.cc;
+        data['subject'] = this.subject;
+        data['body'] = this.body;
+        data['isBodyHtml'] = this.isBodyHtml;
+        data['attachments'] = this.attachments ? this.attachments.map(a => a.toJSON()) : [];
+        return data;
+    }
+}
+
+@Injectable()
+export class EmailServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? '';
+    }
+
+    send(input: SendEmailDto): Observable<void> {
+        let url_ = this.baseUrl + '/api/services/app/Email/Send';
+        const content_ = JSON.stringify(input.toJSON());
+        return this.http.post<void>(url_, content_, {
+            headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
+        });
+    }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 function throwException(message: string, status: number, response: string, headers: { [key: string]: any; }, result?: any): Observable<any> {
     if (result !== null && result !== undefined)
         return _observableThrow(result);
