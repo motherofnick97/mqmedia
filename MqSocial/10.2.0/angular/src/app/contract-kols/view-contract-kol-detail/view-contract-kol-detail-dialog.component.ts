@@ -7,11 +7,9 @@ import {
     ContractKolStatus,
     ReceiveStatus,
 } from '@shared/service-proxies/service-proxies';
-import { DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
 import { LocalizePipe } from '@shared/pipes/localize.pipe';
-import { Tag } from 'primeng/tag';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { InputText } from 'primeng/inputtext';
@@ -27,9 +25,6 @@ import moment from 'moment';
         FormsModule,
         AbpModalHeaderComponent,
         LocalizePipe,
-        DatePipe,
-        DecimalPipe,
-        Tag,
         Button,
         Select,
         InputText,

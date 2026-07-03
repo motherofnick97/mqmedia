@@ -17,6 +17,13 @@ public class KolDuplicateContractAppService
     {
     }
 
+    protected override KolDuplicateContract MapToEntity(CreateKolDuplicateContractDto createInput)
+    {
+        var entity = base.MapToEntity(createInput);
+        entity.TenantId = AbpSession.TenantId;
+        return entity;
+    }
+
     protected override IQueryable<KolDuplicateContract> CreateFilteredQuery(PagedKolDuplicateContractRequestDto input)
     {
         return Repository.GetAll()

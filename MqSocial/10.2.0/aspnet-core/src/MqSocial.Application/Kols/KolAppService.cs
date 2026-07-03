@@ -1,4 +1,5 @@
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
@@ -117,61 +118,88 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return query.OrderBy(input.Sorting);
     }
 
+    public override async Task<PagedResultDto<KolDto>> GetAllAsync(PagedKolRequestDto input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            return await base.GetAllAsync(input);
+        }
+    }
+
+    public override async Task<KolDto> GetAsync(EntityDto<Guid> input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            return await base.GetAsync(input);
+        }
+    }
+
     public override async Task<KolDto> CreateAsync(CreateKolDto input)
     {
-        CheckCreatePermission();
-
-        if (!string.IsNullOrWhiteSpace(input.AccountId))
+        using (CurrentUnitOfWork.SetTenantId(null))
         {
-            var existing = await Repository.GetAll()
-                .FirstOrDefaultAsync(x => x.AccountId == input.AccountId && x.Channel == input.Channel);
+            CheckCreatePermission();
 
-            if (existing != null)
-                throw new UserFriendlyException($"KOL với AccountId '{input.AccountId}' trên kênh '{input.Channel}' đã tồn tại");
+            if (!string.IsNullOrWhiteSpace(input.AccountId))
+            {
+                var existing = await Repository.GetAll()
+                    .FirstOrDefaultAsync(x => x.AccountId == input.AccountId && x.Channel == input.Channel);
+
+                if (existing != null)
+                    throw new UserFriendlyException($"KOL với AccountId '{input.AccountId}' trên kênh '{input.Channel}' đã tồn tại");
+            }
+
+            var kol = MapToEntity(input);
+            await Repository.InsertAsync(kol);
+
+            foreach (var careerId in input.CareerIds ?? new List<Guid>())
+            {
+                await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
+            }
+
+            var reloaded = await Repository.GetAll()
+                .Include(x => x.KolCareers).ThenInclude(x => x.Career)
+                .FirstOrDefaultAsync(x => x.Id == kol.Id);
+
+            return MapToEntityDto(reloaded);
         }
-
-        var kol = MapToEntity(input);
-        await Repository.InsertAsync(kol);
-
-        foreach (var careerId in input.CareerIds ?? new List<Guid>())
-        {
-            await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
-        }
-
-        var reloaded = await Repository.GetAll()
-            .Include(x => x.KolCareers).ThenInclude(x => x.Career)
-            .FirstOrDefaultAsync(x => x.Id == kol.Id);
-
-        return MapToEntityDto(reloaded);
     }
 
     public override async Task<KolDto> UpdateAsync(KolDto input)
     {
-        CheckUpdatePermission();
-
-        var kol = await Repository.GetAsync(input.Id);
-        MapToEntity(input, kol);
-        await Repository.UpdateAsync(kol);
-
-        // Xóa KolCareer cũ, chèn mới
-        var existing = await _kolCareerRepository.GetAll()
-            .Where(x => x.KolId == kol.Id)
-            .ToListAsync();
-        foreach (var item in existing)
-            await _kolCareerRepository.DeleteAsync(item);
-
-        foreach (var careerId in input.CareerIds ?? new List<Guid>())
+        using (CurrentUnitOfWork.SetTenantId(null))
         {
-            await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
+            CheckUpdatePermission();
+
+            var kol = await Repository.GetAsync(input.Id);
+            MapToEntity(input, kol);
+            await Repository.UpdateAsync(kol);
+
+            var existing = await _kolCareerRepository.GetAll()
+                .Where(x => x.KolId == kol.Id)
+                .ToListAsync();
+            foreach (var item in existing)
+                await _kolCareerRepository.DeleteAsync(item);
+
+            foreach (var careerId in input.CareerIds ?? new List<Guid>())
+            {
+                await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = kol.Id, CareerId = careerId });
+            }
+
+            var reloaded = await Repository.GetAll()
+                .Include(x => x.KolCareers).ThenInclude(x => x.Career)
+                .FirstOrDefaultAsync(x => x.Id == kol.Id);
+
+            return MapToEntityDto(reloaded);
         }
+    }
 
-        //await CurrentUnitOfWork.SaveChangesAsync();
-
-        var reloaded = await Repository.GetAll()
-            .Include(x => x.KolCareers).ThenInclude(x => x.Career)
-            .FirstOrDefaultAsync(x => x.Id == kol.Id);
-
-        return MapToEntityDto(reloaded);
+    public override async Task DeleteAsync(EntityDto<Guid> input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            await base.DeleteAsync(input);
+        }
     }
 
     private async Task<KolDto> CrawlUserInfo(string uniqueId)
@@ -235,11 +263,10 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             {
                 var accountId = sheet.Cells[row, 1].Text?.Trim();
                 var channelText = sheet.Cells[row, 2].Text?.Trim();
-                var careerText = sheet.Cells[row, 3].Text?.Trim();
-                var follow = sheet.Cells[row, 4].Text?.Trim();
-                var phone = sheet.Cells[row, 5].Text?.Trim();
-                var address = sheet.Cells[row, 6].Text?.Trim();
-                var note = sheet.Cells[row, 7].Text?.Trim();
+                var follow = sheet.Cells[row, 3].Text?.Trim();
+                var phone = sheet.Cells[row, 4].Text?.Trim();
+                var address = sheet.Cells[row, 5].Text?.Trim();
+                var note = sheet.Cells[row, 6].Text?.Trim();
 
                 if (string.IsNullOrEmpty(accountId))
                 {
@@ -258,11 +285,11 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 {
                     effectiveCareerIds = input.CareerIds;
                 }
-                else if (!string.IsNullOrEmpty(careerText))
-                {
-                    var careerEntity = await _careerRepository.GetAll().FirstOrDefaultAsync(x => x.Name == careerText);
-                    if (careerEntity != null) effectiveCareerIds.Add(careerEntity.Id);
-                }
+                //else if (!string.IsNullOrEmpty(careerText))
+                //{
+                //    var careerEntity = await _careerRepository.GetAll().FirstOrDefaultAsync(x => x.Name == careerText);
+                //    if (careerEntity != null) effectiveCareerIds.Add(careerEntity.Id);
+                //}
 
                 KolDto kolDto = await CrawlUserInfo(accountId);
 

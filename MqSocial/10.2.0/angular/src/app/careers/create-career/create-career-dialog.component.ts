@@ -5,7 +5,6 @@ import { CareerServiceProxy, CreateCareerDto } from '@shared/service-proxies/ser
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
 import { AbpValidationSummaryComponent } from '../../../shared/components/validation/abp-validation.summary.component';
-import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { InputText } from 'primeng/inputtext';
 import { Button } from 'primeng/button';
 
@@ -16,7 +15,6 @@ import { Button } from 'primeng/button';
         FormsModule,
         AbpModalHeaderComponent,
         AbpValidationSummaryComponent,
-        LocalizePipe,
         InputText,
         Button,
     ],

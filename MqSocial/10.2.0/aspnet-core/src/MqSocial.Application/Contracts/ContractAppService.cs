@@ -27,6 +27,13 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Gui
         _contractKolRepository = contractKolRepository;
     }
 
+    protected override Contract MapToEntity(CreateContractDto createInput)
+    {
+        var entity = base.MapToEntity(createInput);
+        entity.TenantId = AbpSession.TenantId;
+        return entity;
+    }
+
     protected override IQueryable<Contract> CreateFilteredQuery(PagedContractRequestDto input)
     {
         return Repository.GetAll()

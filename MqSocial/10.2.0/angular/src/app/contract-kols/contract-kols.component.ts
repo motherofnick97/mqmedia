@@ -32,7 +32,6 @@ import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { Tag } from 'primeng/tag';
 import { Toolbar } from 'primeng/toolbar';
-import { IconField } from 'primeng/iconfield';
 import { InputIcon } from 'primeng/inputicon';
 import { InputText } from 'primeng/inputtext';
 import { InputNumber } from 'primeng/inputnumber';
@@ -56,8 +55,6 @@ import moment from 'moment';
         Select,
         Tag,
         Toolbar,
-        IconField,
-        InputIcon,
         InputText,
         InputNumber,
         DatePicker,

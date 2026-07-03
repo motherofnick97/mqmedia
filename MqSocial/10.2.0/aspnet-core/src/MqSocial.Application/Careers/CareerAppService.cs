@@ -1,4 +1,5 @@
 using Abp.Application.Services;
+using Abp.Application.Services.Dto;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
@@ -29,14 +30,49 @@ public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, Pag
         return query.OrderBy(x => x.Name);
     }
 
+    public override async Task<PagedResultDto<CareerDto>> GetAllAsync(PagedCareerRequestDto input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            return await base.GetAllAsync(input);
+        }
+    }
+
+    public override async Task<CareerDto> GetAsync(EntityDto<Guid> input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            return await base.GetAsync(input);
+        }
+    }
+
     public override async Task<CareerDto> CreateAsync(CreateCareerDto input)
     {
-        var existing = await Repository.GetAll()
-            .FirstOrDefaultAsync(x => x.Name == input.Name);
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            var existing = await Repository.GetAll()
+                .FirstOrDefaultAsync(x => x.Name == input.Name);
 
-        if (existing != null)
-            throw new UserFriendlyException($"Nghề nghiệp '{input.Name}' đã tồn tại");
+            if (existing != null)
+                throw new UserFriendlyException($"Nghề nghiệp '{input.Name}' đã tồn tại");
 
-        return await base.CreateAsync(input);
+            return await base.CreateAsync(input);
+        }
+    }
+
+    public override async Task<CareerDto> UpdateAsync(CareerDto input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            return await base.UpdateAsync(input);
+        }
+    }
+
+    public override async Task DeleteAsync(EntityDto<Guid> input)
+    {
+        using (CurrentUnitOfWork.SetTenantId(null))
+        {
+            await base.DeleteAsync(input);
+        }
     }
 }

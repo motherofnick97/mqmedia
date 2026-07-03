@@ -31,6 +31,13 @@ public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, Gui
         _contractKolRepository = contractKolRepository;
     }
 
+    protected override Campaign MapToEntity(CreateCampaignDto createInput)
+    {
+        var entity = base.MapToEntity(createInput);
+        entity.TenantId = AbpSession.TenantId;
+        return entity;
+    }
+
     protected override IQueryable<Campaign> CreateFilteredQuery(PagedCampaignRequestDto input)
     {
         return Repository.GetAll()

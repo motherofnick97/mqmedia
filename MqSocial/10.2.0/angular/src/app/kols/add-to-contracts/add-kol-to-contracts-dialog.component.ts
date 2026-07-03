@@ -13,7 +13,6 @@ import {
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
-import { LocalizePipe } from '@shared/pipes/localize.pipe';
 import { Button } from 'primeng/button';
 import { Select } from 'primeng/select';
 import { Tag } from 'primeng/tag';
@@ -26,7 +25,6 @@ import moment from 'moment';
         FormsModule,
         CommonModule,
         AbpModalHeaderComponent,
-        LocalizePipe,
         Button,
         Select,
         Tag,

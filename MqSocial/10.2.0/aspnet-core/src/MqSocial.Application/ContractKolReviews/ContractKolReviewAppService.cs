@@ -17,6 +17,13 @@ public class ContractKolReviewAppService
     {
     }
 
+    protected override ContractKolReview MapToEntity(CreateContractKolReviewDto createInput)
+    {
+        var entity = base.MapToEntity(createInput);
+        entity.TenantId = AbpSession.TenantId;
+        return entity;
+    }
+
     protected override IQueryable<ContractKolReview> CreateFilteredQuery(PagedContractKolReviewRequestDto input)
     {
         return Repository.GetAll()
