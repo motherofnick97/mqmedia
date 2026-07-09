@@ -7,11 +7,11 @@ public static class MqSocialDbContextConfigurer
 {
     public static void Configure(DbContextOptionsBuilder<MqSocialDbContext> builder, string connectionString)
     {
-        builder.UseSqlServer(connectionString);
+        builder.UseNpgsql(connectionString);
     }
 
     public static void Configure(DbContextOptionsBuilder<MqSocialDbContext> builder, DbConnection connection)
     {
-        builder.UseSqlServer(connection);
+        builder.UseNpgsql(connection);
     }
 }

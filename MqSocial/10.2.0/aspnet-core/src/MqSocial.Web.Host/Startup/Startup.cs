@@ -17,6 +17,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.DataProtection;
 
 namespace MqSocial.Web.Host.Startup
 {
@@ -42,6 +43,10 @@ namespace MqSocial.Web.Host.Startup
             {
                 options.Filters.Add(new AbpAutoValidateAntiforgeryTokenAttribute());
             });
+
+            services.AddDataProtection()
+                    .SetApplicationName("MqSocial")
+                    .PersistKeysToFileSystem(new DirectoryInfo("/var/www/mqsocial/keys"));
 
             IdentityRegistrar.Register(services);
             AuthConfigurer.Configure(services, _appConfiguration);

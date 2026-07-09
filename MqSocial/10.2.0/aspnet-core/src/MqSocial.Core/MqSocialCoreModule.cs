@@ -19,6 +19,10 @@ public class MqSocialCoreModule : AbpModule
 {
     public override void PreInitialize()
     {
+        // PostgreSQL's "timestamp with time zone" only accepts DateTime.Kind == Utc.
+        // Abp's default clock provider (Unspecified) hands back Kind=Local, which Npgsql rejects.
+        Clock.Provider = ClockProviders.Utc;
+
         Configuration.Auditing.IsEnabledForAnonymousUsers = true;
 
         // Declare entity types
