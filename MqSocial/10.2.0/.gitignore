@@ -9,4 +9,5 @@ aspnet-core/src/MqSocial.Web.Mvc/App_Data/Logs/
 aspnet-core/src/MqSocial.Migrator/Logs/Logs.txt
 aspnet-core/build/outputs/
 aspnet-core/docker/mvc/Mvc-Logs/
+schedule/publish/
 

@@ -16,8 +16,8 @@
   <ItemGroup>
     <PackageReference Include="Hangfire" Version="1.8.23" />
     <PackageReference Include="Hangfire.Core" Version="1.8.23" />
-    <PackageReference Include="Hangfire.SqlServer" Version="1.8.23" />
-    <PackageReference Include="Microsoft.Data.SqlClient" Version="7.0.2" />
+    <PackageReference Include="Hangfire.PostgreSql" Version="1.20.9" />
+    <PackageReference Include="Npgsql" Version="9.0.4" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.9" />
   </ItemGroup>
 

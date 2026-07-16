@@ -1,4 +1,4 @@
-using Microsoft.Data.SqlClient;
+using Npgsql;
 
 public class DbConnectionFactory
 {
@@ -9,5 +9,5 @@ public class DbConnectionFactory
         _connectionString = connectionString;
     }
 
-    public SqlConnection Create() => new SqlConnection(_connectionString);
+    public NpgsqlConnection Create() => new NpgsqlConnection(_connectionString);
 }

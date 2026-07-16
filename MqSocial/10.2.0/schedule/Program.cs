@@ -1,5 +1,5 @@
-﻿using Hangfire;
-using Hangfire.SqlServer;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -15,13 +15,7 @@ var host = Host.CreateDefaultBuilder(args)
             .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
             .UseSimpleAssemblyNameTypeSerializer()
             .UseRecommendedSerializerSettings()
-            .UseSqlServerStorage(connectionString,
-                new SqlServerStorageOptions
-                {
-                    QueuePollInterval = TimeSpan.Zero,
-                    UseRecommendedIsolationLevel = true,
-                    DisableGlobalLocks = true
-                }));
+            .UsePostgreSqlStorage(o => o.UseNpgsqlConnection(connectionString)));
 
         services.AddHangfireServer();
 
@@ -32,7 +26,6 @@ var host = Host.CreateDefaultBuilder(args)
 await host.StartAsync();
 
 var jobManager = host.Services.GetRequiredService<IRecurringJobManager>();
-
 
 jobManager.AddOrUpdate<UpdateContractKolResultJob>(
     "update-contract-kol-result",

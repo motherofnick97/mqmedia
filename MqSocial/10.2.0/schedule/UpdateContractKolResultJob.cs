@@ -1,6 +1,6 @@
-using Microsoft.Data.SqlClient;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Npgsql;
 using System.Text.RegularExpressions;
 
 public class UpdateContractKolResultJob
@@ -42,28 +42,26 @@ public class UpdateContractKolResultJob
     {
         var results = new List<ContractKolResultRecord>();
         const string sql = """
-            SELECT 
-            	A.Id Id, PostLink, ChannelType
-            FROM 
-            	ContractKolResults A
-            inner join 
-            	ContractKols B
-            on 
-            	A.ContractKolId = B.Id
-            inner join 
-            	Contracts C
-            on 
-            	B.ContractId = C.Id
-            WHERE 
-            	A.IsDeleted = 0 and B.IsDeleted = 0 and C.IsDeleted = 0
-            	AND PostLink IS NOT NULL
-            	AND PostLink != ''
-            	and C.Status = 2
+            SELECT
+                A."Id", A."PostLink", A."ChannelType"
+            FROM
+                "ContractKolResults" A
+            INNER JOIN
+                "ContractKols" B ON A."ContractKolId" = B."Id"
+            INNER JOIN
+                "Contracts" C ON B."ContractId" = C."Id"
+            WHERE
+                A."IsDeleted" = false
+                AND B."IsDeleted" = false
+                AND C."IsDeleted" = false
+                AND A."PostLink" IS NOT NULL
+                AND A."PostLink" != ''
+                AND C."Status" = 2
             """;
 
         await using var conn = _db.Create();
         await conn.OpenAsync();
-        await using var cmd = new SqlCommand(sql, conn);
+        await using var cmd = new NpgsqlCommand(sql, conn);
         await using var reader = await cmd.ExecuteReaderAsync();
 
         while (await reader.ReadAsync())
@@ -81,26 +79,26 @@ public class UpdateContractKolResultJob
     private async Task UpdateMetricsAsync(Guid id, PostMetrics metrics)
     {
         const string sql = """
-            UPDATE ContractKolResults
-            SET [View]    = @View,
-                [Like]  = @Like,
-                [Comment] = @Comment,
-                [Save]    = @Save,
-                [Share]   = @Share,
-                LastModificationTime = @Now
-            WHERE Id = @Id
+            UPDATE "ContractKolResults"
+            SET "View"               = @View,
+                "Like"               = @Like,
+                "Comment"            = @Comment,
+                "Save"               = @Save,
+                "Share"              = @Share,
+                "LastModificationTime" = @Now
+            WHERE "Id" = @Id
             """;
 
         await using var conn = _db.Create();
         await conn.OpenAsync();
-        await using var cmd = new SqlCommand(sql, conn);
-        cmd.Parameters.AddWithValue("@View", (object?)metrics.View ?? DBNull.Value);
+        await using var cmd = new NpgsqlCommand(sql, conn);
+        cmd.Parameters.AddWithValue("@View",    (object?)metrics.View    ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@Like",    (object?)metrics.Like    ?? DBNull.Value);
         cmd.Parameters.AddWithValue("@Comment", (object?)metrics.Comment ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@Save", (object?)metrics.Save ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@Share", (object?)metrics.Share ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@Like", (object?)metrics.Like ?? DBNull.Value);
-        cmd.Parameters.AddWithValue("@Now", DateTime.UtcNow);
-        cmd.Parameters.AddWithValue("@Id", id);
+        cmd.Parameters.AddWithValue("@Save",    (object?)metrics.Save    ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@Share",   (object?)metrics.Share   ?? DBNull.Value);
+        cmd.Parameters.AddWithValue("@Now",     DateTime.UtcNow);
+        cmd.Parameters.AddWithValue("@Id",      id);
         await cmd.ExecuteNonQueryAsync();
     }
 
@@ -116,14 +114,10 @@ public class UpdateContractKolResultJob
 
     private async Task<PostMetrics?> FetchTikTokMetricsAsync(string postLink)
     {
-        string videoId = string.Empty;
         var match = Regex.Match(postLink, @"/video/(\d+)");
-        if (match.Success)
-        {
-            videoId = match.Groups[1].Value;
-        }
+        if (!match.Success) return null;
 
-        if (string.IsNullOrEmpty(videoId)) return null;
+        var videoId = match.Groups[1].Value;
 
         var client = new HttpClient();
         var request = new HttpRequestMessage
@@ -147,27 +141,23 @@ public class UpdateContractKolResultJob
             if (token.Type == JTokenType.String && int.TryParse(token.Value<string>(), out var val)) return val;
             return 0;
         }
-        var stats = json["itemInfo"]["itemStruct"]["stats"];
-        var diggCount = SafeInt(stats["diggCount"]);
-        var shareCount = SafeInt(stats["shareCount"]);
-        var commentCount = SafeInt(stats["commentCount"]);
-        var playCount = SafeInt(stats["playCount"]);
-        var collectCount = SafeInt(stats["collectCount"]);
-        // TODO: Gọi TikTok API hoặc crawl để lấy View, Comment, Share
-        await Task.CompletedTask;
-        return new PostMetrics(playCount, commentCount, collectCount, shareCount, diggCount);
+
+        var stats = json["itemInfo"]!["itemStruct"]!["stats"]!;
+        return new PostMetrics(
+            View:    SafeInt(stats["playCount"]!),
+            Like:    SafeInt(stats["diggCount"]!),
+            Comment: SafeInt(stats["commentCount"]!),
+            Save:    SafeInt(stats["collectCount"]!),
+            Share:   SafeInt(stats["shareCount"]!)
+        );
     }
 
     private async Task<PostMetrics?> FetchFacebookMetricsAsync(string postLink)
     {
-        // TODO: Gọi Facebook Graph API để lấy View, Comment, Share
         await Task.CompletedTask;
         return null;
     }
 
     private record ContractKolResultRecord(Guid Id, string PostLink, int ChannelType);
-
-    private record PostMetrics(int? View, int? Comment, int? Save, int? Share, int? Like);
-
-    
+    private record PostMetrics(int? View, int? Like, int? Comment, int? Save, int? Share);
 }

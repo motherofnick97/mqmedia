@@ -32,7 +32,7 @@ public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, Pag
 
     public override async Task<PagedResultDto<CareerDto>> GetAllAsync(PagedCareerRequestDto input)
     {
-        using (CurrentUnitOfWork.SetTenantId(null))
+        using (CurrentUnitOfWork.SetTenantId(null)) 
         {
             return await base.GetAllAsync(input);
         }
