@@ -130,7 +130,13 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     {
         using (CurrentUnitOfWork.SetTenantId(null))
         {
-            return await base.GetAsync(input);
+            CheckGetPermission();
+
+            var kol = await Repository.GetAll()
+                .Include(x => x.KolCareers).ThenInclude(x => x.Career)
+                .FirstOrDefaultAsync(x => x.Id == input.Id);
+
+            return MapToEntityDto(kol);
         }
     }
 
@@ -275,7 +281,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                     continue;
                 }
 
-                ChannelType? channel = null;
+                ChannelType channel = ChannelType.Khac;
                 if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
                     channel = ch;
 
@@ -300,7 +306,12 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                     continue;
                 }
 
-                Guid kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, effectiveCareerIds);
+                Guid kolId = Guid.Empty;
+
+                using (CurrentUnitOfWork.SetTenantId(null))
+                {
+                    kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, effectiveCareerIds);
+                }
 
                 if (input.ContractId.HasValue)
                 {
@@ -329,12 +340,12 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return result;
     }
 
-    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType? channel, string address, string note, string phone, List<Guid> effectiveCareerIds)
+    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType channel, string address, string note, string phone, List<Guid> effectiveCareerIds)
     {
         Guid kolId = new Guid();
 
         var exists = await Repository.GetAll()
-                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel.Value);
+                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
         if (exists != null)
         {
             kolId = exists.Id;
@@ -344,6 +355,9 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             exists.Address = address;
             exists.Note = note;
             exists.Phone = phone;
+            exists.Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{exists.AccountId}"
+                            : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{exists.AccountId}/" 
+                                : string.Empty);
 
             foreach (var careerId in effectiveCareerIds)
             {
@@ -359,11 +373,14 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             {
                 Name = kolDto.Name,
                 AccountId = accountId,
-                Channel = channel ?? ChannelType.Khac,
+                Channel = channel,
                 Follow = kolDto.Follow,
                 Note = note,
                 Address = address,
                 Phone = phone,
+                Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{exists.AccountId}"
+                                    : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{exists.AccountId}/"
+                                        : string.Empty)
             });
 
             kolId = newKol.Id;
@@ -384,7 +401,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             {
                 KolId = kolId,
                 ContractId = contractId,
-                Status = ContractKolStatus.Register
+                Status = ContractKolStatus.Register,
+                TenantId = AbpSession.TenantId
             });
     }
 }

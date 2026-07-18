@@ -306,39 +306,6 @@
     .step h4 { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--dark); }
     .step p { font-size: 13px; color: var(--muted); line-height: 1.6; }
 
-    /* ── KOL Showcase ──────────────────────────────────── */
-    .kol-section { padding: 100px 0; background: var(--white); }
-    .kol-header { text-align: center; margin-bottom: 60px; }
-    .kol-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
-    .kol-card {
-      border-radius: 20px; overflow: hidden;
-      background: var(--gray); transition: all .35s;
-      border: 2px solid transparent;
-    }
-    .kol-card:hover { transform: translateY(-8px); border-color: var(--gold); box-shadow: 0 20px 48px rgba(246,166,35,.15); }
-    .kol-thumb {
-      aspect-ratio: 3/4; display: flex; align-items: center; justify-content: center;
-      font-size: 60px; position: relative; overflow: hidden;
-    }
-    .kol-thumb-bg {
-      position: absolute; inset: 0;
-      background: linear-gradient(135deg, var(--c1), var(--c2));
-    }
-    .kol-thumb-emoji { position: relative; z-index: 1; }
-    .kol-tiktok-badge {
-      position: absolute; bottom: 10px; right: 10px; z-index: 2;
-      background: rgba(0,0,0,.7); border-radius: 8px; padding: 4px 8px;
-      display: flex; align-items: center; gap: 4px;
-      font-size: 11px; color: white; font-weight: 600;
-    }
-    .kol-info { padding: 16px; }
-    .kol-info h4 { font-size: 14px; font-weight: 700; color: var(--dark); margin-bottom: 4px; }
-    .kol-info span { font-size: 12px; color: var(--muted); }
-    .kol-followers {
-      display: flex; align-items: center; gap: 4px; margin-top: 8px;
-      font-size: 12px; font-weight: 600; color: var(--teal);
-    }
-
     /* ── Platforms ─────────────────────────────────────── */
     .platforms { padding: 80px 0; background: var(--gray); }
     .platforms-inner { display: flex; align-items: center; gap: 60px; }
@@ -412,6 +379,27 @@
     @media (max-width: 900px) { .portfolio-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 540px) { .portfolio-grid { grid-template-columns: 1fr; } }
 
+    /* ── Clients ───────────────────────────────────────── */
+    .clients { padding: 100px 0; background: var(--gray); }
+    .clients-header { text-align: center; margin-bottom: 60px; }
+    .clients-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 24px; }
+    .client-card {
+      background: var(--white); border-radius: 16px; padding: 28px 16px;
+      display: flex; flex-direction: column; align-items: center; text-align: center; gap: 10px;
+      border: 2px solid transparent; transition: all .3s;
+    }
+    .client-card:hover { transform: translateY(-4px); border-color: var(--teal); box-shadow: 0 12px 32px rgba(13,110,110,.12); }
+    .client-logo {
+      width: 64px; height: 64px; border-radius: 50%; overflow: hidden;
+      background: var(--gray); display: flex; align-items: center; justify-content: center;
+      font-size: 20px; font-weight: 800; color: var(--teal);
+    }
+    .client-logo img { width: 100%; height: 100%; object-fit: cover; }
+    .client-card h4 { font-size: 14px; font-weight: 700; color: var(--dark); }
+    .client-card span { font-size: 12px; color: var(--muted); }
+    @media (max-width: 900px) { .clients-grid { grid-template-columns: repeat(3, 1fr); } }
+    @media (max-width: 540px) { .clients-grid { grid-template-columns: 1fr 1fr; } }
+
     /* ── Animations ────────────────────────────────────── */
     @keyframes float {
       0%, 100% { transform: translateY(0); }
@@ -448,7 +436,6 @@
       .why-us .container { grid-template-columns: 1fr; gap: 40px; }
       .process-steps { grid-template-columns: 1fr 1fr; }
       .process-steps::before { display: none; }
-      .kol-grid { grid-template-columns: 1fr 1fr; }
       .platforms-inner { flex-direction: column; }
       .footer-top { grid-template-columns: 1fr 1fr; }
 
@@ -474,7 +461,6 @@
     }
     @media (max-width: 540px) {
       .services-grid { grid-template-columns: 1fr; }
-      .kol-grid { grid-template-columns: 1fr 1fr; }
       .footer-top { grid-template-columns: 1fr; }
       .stats-grid { grid-template-columns: 1fr 1fr; }
       .hero-stats { gap: 16px; }
@@ -499,7 +485,7 @@
       <li><a href="#why-us">Về chúng tôi</a></li>
       <li><a href="#process">Quy trình</a></li>
       <li><a href="#portfolio">Portfolio</a></li>
-      <li><a href="#kol">KOL/KOC</a></li>
+      <li><a href="#clients">Khách hàng</a></li>
     </ul>
     <div class="nav-cta">
       <a href="#contact" class="btn btn-outline" style="padding:10px 22px;font-size:13px;">Liên hệ ngay</a>
@@ -526,7 +512,7 @@
         triệu khán giả
       </h1>
       <p>
-        Chúng tôi booking KOL, KOC uy tín – sản xuất nội dung viral – triển khai chiến dịch quảng cáo TikTok hiệu quả, đưa thương hiệu của bạn đến đúng khách hàng mục tiêu.
+        Chúng tôi kết nối booking KOL, KOC uy tín – sản xuất nội dung viral trên TikTok, đưa thương hiệu của bạn đến gần hơn với đúng khách hàng mục tiêu thông qua người có sức ảnh hưởng.
       </p>
       <div class="hero-btns">
         <a href="#contact" class="btn btn-primary">🚀 Bắt đầu chiến dịch</a>
@@ -585,8 +571,8 @@
                 <div class="play-btn" style="background:#0d6e6e">▶</div>
               </div>
               <div style="width:100%;background:rgba(255,255,255,.05);border-radius:8px;padding:8px 10px;display:flex;align-items:center;justify-content:space-between;">
-                <span style="font-size:10px;color:rgba(255,255,255,.6)">📊 Hiệu suất chiến dịch</span>
-                <span style="font-size:10px;color:#6bffb8;font-weight:700">+340% ROI</span>
+                <span style="font-size:10px;color:rgba(255,255,255,.6)">📊 Tăng trưởng tiếp cận</span>
+                <span style="font-size:10px;color:#6bffb8;font-weight:700">+340%</span>
               </div>
             </div>
           </div>
@@ -709,7 +695,7 @@
       </div>
       <div class="stat-card" style="grid-column:span 2">
         <strong style="font-size:32px">340%</strong>
-        <span>ROI trung bình chiến dịch</span>
+        <span>Tăng trưởng tiếp cận trung bình</span>
       </div>
     </div>
   </div>
@@ -769,7 +755,7 @@
           <div class="portfolio-metrics">
             <div class="p-metric"><strong>1.8M</strong><small>Lượt xem</small></div>
             <div class="p-metric"><strong>62K</strong><small>Lượt thích</small></div>
-            <div class="p-metric"><strong>x3.2</strong><small>Doanh số</small></div>
+            <div class="p-metric"><strong>x3.2</strong><small>Tăng trưởng tương tác</small></div>
           </div>
         </div>
       </div>
@@ -801,7 +787,7 @@
           <p>Booking 5 KOC beauty micro-influencer review dòng skincare mới ra mắt, nội dung chân thực và gần gũi.</p>
           <div class="portfolio-metrics">
             <div class="p-metric"><strong>3.2M</strong><small>Reach</small></div>
-            <div class="p-metric"><strong>28K</strong><small>Click sản phẩm</small></div>
+            <div class="p-metric"><strong>28K</strong><small>Lượt tương tác</small></div>
           </div>
         </div>
       </div>
@@ -810,62 +796,45 @@
   </div>
 </section>
 
-<!-- ── KOL Showcase ── -->
-<section class="kol-section" id="kol">
+<!-- ── Clients ── -->
+<section class="clients" id="clients">
   <div class="container">
-    <div class="kol-header fade-up">
-      <div class="tag">Mạng lưới KOL/KOC</div>
-      <h2 class="section-title">Đội ngũ influencer<br/>đa dạng & uy tín</h2>
-      <p class="section-sub" style="margin:12px auto 0">Từ micro-influencer đến mega KOL – chúng tôi có đúng người cho mọi chiến dịch.</p>
+    <div class="clients-header fade-up">
+      <div class="tag">Khách hàng</div>
+      <h2 class="section-title">Thương hiệu đã<br/>đồng hành cùng chúng tôi</h2>
+      <p class="section-sub" style="margin:12px auto 0">Một số khách hàng đã tin tưởng lựa chọn Mạnh Quân Media cho chiến dịch của mình.</p>
     </div>
-    <div class="kol-grid">
-      <div class="kol-card fade-up">
-        <div class="kol-thumb" style="--c1:#f6a623;--c2:#ff6b35">
-          <div class="kol-thumb-bg"></div>
-          <span class="kol-thumb-emoji">👩‍💄</span>
-          <div class="kol-tiktok-badge">🎵 Beauty</div>
-        </div>
-        <div class="kol-info">
-          <h4>Beauty KOC</h4>
-          <span>Làm đẹp · Skincare · Lifestyle</span>
-          <div class="kol-followers">👥 500K–2M followers</div>
-        </div>
+    <!--
+      Mỗi khách hàng là 1 khối .client-card. Copy 1 khối bên dưới và sửa lại để thêm khách hàng mới:
+      - Có logo: thay nội dung .client-logo bằng <img src="clients/ten-file-logo.png" alt="Tên khách hàng" />
+      - Chưa có logo: cứ để 2 ký tự viết tắt như hiện tại
+      - Sửa "Tên khách hàng" và "Ngành hàng" cho đúng
+    -->
+    <div class="clients-grid">
+      <div class="client-card fade-up">
+        <div class="client-logo">AB</div>
+        <h4>Tên khách hàng 1</h4>
+        <span>Ngành hàng</span>
       </div>
-      <div class="kol-card fade-up" style="animation-delay:.1s">
-        <div class="kol-thumb" style="--c1:#0d6e6e;--c2:#20bf6b">
-          <div class="kol-thumb-bg"></div>
-          <span class="kol-thumb-emoji">🍜</span>
-          <div class="kol-tiktok-badge">🎵 Food</div>
-        </div>
-        <div class="kol-info">
-          <h4>Food Reviewer</h4>
-          <span>Ẩm thực · Review nhà hàng</span>
-          <div class="kol-followers">👥 200K–5M followers</div>
-        </div>
+      <div class="client-card fade-up" style="animation-delay:.05s">
+        <div class="client-logo">CD</div>
+        <h4>Tên khách hàng 2</h4>
+        <span>Ngành hàng</span>
       </div>
-      <div class="kol-card fade-up" style="animation-delay:.2s">
-        <div class="kol-thumb" style="--c1:#6b48ff;--c2:#ff4757">
-          <div class="kol-thumb-bg"></div>
-          <span class="kol-thumb-emoji">🏋️</span>
-          <div class="kol-tiktok-badge">🎵 Fitness</div>
-        </div>
-        <div class="kol-info">
-          <h4>Fitness KOL</h4>
-          <span>Thể thao · Sức khỏe · Dinh dưỡng</span>
-          <div class="kol-followers">👥 300K–3M followers</div>
-        </div>
+      <div class="client-card fade-up" style="animation-delay:.1s">
+        <div class="client-logo">EF</div>
+        <h4>Tên khách hàng 3</h4>
+        <span>Ngành hàng</span>
       </div>
-      <div class="kol-card fade-up" style="animation-delay:.3s">
-        <div class="kol-thumb" style="--c1:#ff4757;--c2:#f6a623">
-          <div class="kol-thumb-bg"></div>
-          <span class="kol-thumb-emoji">🛍️</span>
-          <div class="kol-tiktok-badge">🎵 Fashion</div>
-        </div>
-        <div class="kol-info">
-          <h4>Fashion KOC</h4>
-          <span>Thời trang · Phong cách · Xu hướng</span>
-          <div class="kol-followers">👥 100K–8M followers</div>
-        </div>
+      <div class="client-card fade-up" style="animation-delay:.15s">
+        <div class="client-logo">GH</div>
+        <h4>Tên khách hàng 4</h4>
+        <span>Ngành hàng</span>
+      </div>
+      <div class="client-card fade-up" style="animation-delay:.2s">
+        <div class="client-logo">IJ</div>
+        <h4>Tên khách hàng 5</h4>
+        <span>Ngành hàng</span>
       </div>
     </div>
   </div>
@@ -944,7 +913,7 @@
           <li><a href="#why-us">Về chúng tôi</a></li>
           <li><a href="#process">Quy trình</a></li>
           <li><a href="#portfolio">Portfolio</a></li>
-          <li><a href="#kol">Mạng lưới KOL</a></li>
+          <li><a href="#clients">Khách hàng</a></li>
           <li><a href="#contact">Liên hệ</a></li>
         </ul>
       </div>
