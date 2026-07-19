@@ -27,7 +27,7 @@ public class CreateContractKolDto
 
     public int SampleQuantity { get; set; }
 
-    public ReceiveStatus SampleReceiveStatus { get; set; }
+    public ReceiveStatus SampleReceiveStatus { get; set; } = ReceiveStatus.NotShip;
 
     public DateTime? AirTime { get; set; }
 

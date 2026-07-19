@@ -402,7 +402,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 KolId = kolId,
                 ContractId = contractId,
                 Status = ContractKolStatus.Register,
-                TenantId = AbpSession.TenantId
+                TenantId = AbpSession.TenantId,
+                SampleReceiveStatus = ReceiveStatus.NotShip
             });
     }
 }

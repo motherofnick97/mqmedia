@@ -342,7 +342,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     getKolName(kolId: string | undefined): string {
-        return kolId ? (this.kolMap[kolId] ?? kolId) : '—';
+        return kolId ? this.kolMap[kolId] : '—';
     }
 
     getContractName(contractId: string | undefined): string {
