@@ -280,6 +280,12 @@ Trong **project gốc** (không chỉ trong `publish/`), tạo file:
 
 > **Quan trọng:** phần `Kestrel.Endpoints.Http` bắt buộc phải có — nếu `appsettings.json` gốc có định nghĩa `Https` endpoint (cần cert riêng cho Kestrel) thì service sẽ crash lúc start vì không tìm thấy chứng chỉ. Vì HTTPS đã do Nginx đảm nhiệm (SSL termination), backend chỉ cần chạy HTTP nội bộ.
 
+> **Đã từng gặp thực tế (19/07):** `appsettings.json` gốc (dùng cho dev local) có endpoint đặt tên là `"Http"` nhưng `Url` lại là `https://localhost:44311/`. Kestrel bind endpoint theo **scheme trong URL, không theo tên key** — nên dù tên là "Http", Kestrel vẫn hiểu đây là HTTPS và đòi cert. Nếu `appsettings.Production.json` **mất khối `Kestrel.Endpoints.Http`** (ví dụ bị ghi đè/tạo lại khi sửa code mà quên giữ lại đoạn này), service sẽ crash liên tục dạng core-dump với lỗi:
+> ```
+> System.InvalidOperationException: Unable to configure HTTPS endpoint. No server certificate was specified...
+> ```
+> Cách nhận biết: `journalctl -u mqsocial-api -f` thấy lỗi trên + service tự restart lặp vô hạn (`Scheduled restart job, restart counter is at N`). Cách sửa: kiểm tra lại `aspnet-core\src\MqSocial.Web.Host\appsettings.Production.json` ở **local** có đủ khối `Kestrel.Endpoints.Http.Url = "http://localhost:5000"` như mẫu trên chưa, publish + `scp` đè lại, rồi `systemctl restart mqsocial-api`.
+
 Kiểm tra `.csproj` có copy file `appsettings.Production.json` khi publish (thường mặc định copy theo wildcard `appsettings*.json`, không cần sửa gì thêm).
 
 Build lại và upload:
