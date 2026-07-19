@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Campaigns;
 
-//[AbpAuthorize(PermissionNames.Pages_Campaigns)]
+[AbpAuthorize(PermissionNames.Pages_Campaigns)]
 public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, Guid, PagedCampaignRequestDto, CreateCampaignDto, CampaignDto>, ICampaignAppService
 {
     private readonly IRepository<Contract, Guid> _contractRepository;
@@ -29,6 +29,9 @@ public class CampaignAppService : AsyncCrudAppService<Campaign, CampaignDto, Gui
     {
         _contractRepository = contractRepository;
         _contractKolRepository = contractKolRepository;
+        CreatePermissionName = PermissionNames.Pages_Campaigns_Create;
+        UpdatePermissionName = PermissionNames.Pages_Campaigns_Update;
+        DeletePermissionName = PermissionNames.Pages_Campaigns_Delete;
     }
 
     protected override Campaign MapToEntity(CreateCampaignDto createInput)

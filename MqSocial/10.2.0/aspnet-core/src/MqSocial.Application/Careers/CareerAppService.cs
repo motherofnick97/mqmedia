@@ -1,10 +1,12 @@
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
+using MqSocial.Authorization;
 using MqSocial.Careers.Dto;
 using System;
 using System.Linq;
@@ -12,11 +14,15 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Careers;
 
+[AbpAuthorize(PermissionNames.Pages_Careers)]
 public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, PagedCareerRequestDto, CreateCareerDto, CareerDto>, ICareerAppService
 {
     public CareerAppService(IRepository<Career, Guid> repository)
         : base(repository)
     {
+        CreatePermissionName = PermissionNames.Pages_Careers_Create;
+        UpdatePermissionName = PermissionNames.Pages_Careers_Update;
+        DeletePermissionName = PermissionNames.Pages_Careers_Delete;
     }
 
     protected override IQueryable<Career> CreateFilteredQuery(PagedCareerRequestDto input)

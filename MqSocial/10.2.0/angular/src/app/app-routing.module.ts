@@ -41,31 +41,37 @@ import { AppComponent } from './app.component';
                     {
                         path: 'contract-kols',
                         loadChildren: () => import('./contract-kols/contract-kols.module').then((m) => m.ContractKolsModule),
+                        data: { permission: 'Pages.ContractKols' },
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'contracts',
                         loadChildren: () => import('./contracts/contracts.module').then((m) => m.ContractsModule),
+                        data: { permission: 'Pages.Contracts' },
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'kols',
                         loadChildren: () => import('./kols/kols.module').then((m) => m.KolsModule),
+                        data: { permission: 'Pages.Kols' },
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'companies',
                         loadChildren: () => import('./companies/companies.module').then((m) => m.CompaniesModule),
+                        data: { permission: 'Pages.Companies' },
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'campaigns',
                         loadChildren: () => import('./campaigns/campaigns.module').then((m) => m.CampaignsModule),
+                        data: { permission: 'Pages.Campaigns' },
                         canActivate: [AppRouteGuard],
                     },
                     {
                         path: 'careers',
                         loadChildren: () => import('./careers/careers.module').then((m) => m.CareersModule),
+                        data: { permission: 'Pages.Careers' },
                         canActivate: [AppRouteGuard],
                     },
                     {

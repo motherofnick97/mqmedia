@@ -7,7 +7,11 @@ public class ContractKolDto : EntityDto<Guid>
 {
     public Guid KolId { get; set; }
 
+    public string KolName { get; set; }
+
     public Guid ContractId { get; set; }
+
+    public string ContractName { get; set; }
 
     public ContractKolStatus Status { get; set; }
 

@@ -41,10 +41,12 @@
             </div>
 
             <!-- Payment -->
-            <div class="col-md-4">
-                <label class="form-label">Payment</label>
-                <p-inputnumber name="payment" [(ngModel)]="entry.payment" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
-            </div>
+            @if (isGranted('Pages.ContractKols.Payment')) {
+                <div class="col-md-4">
+                    <label class="form-label">Payment</label>
+                    <p-inputnumber name="payment" [(ngModel)]="entry.payment" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
+                </div>
+            }
 
             <!-- Air Time -->
             <div class="col-md-4">

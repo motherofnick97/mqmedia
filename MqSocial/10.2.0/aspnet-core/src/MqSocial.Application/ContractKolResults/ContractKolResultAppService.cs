@@ -1,18 +1,23 @@
 using Abp.Application.Services;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
+using MqSocial.Authorization;
 using MqSocial.ContractKolResults.Dto;
 using System;
 using System.Linq;
 
 namespace MqSocial.ContractKolResults;
 
-//[AbpAuthorize(PermissionNames.Pages_ContractKolResults)]
+[AbpAuthorize(PermissionNames.Pages_ContractKols)]
 public class ContractKolResultAppService : AsyncCrudAppService<ContractKolResult, ContractKolResultDto, Guid, PagedContractKolResultRequestDto, CreateContractKolResultDto, ContractKolResultDto>, IContractKolResultAppService
 {
     public ContractKolResultAppService(IRepository<ContractKolResult, Guid> repository)
         : base(repository)
     {
+        CreatePermissionName = PermissionNames.Pages_ContractKols_Create;
+        UpdatePermissionName = PermissionNames.Pages_ContractKols_Update;
+        DeletePermissionName = PermissionNames.Pages_ContractKols_Delete;
     }
 
     protected override ContractKolResult MapToEntity(CreateContractKolResultDto createInput)

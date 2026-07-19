@@ -1,6 +1,8 @@
 using Abp.Application.Services;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
+using MqSocial.Authorization;
 using MqSocial.KolDuplicateContracts.Dto;
 using System;
 using System.Linq;
@@ -8,6 +10,7 @@ using System.Linq.Dynamic.Core;
 
 namespace MqSocial.KolDuplicateContracts;
 
+[AbpAuthorize(PermissionNames.Pages_ContractKols)]
 public class KolDuplicateContractAppService
     : AsyncCrudAppService<KolDuplicateContract, KolDuplicateContractDto, Guid, PagedKolDuplicateContractRequestDto, CreateKolDuplicateContractDto, KolDuplicateContractDto>,
       IKolDuplicateContractAppService
@@ -15,6 +18,9 @@ public class KolDuplicateContractAppService
     public KolDuplicateContractAppService(IRepository<KolDuplicateContract, Guid> repository)
         : base(repository)
     {
+        CreatePermissionName = PermissionNames.Pages_ContractKols_Create;
+        UpdatePermissionName = PermissionNames.Pages_ContractKols_Update;
+        DeletePermissionName = PermissionNames.Pages_ContractKols_Delete;
     }
 
     protected override KolDuplicateContract MapToEntity(CreateKolDuplicateContractDto createInput)

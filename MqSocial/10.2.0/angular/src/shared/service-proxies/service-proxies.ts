@@ -4968,7 +4968,9 @@ export enum ReceiveStatus {
 export interface IContractKolDto {
     id: string;
     kolId: string | undefined;
+    kolName: string | undefined;
     contractId: string | undefined;
+    contractName: string | undefined;
     status: ContractKolStatus | undefined;
     cash: number | undefined;
     payment: number | undefined;
@@ -4991,7 +4993,9 @@ export interface IContractKolDto {
 export class ContractKolDto implements IContractKolDto {
     id: string;
     kolId: string | undefined;
+    kolName: string | undefined;
     contractId: string | undefined;
+    contractName: string | undefined;
     status: ContractKolStatus | undefined;
     cash: number | undefined;
     payment: number | undefined;
@@ -5023,7 +5027,9 @@ export class ContractKolDto implements IContractKolDto {
         if (_data) {
             this.id = _data["id"];
             this.kolId = _data["kolId"];
+            this.kolName = _data["kolName"];
             this.contractId = _data["contractId"];
+            this.contractName = _data["contractName"];
             this.status = _data["status"];
             this.cash = _data["cash"];
             this.payment = _data["payment"];
@@ -5055,7 +5061,9 @@ export class ContractKolDto implements IContractKolDto {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["kolId"] = this.kolId;
+        data["kolName"] = this.kolName;
         data["contractId"] = this.contractId;
+        data["contractName"] = this.contractName;
         data["status"] = this.status;
         data["cash"] = this.cash;
         data["payment"] = this.payment;

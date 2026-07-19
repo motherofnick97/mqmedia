@@ -1,6 +1,8 @@
 using Abp.Application.Services;
+using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Linq.Extensions;
+using MqSocial.Authorization;
 using MqSocial.ContractKolReviews.Dto;
 using System;
 using System.Linq;
@@ -8,6 +10,7 @@ using System.Linq.Dynamic.Core;
 
 namespace MqSocial.ContractKolReviews;
 
+[AbpAuthorize(PermissionNames.Pages_ContractKols)]
 public class ContractKolReviewAppService
     : AsyncCrudAppService<ContractKolReview, ContractKolReviewDto, Guid, PagedContractKolReviewRequestDto, CreateContractKolReviewDto, ContractKolReviewDto>,
       IContractKolReviewAppService
@@ -15,6 +18,9 @@ public class ContractKolReviewAppService
     public ContractKolReviewAppService(IRepository<ContractKolReview, Guid> repository)
         : base(repository)
     {
+        CreatePermissionName = PermissionNames.Pages_ContractKols_Create;
+        UpdatePermissionName = PermissionNames.Pages_ContractKols_Update;
+        DeletePermissionName = PermissionNames.Pages_ContractKols_Delete;
     }
 
     protected override ContractKolReview MapToEntity(CreateContractKolReviewDto createInput)

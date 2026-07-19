@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Contracts;
 
-//[AbpAuthorize(PermissionNames.Pages_Contracts)]
+[AbpAuthorize(PermissionNames.Pages_Contracts)]
 public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Guid, PagedContractRequestDto, CreateContractDto, ContractDto>, IContractAppService
 {
     private readonly IRepository<ContractKol, Guid> _contractKolRepository;
@@ -25,6 +25,9 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Gui
         : base(repository)
     {
         _contractKolRepository = contractKolRepository;
+        CreatePermissionName = PermissionNames.Pages_Contracts_Create;
+        UpdatePermissionName = PermissionNames.Pages_Contracts_Update;
+        DeletePermissionName = PermissionNames.Pages_Contracts_Delete;
     }
 
     protected override Contract MapToEntity(CreateContractDto createInput)

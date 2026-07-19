@@ -12,7 +12,6 @@ import {
     ContractKolStatus,
     ReceiveStatus,
     ChannelType,
-    KolServiceProxy,
     ContractServiceProxy,
     ContractKolResultServiceProxy,
     ContractKolResultDto,
@@ -72,8 +71,6 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     filterContractId: string | undefined = undefined;
     advancedFiltersVisible = false;
 
-    kolMap: Record<string, string> = {};
-    contractMap: Record<string, string> = {};
     contractOptions: { value: string | undefined; label: string }[] = [];
 
     editingRowKeys: { [s: string]: boolean } = {};
@@ -178,7 +175,6 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     constructor(
         injector: Injector,
         private _contractKolService: ContractKolServiceProxy,
-        private _kolService: KolServiceProxy,
         private _contractService: ContractServiceProxy,
         private _contractKolResultService: ContractKolResultServiceProxy,
         private _emailService: EmailServiceProxy,
@@ -189,15 +185,13 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     ngOnInit(): void {
-        this._kolService.getAll(undefined, undefined, undefined, undefined, 0, 1000).subscribe((r) => {
-            (r.items ?? []).forEach((k) => { this.kolMap[k.id] = k.name ?? k.id; });
-        });
+        // Chỉ dùng để build danh sách lọc theo hợp đồng — tên KOL/hợp đồng của từng dòng
+        // đã có sẵn trong kết quả trả về của contractKolService.getAll (kolName/contractName).
         this._contractService.getAll(undefined, undefined, undefined, undefined, 0, 1000).subscribe((r) => {
             this.contractOptions = [
                 { value: undefined, label: 'Tất cả' },
                 ...(r.items ?? []).map((c) => ({ value: c.id, label: c.name ?? c.id })),
             ];
-            (r.items ?? []).forEach((c) => { this.contractMap[c.id] = c.name ?? c.id; });
         });
     }
 
@@ -210,8 +204,8 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         const modalRef = this._modalService.show(ViewContractKolDetailDialogComponent, {
             class: 'modal-xl',
             initialState: {
-                kolName: this.getKolName(record.kolId),
-                contractName: this.getContractName(record.contractId),
+                kolName: this.getKolName(record),
+                contractName: this.getContractName(record),
             },
         });
         modalRef.content.setRecord(record);
@@ -341,12 +335,12 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         this.list();
     }
 
-    getKolName(kolId: string | undefined): string {
-        return kolId ? this.kolMap[kolId] : '—';
+    getKolName(record: ContractKolDto): string {
+        return record.kolName ?? '—';
     }
 
-    getContractName(contractId: string | undefined): string {
-        return contractId ? (this.contractMap[contractId] ?? contractId) : '—';
+    getContractName(record: ContractKolDto): string {
+        return record.contractName ?? '—';
     }
 
     getStatusLabel(status: ContractKolStatus): string {
@@ -457,8 +451,8 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         for (const kol of kols) {
             const kolResults = resultsByKolId[kol.id] ?? [];
             const baseFields = [
-                td(this.getKolName(kol.kolId)),
-                td(this.getContractName(kol.contractId)),
+                td(this.getKolName(kol)),
+                td(this.getContractName(kol)),
                 td(kol.status != null ? this.getStatusLabel(kol.status) : ''),
                 td(kol.cash?.toLocaleString()),
                 td(kol.payment?.toLocaleString()),
@@ -527,8 +521,8 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
 
     private buildExportRow(kol: ContractKolDto, result: ContractKolResultDto | null): any {
         return {
-            'KOL': this.getKolName(kol.kolId),
-            'Hợp đồng': this.getContractName(kol.contractId),
+            'KOL': this.getKolName(kol),
+            'Hợp đồng': this.getContractName(kol),
             'Trạng thái': kol.status != null ? this.getStatusLabel(kol.status) : '',
             'Cash': kol.cash ?? 0,
             'Payment': kol.payment ?? 0,
@@ -558,7 +552,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
 
     delete(ck: ContractKolDto): void {
         abp.message.confirm(
-            `Xóa KOL "${this.getKolName(ck.kolId)}" khỏi hợp đồng "${this.getContractName(ck.contractId)}"?`,
+            `Xóa KOL "${this.getKolName(ck)}" khỏi hợp đồng "${this.getContractName(ck)}"?`,
             undefined,
             (result: boolean) => {
                 if (result) {

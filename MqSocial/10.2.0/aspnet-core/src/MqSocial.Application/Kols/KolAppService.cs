@@ -34,7 +34,7 @@ using System.Threading.Tasks;
 
 namespace MqSocial.Kols;
 
-//[AbpAuthorize(PermissionNames.Pages_Kols)]
+[AbpAuthorize(PermissionNames.Pages_Kols)]
 public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequestDto, CreateKolDto, KolDto>, IKolAppService
 {
     public ILogger Logger { get; set; }
@@ -62,6 +62,9 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         _contractKolRepository = contractKolRepository;
         _kolDuplicateContractRepository = kolDuplicateContractRepository;
         _contractRepository = contractRepository;
+        CreatePermissionName = PermissionNames.Pages_Kols_Create;
+        UpdatePermissionName = PermissionNames.Pages_Kols_Update;
+        DeletePermissionName = PermissionNames.Pages_Kols_Delete;
     }
 
     // Trả về: KolId → danh sách tên contract bị duplicate với contractId đầu vào

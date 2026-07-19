@@ -46,16 +46,18 @@
                 [fluid]="true">
             </p-inputnumber>
         </div>
-        <div class="col-md-3 mb-2">
-            <label class="text-muted small mb-1 d-block">Thanh toán (Payment)</label>
-            <p-inputnumber
-                name="payment"
-                [(ngModel)]="record.payment"
-                [min]="0"
-                mode="decimal"
-                [fluid]="true">
-            </p-inputnumber>
-        </div>
+        @if (isGranted('Pages.ContractKols.Payment')) {
+            <div class="col-md-3 mb-2">
+                <label class="text-muted small mb-1 d-block">Thanh toán (Payment)</label>
+                <p-inputnumber
+                    name="payment"
+                    [(ngModel)]="record.payment"
+                    [min]="0"
+                    mode="decimal"
+                    [fluid]="true">
+                </p-inputnumber>
+            </div>
+        }
     </div>
 
     <!-- Mẫu sản phẩm -->
