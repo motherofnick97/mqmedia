@@ -6,15 +6,24 @@ using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
+using MqSocial.Common.Enum;
 using MqSocial.Contracts;
+using MqSocial.ContractKolResults;
 using MqSocial.ContractKols.Dto;
 using MqSocial.ContractKolReviews;
+using MqSocial.Emails;
+using MqSocial.Emails.Dto;
 using MqSocial.KolDuplicateContracts;
 using MqSocial.Kols;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Linq.Dynamic.Core;
+using System.Net;
+using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MqSocial.ContractKols;
@@ -22,23 +31,44 @@ namespace MqSocial.ContractKols;
 [AbpAuthorize(PermissionNames.Pages_ContractKols)]
 public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKolDto, Guid, PagedContractKolRequestDto, CreateContractKolDto, ContractKolDto>, IContractKolAppService
 {
+    private static readonly Dictionary<ReceiveStatus, string> ReceiveStatusLabels = new()
+    {
+        [ReceiveStatus.NotShip] = "Chưa gửi",
+        [ReceiveStatus.Shipping] = "Đang gửi",
+        [ReceiveStatus.Received] = "Đã nhận",
+        [ReceiveStatus.NotReceived] = "Không nhận",
+    };
+
+    private static readonly Dictionary<ChannelType, string> ChannelLabels = new()
+    {
+        [ChannelType.Tiktok] = "TikTok",
+        [ChannelType.Facebook] = "Facebook",
+        [ChannelType.Khac] = "Khác",
+    };
+
     private readonly IRepository<Contract, Guid> _contractRepository;
     private readonly IRepository<KolDuplicateContract, Guid> _kolDuplicateContractRepository;
     private readonly IRepository<ContractKolReview, Guid> _contractKolReviewRepository;
     private readonly IRepository<Kol, Guid> _kolRepository;
+    private readonly IRepository<ContractKolResult, Guid> _contractKolResultRepository;
+    private readonly IEmailAppService _emailAppService;
 
     public ContractKolAppService(
         IRepository<ContractKol, Guid> repository,
         IRepository<KolDuplicateContract, Guid> kolDuplicateContractRepository,
         IRepository<Contract, Guid> contractRepository,
         IRepository<ContractKolReview, Guid> contractKolReviewRepository,
-        IRepository<Kol, Guid> kolRepository)
+        IRepository<Kol, Guid> kolRepository,
+        IRepository<ContractKolResult, Guid> contractKolResultRepository,
+        IEmailAppService emailAppService)
         : base(repository)
     {
         _kolDuplicateContractRepository = kolDuplicateContractRepository;
         _contractRepository = contractRepository;
         _contractKolReviewRepository = contractKolReviewRepository;
         _kolRepository = kolRepository;
+        _contractKolResultRepository = contractKolResultRepository;
+        _emailAppService = emailAppService;
         CreatePermissionName = PermissionNames.Pages_ContractKols_Create;
         UpdatePermissionName = PermissionNames.Pages_ContractKols_Update;
         DeletePermissionName = PermissionNames.Pages_ContractKols_Delete;
@@ -201,5 +231,115 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
             .Where(x => conflictingContractIds.Contains(x.Id))
             .Select(x => x.Name)
             .ToListAsync();
+    }
+
+    public async Task SendListEmailAsync(SendContractKolsEmailDto input)
+    {
+        if (input.To == null || input.To.Count == 0)
+            throw new UserFriendlyException("Vui lòng nhập ít nhất một địa chỉ email.");
+
+        var kolsResult = await GetAllAsync(new PagedContractKolRequestDto
+        {
+            ContractId = input.ContractId,
+            Status = input.Status,
+            Sorting = "Id",
+            SkipCount = 0,
+            MaxResultCount = 10000,
+        });
+
+        var kols = kolsResult.Items.ToList();
+        var kolIds = kols.Select(x => x.Id).ToList();
+
+        var results = await _contractKolResultRepository.GetAll()
+            .Where(x => kolIds.Contains(x.ContractKolId))
+            .OrderBy(x => x.PostTime)
+            .ToListAsync();
+
+        var resultsByKolId = results
+            .GroupBy(x => x.ContractKolId)
+            .ToDictionary(g => g.Key, g => g.ToList());
+
+        var html = BuildEmailHtml(input.Subject, input.Body, kols, resultsByKolId);
+
+        await _emailAppService.SendAsync(new SendEmailDto
+        {
+            To = input.To,
+            Subject = input.Subject,
+            Body = html,
+            IsBodyHtml = true,
+        });
+    }
+
+    private static string BuildEmailHtml(
+        string subject,
+        string introBody,
+        List<ContractKolDto> kols,
+        Dictionary<Guid, List<ContractKolResult>> resultsByKolId)
+    {
+        static string Th(string t) => $"<th style=\"border:1px solid #ccc;padding:6px 10px;background:#f0f0f0;white-space:nowrap\">{t}</th>";
+        static string Td(string t) => $"<td style=\"border:1px solid #ccc;padding:5px 10px;vertical-align:top\">{(string.IsNullOrEmpty(t) ? "—" : t)}</td>";
+
+        var sb = new StringBuilder();
+        sb.Append("<html><body style=\"font-family:Arial,sans-serif;font-size:13px\">");
+        sb.Append($"<h2 style=\"color:#333\">{WebUtility.HtmlEncode(subject)}</h2>");
+        if (!string.IsNullOrWhiteSpace(introBody))
+            sb.Append($"<p style=\"white-space:pre-wrap\">{WebUtility.HtmlEncode(introBody)}</p>");
+
+        sb.Append("<table style=\"border-collapse:collapse;width:100%;font-size:12px\">");
+        sb.Append("<thead><tr>");
+        sb.Append(Th("KOL") + Th("Hợp đồng") + Th("Trạng thái") + Th("Cash") + Th("Air Time") + Th("Nhận mẫu") + Th("Kết quả review"));
+        sb.Append("</tr></thead><tbody>");
+
+        foreach (var kol in kols)
+        {
+            sb.Append("<tr>");
+            sb.Append(Td(WebUtility.HtmlEncode(kol.KolName)));
+            sb.Append(Td(WebUtility.HtmlEncode(kol.ContractName)));
+            sb.Append(Td(WebUtility.HtmlEncode(GetEnumDescription(kol.Status))));
+            sb.Append(Td(kol.Cash.ToString("N0", CultureInfo.InvariantCulture)));
+            sb.Append(Td(kol.AirTime.HasValue ? kol.AirTime.Value.ToString("dd/MM/yyyy") : null));
+            sb.Append(Td(ReceiveStatusLabels.TryGetValue(kol.SampleReceiveStatus, out var receiveLabel) ? receiveLabel : null));
+            sb.Append(Td(WebUtility.HtmlEncode(kol.ReviewResult)));
+            sb.Append("</tr>");
+
+            if (resultsByKolId.TryGetValue(kol.Id, out var kolResults) && kolResults.Count > 0)
+            {
+                sb.Append("<tr><td colspan=\"7\" style=\"padding:6px 10px 14px 24px;background:#fafafa;border:1px solid #ccc\">");
+                sb.Append("<table style=\"border-collapse:collapse;width:100%;font-size:11px\">");
+                sb.Append("<thead><tr>");
+                sb.Append(Th("Ngày đăng") + Th("Kênh") + Th("Link bài") + Th("View") + Th("Comment") + Th("Like") + Th("Save") + Th("Share"));
+                sb.Append("</tr></thead><tbody>");
+
+                foreach (var r in kolResults)
+                {
+                    var link = string.IsNullOrWhiteSpace(r.PostLink)
+                        ? null
+                        : $"<a href=\"{WebUtility.HtmlEncode(r.PostLink)}\">Link</a>";
+
+                    sb.Append("<tr>");
+                    sb.Append(Td(r.PostTime.HasValue ? r.PostTime.Value.ToString("dd/MM/yyyy") : null));
+                    sb.Append(Td(ChannelLabels.TryGetValue(r.ChannelType, out var channelLabel) ? channelLabel : null));
+                    sb.Append(Td(link));
+                    sb.Append(Td(r.View?.ToString("N0", CultureInfo.InvariantCulture)));
+                    sb.Append(Td(r.Comment?.ToString("N0", CultureInfo.InvariantCulture)));
+                    sb.Append(Td(r.Like?.ToString("N0", CultureInfo.InvariantCulture)));
+                    sb.Append(Td(r.Save?.ToString("N0", CultureInfo.InvariantCulture)));
+                    sb.Append(Td(r.Share?.ToString("N0", CultureInfo.InvariantCulture)));
+                    sb.Append("</tr>");
+                }
+
+                sb.Append("</tbody></table></td></tr>");
+            }
+        }
+
+        sb.Append("</tbody></table></body></html>");
+        return sb.ToString();
+    }
+
+    private static string GetEnumDescription(Enum value)
+    {
+        var field = value.GetType().GetField(value.ToString());
+        var attr = field?.GetCustomAttribute<DescriptionAttribute>();
+        return attr?.Description ?? value.ToString();
     }
 }

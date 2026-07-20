@@ -20,43 +20,26 @@
         <div class="container-fluid">
             <div class="card table-wrapper">
                 <div class="card-header">
-                    <div class="row align-items-center">
-                        <div class="col-md-6"></div>
-                        <div class="col-md-6">
-                            <div class="d-flex" style="gap: 0.5rem">
-                                <p-button icon="pi pi-search" pTooltip="Tìm kiếm" tooltipPosition="top" (onClick)="list()"></p-button>
-                                <p-button
-                                    [icon]="advancedFiltersVisible ? 'pi pi-angle-up' : 'pi pi-angle-down'"
-                                    severity="secondary"
-                                    pTooltip="Bộ lọc nâng cao" tooltipPosition="top"
-                                    (onClick)="advancedFiltersVisible = !advancedFiltersVisible">
-                                </p-button>
-                            </div>
+                    <div class="row g-3 align-items-end">
+                        <div class="col-md-4">
+                            <label class="form-label">Hợp đồng</label>
+                            <p-select [(ngModel)]="filterContractId" name="filterContractId"
+                                [options]="contractOptions" optionLabel="label" optionValue="value" [fluid]="true">
+                            </p-select>
                         </div>
-                    </div>
-
-                    @if (advancedFiltersVisible) {
-                        <div class="mt-2 pt-3 border-top">
-                            <div class="row g-3">
-                                <div class="col-md-6">
-                                    <label class="form-label">Hợp đồng</label>
-                                    <p-select [(ngModel)]="filterContractId" name="filterContractId"
-                                        [options]="contractOptions" optionLabel="label" optionValue="value" [fluid]="true">
-                                    </p-select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label class="form-label">{{ 'Status' | localize }}</label>
-                                    <p-select [(ngModel)]="filterStatus" name="filterStatus"
-                                        [options]="statusOptions" optionLabel="label" optionValue="value" [fluid]="true">
-                                    </p-select>
-                                </div>
-                            </div>
-                            <div class="d-flex mt-3" style="gap: 0.5rem">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ 'Status' | localize }}</label>
+                            <p-select [(ngModel)]="filterStatus" name="filterStatus"
+                                [options]="statusOptions" optionLabel="label" optionValue="value" [fluid]="true">
+                            </p-select>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="d-flex" style="gap: 0.5rem">
                                 <p-button icon="pi pi-search" [label]="'Search' | localize" (onClick)="list()"></p-button>
                                 <p-button [label]="'Clear' | localize" severity="secondary" (onClick)="clearFilters()"></p-button>
                             </div>
                         </div>
-                    }
+                    </div>
                 </div>
 
                 <div class="card-body p-0">
@@ -517,7 +500,7 @@
 </div>
 
 <!-- Email dialog -->
-<p-dialog header="Gửi email đính kèm Excel" [(visible)]="emailDialogVisible"
+<p-dialog header="Gửi email danh sách KOL" [(visible)]="emailDialogVisible"
     [modal]="true" [style]="{'width':'480px'}" [closable]="true">
     <div class="d-flex flex-column" style="gap: 1rem">
         <div>
@@ -531,7 +514,8 @@
         </div>
         <div>
             <label class="form-label">Nội dung</label>
-            <textarea pTextarea [(ngModel)]="emailBody" rows="4" style="width:100%"></textarea>
+            <textarea pTextarea [(ngModel)]="emailBody" rows="4" style="width:100%"
+                placeholder="Ghi chú thêm (tuỳ chọn)..."></textarea>
         </div>
     </div>
     <ng-template pTemplate="footer">

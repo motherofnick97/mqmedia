@@ -5447,6 +5447,49 @@ export class ContractKolServiceProxy {
         }
         return _observableOf(null as any);
     }
+
+    sendListEmail(input: SendContractKolsEmailDto): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/SendListEmail";
+        const content_ = JSON.stringify(input.toJSON());
+        return this.http.post<void>(url_, content_, {
+            headers: new HttpHeaders({ "Content-Type": "application/json" }),
+        });
+    }
+}
+
+export interface ISendContractKolsEmailDto {
+    contractId: string;
+    status: ContractKolStatus | undefined;
+    to: string[];
+    subject: string;
+    body: string | undefined;
+}
+
+export class SendContractKolsEmailDto implements ISendContractKolsEmailDto {
+    contractId: string;
+    status: ContractKolStatus | undefined;
+    to: string[] = [];
+    subject: string;
+    body: string | undefined;
+
+    constructor(data?: ISendContractKolsEmailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data['contractId'] = this.contractId;
+        data['status'] = this.status;
+        data['to'] = this.to;
+        data['subject'] = this.subject;
+        data['body'] = this.body;
+        return data;
+    }
 }
 
 export enum ContractStatus {
