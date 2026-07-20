@@ -1,0 +1,52 @@
+<form class="form-horizontal" autocomplete="off" #createContractTemplateModal="ngForm" (ngSubmit)="save()">
+    <abp-modal-header [title]="'CreateNewContractTemplate' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
+        <div class="form-group row required">
+            <label class="col-md-3 col-form-label" for="name">{{ 'Name' | localize }}</label>
+            <div class="col-md-9">
+                <input
+                    pInputText
+                    type="text"
+                    name="name"
+                    id="name"
+                    required
+                    maxlength="256"
+                    [(ngModel)]="contractTemplate.name"
+                    #nameModel="ngModel"
+                    #nameEl
+                    style="width: 100%" />
+                <abp-validation-summary [control]="nameModel" [controlEl]="nameEl"></abp-validation-summary>
+            </div>
+        </div>
+        <div class="form-group row">
+            <label class="col-md-3 col-form-label">File</label>
+            <div class="col-md-9">
+                <input #fileInput type="file" style="display: none" (change)="onFileSelected($event)" />
+                <div class="d-flex align-items-center" style="gap: 0.5rem">
+                    <p-button
+                        type="button"
+                        icon="pi pi-upload"
+                        [label]="'ChooseFile' | localize"
+                        severity="secondary"
+                        (onClick)="pickFile()">
+                    </p-button>
+                    <span>{{ selectedFile ? selectedFile.name : ('NoFileChosen' | localize) }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <p-button
+            [label]="'Cancel' | localize"
+            severity="secondary"
+            [disabled]="saving"
+            (onClick)="bsModalRef.hide()">
+        </p-button>
+        <p-button
+            [label]="'Save' | localize"
+            [disabled]="!createContractTemplateModal.form.valid || saving"
+            [loading]="saving"
+            (onClick)="save()">
+        </p-button>
+    </div>
+</form>

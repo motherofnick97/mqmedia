@@ -59,4 +59,12 @@ public static class PermissionNames
     public const string Pages_Careers_Update = "Pages.Careers.Update";
 
     public const string Pages_Careers_Delete = "Pages.Careers.Delete";
+
+    public const string Pages_ContractTemplates = "Pages.ContractTemplates";
+
+    public const string Pages_ContractTemplates_Create = "Pages.ContractTemplates.Create";
+
+    public const string Pages_ContractTemplates_Update = "Pages.ContractTemplates.Update";
+
+    public const string Pages_ContractTemplates_Delete = "Pages.ContractTemplates.Delete";
 }

@@ -19,4 +19,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MqSocial.Core\MqSocial.Core.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="ContractTemplates\Templates\" />
+  </ItemGroup>
 </Project>

@@ -75,6 +75,12 @@ import { AppComponent } from './app.component';
                         canActivate: [AppRouteGuard],
                     },
                     {
+                        path: 'contract-templates',
+                        loadChildren: () => import('./contract-templates/contract-templates.module').then((m) => m.ContractTemplatesModule),
+                        data: { permission: 'Pages.ContractTemplates' },
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
                         path: 'update-password',
                         loadChildren: () => import('./users/users.module').then((m) => m.UsersModule),
                         canActivate: [AppRouteGuard],

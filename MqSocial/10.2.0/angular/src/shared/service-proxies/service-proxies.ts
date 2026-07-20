@@ -3890,6 +3890,379 @@ const responseBlob = response instanceof HttpResponse ? response.body : (respons
     }
 }
 
+export interface IContractTemplateDto {
+    id: string;
+    name: string | undefined;
+    filePath: string | undefined;
+}
+
+export class ContractTemplateDto implements IContractTemplateDto {
+    id: string;
+    name: string | undefined;
+    filePath: string | undefined;
+
+    constructor(data?: IContractTemplateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.filePath = _data["filePath"];
+        }
+    }
+
+    static fromJS(data: any): ContractTemplateDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractTemplateDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["filePath"] = this.filePath;
+        return data;
+    }
+
+    clone(): ContractTemplateDto {
+        const json = this.toJSON();
+        let result = new ContractTemplateDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateContractTemplateDto {
+    name: string | undefined;
+    filePath: string | undefined;
+}
+
+export class CreateContractTemplateDto implements ICreateContractTemplateDto {
+    name: string | undefined;
+    filePath: string | undefined;
+
+    constructor(data?: ICreateContractTemplateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.name = _data["name"];
+            this.filePath = _data["filePath"];
+        }
+    }
+
+    static fromJS(data: any): CreateContractTemplateDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateContractTemplateDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["name"] = this.name;
+        data["filePath"] = this.filePath;
+        return data;
+    }
+
+    clone(): CreateContractTemplateDto {
+        const json = this.toJSON();
+        let result = new CreateContractTemplateDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IContractTemplateDtoPagedResultDto {
+    totalCount: number;
+    items: ContractTemplateDto[] | undefined;
+}
+
+export class ContractTemplateDtoPagedResultDto implements IContractTemplateDtoPagedResultDto {
+    totalCount: number;
+    items: ContractTemplateDto[] | undefined;
+
+    constructor(data?: IContractTemplateDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(ContractTemplateDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ContractTemplateDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractTemplateDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): ContractTemplateDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new ContractTemplateDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+@Injectable()
+export class ContractTemplateServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(keyword: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<ContractTemplateDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractTemplate/GetAll?";
+        if (keyword !== undefined && keyword !== null)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Accept": "text/plain" })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractTemplateDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractTemplateDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<ContractTemplateDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractTemplateDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: string | undefined): Observable<ContractTemplateDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractTemplate/Get?";
+        if (id !== undefined && id !== null)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Accept": "text/plain" })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGet(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractTemplateDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractTemplateDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<ContractTemplateDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractTemplateDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateContractTemplateDto | undefined): Observable<ContractTemplateDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractTemplate/Create";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+
+        let options_: any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractTemplateDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractTemplateDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<ContractTemplateDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractTemplateDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    update(body: ContractTemplateDto | undefined): Observable<ContractTemplateDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractTemplate/Update";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+
+        let options_: any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processUpdate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<ContractTemplateDto>; }
+            } else return _observableThrow(response_) as any as Observable<ContractTemplateDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<ContractTemplateDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = ContractTemplateDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/ContractTemplate/Delete?";
+        if (id !== undefined && id !== null)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({})
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ICareerDto {
     id: string;
     name: string | undefined;
