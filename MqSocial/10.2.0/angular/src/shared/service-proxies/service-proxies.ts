@@ -6312,6 +6312,14 @@ export class ContractKolServiceProxy {
             headers: new HttpHeaders({ "Content-Type": "application/json" }),
         });
     }
+
+    exportContract(input: ExportContractDto): Observable<ExportContractResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/ContractKol/ExportContract";
+        const content_ = JSON.stringify(input.toJSON());
+        return this.http.post<ExportContractResultDto>(url_, content_, {
+            headers: new HttpHeaders({ "Content-Type": "application/json" }),
+        });
+    }
 }
 
 export interface ISendContractKolsEmailDto {
@@ -6349,6 +6357,57 @@ export class SendContractKolsEmailDto implements ISendContractKolsEmailDto {
     }
 }
 
+export interface IExportContractDto {
+    contractKolId: string;
+    contractTemplateId: string;
+    contractNumber: string | undefined;
+    signedDate: moment.Moment;
+    cccdIssueDate: moment.Moment | undefined;
+    cccdIssuePlace: string | undefined;
+    durationDays: number;
+}
+
+export class ExportContractDto implements IExportContractDto {
+    contractKolId: string;
+    contractTemplateId: string;
+    contractNumber: string | undefined;
+    signedDate: moment.Moment;
+    cccdIssueDate: moment.Moment | undefined;
+    cccdIssuePlace: string | undefined;
+    durationDays: number;
+
+    constructor(data?: IExportContractDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data['contractKolId'] = this.contractKolId;
+        data['contractTemplateId'] = this.contractTemplateId;
+        data['contractNumber'] = this.contractNumber;
+        data['signedDate'] = this.signedDate ? this.signedDate.toISOString() : undefined;
+        data['cccdIssueDate'] = this.cccdIssueDate ? this.cccdIssueDate.toISOString() : undefined;
+        data['cccdIssuePlace'] = this.cccdIssuePlace;
+        data['durationDays'] = this.durationDays;
+        return data;
+    }
+}
+
+export interface IExportContractResultDto {
+    filePath: string | undefined;
+    fileName: string | undefined;
+}
+
+export class ExportContractResultDto implements IExportContractResultDto {
+    filePath: string | undefined;
+    fileName: string | undefined;
+}
+
 export enum ContractStatus {
     Prepare = 1,
     Processing = 2,
@@ -6366,8 +6425,9 @@ export interface IContractDto {
     budget: number | undefined;
     request: string | undefined;
     script: string | undefined;
-    tenantId: number | undefined;
     maxReviewTime: number | undefined;
+    productName: string | undefined;
+    tenantId: number | undefined;
 }
 
 export class ContractDto implements IContractDto {
@@ -6379,8 +6439,9 @@ export class ContractDto implements IContractDto {
     budget: number | undefined;
     request: string | undefined;
     script: string | undefined;
-    tenantId: number | undefined;
     maxReviewTime: number | undefined;
+    productName: string | undefined;
+    tenantId: number | undefined;
 
     constructor(data?: IContractDto) {
         if (data) {
@@ -6401,8 +6462,9 @@ export class ContractDto implements IContractDto {
             this.budget = _data["budget"];
             this.request = _data["request"];
             this.script = _data["script"];
-            this.tenantId = _data["tenantId"];
             this.maxReviewTime = _data["maxReviewTime"];
+            this.productName = _data["productName"];
+            this.tenantId = _data["tenantId"];
         }
     }
 
@@ -6423,8 +6485,9 @@ export class ContractDto implements IContractDto {
         data["budget"] = this.budget;
         data["request"] = this.request;
         data["script"] = this.script;
-        data["tenantId"] = this.tenantId;
         data["maxReviewTime"] = this.maxReviewTime;
+        data["productName"] = this.productName;
+        data["tenantId"] = this.tenantId;
         return data;
     }
 
@@ -6445,6 +6508,7 @@ export interface ICreateContractDto {
     request: string | undefined;
     script: string | undefined;
     maxReviewTime: number | undefined;
+    productName: string | undefined;
 }
 
 export class CreateContractDto implements ICreateContractDto {
@@ -6456,6 +6520,7 @@ export class CreateContractDto implements ICreateContractDto {
     request: string | undefined;
     script: string | undefined;
     maxReviewTime: number | undefined = 0;
+    productName: string | undefined;
 
     constructor(data?: ICreateContractDto) {
         if (data) {
@@ -6476,6 +6541,7 @@ export class CreateContractDto implements ICreateContractDto {
             this.request = _data["request"];
             this.script = _data["script"];
             this.maxReviewTime = _data["maxReviewTime"];
+            this.productName = _data["productName"];
         }
     }
 
@@ -6496,6 +6562,7 @@ export class CreateContractDto implements ICreateContractDto {
         data["request"] = this.request;
         data["script"] = this.script;
         data["maxReviewTime"] = this.maxReviewTime;
+        data["productName"] = this.productName;
         return data;
     }
 

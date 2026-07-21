@@ -33,6 +33,14 @@
         </div>
 
         <div class="form-group row">
+            <label class="col-md-3 col-form-label" for="productName">Tên sản phẩm</label>
+            <div class="col-md-9">
+                <input pInputText type="text" name="productName" id="productName"
+                    [(ngModel)]="contract.productName" style="width:100%" />
+            </div>
+        </div>
+
+        <div class="form-group row">
             <label class="col-md-3 col-form-label" for="budget">{{ 'Budget' | localize }}</label>
             <div class="col-md-9">
                 <p-inputnumber name="budget" inputId="budget" [(ngModel)]="contract.budget"

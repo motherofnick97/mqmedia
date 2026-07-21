@@ -20,6 +20,7 @@ import {
 } from '@shared/service-proxies/service-proxies';
 import { CreateContractKolDialogComponent } from './create-contract-kol/create-contract-kol-dialog.component';
 import { ViewContractKolDetailDialogComponent } from './view-contract-kol-detail/view-contract-kol-detail-dialog.component';
+import { ExportContractDialogComponent } from './export-contract/export-contract-dialog.component';
 import { Table, TableModule } from 'primeng/table';
 import { LazyLoadEvent, PrimeTemplate } from 'primeng/api';
 import { Paginator, PaginatorModule } from 'primeng/paginator';
@@ -195,6 +196,14 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     createContractKol(): void {
         const modalRef: BsModalRef = this._modalService.show(CreateContractKolDialogComponent, { class: 'modal-xl' });
         modalRef.content.onSave.subscribe(() => this.refresh());
+    }
+
+    exportContract(record: ContractKolDto): void {
+        const modalRef = this._modalService.show(ExportContractDialogComponent, {
+            class: 'modal-lg',
+            initialState: { contractKolId: record.id },
+        });
+        modalRef.content.onSave.subscribe(() => {});
     }
 
     viewDetail(record: ContractKolDto): void {
