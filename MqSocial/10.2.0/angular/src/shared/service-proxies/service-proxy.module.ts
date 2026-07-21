@@ -17,6 +17,7 @@ import * as ApiServiceProxies from './service-proxies';
         ApiServiceProxies.CompanyServiceProxy,
         ApiServiceProxies.ContractTemplateServiceProxy,
         ApiServiceProxies.KolServiceProxy,
+        ApiServiceProxies.KolGeneralServiceProxy,
         ApiServiceProxies.ContractServiceProxy,
         ApiServiceProxies.ContractKolServiceProxy,
         ApiServiceProxies.ContractKolResultServiceProxy,

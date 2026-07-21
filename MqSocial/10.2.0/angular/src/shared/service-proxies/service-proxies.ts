@@ -4263,6 +4263,490 @@ export class ContractTemplateServiceProxy {
     }
 }
 
+export enum Bank {
+    Vietcombank = 1,
+    Techcombank = 2,
+    VPBank = 3,
+    Vietinbank = 4,
+    BIDV = 5,
+    MB = 6,
+    SHB = 7,
+    Agribank = 8,
+    ACB = 9,
+    Sacombank = 10,
+    HDBank = 11,
+    VIB = 12,
+    TPBank = 13,
+    MSB = 14,
+    OCB = 15,
+    SeABank = 16,
+    Eximbank = 17,
+    LPBank = 18,
+    NamABank = 19,
+    ABBank = 20,
+    PVcomBank = 21,
+    BacABank = 22,
+    Kienlongbank = 23,
+    BVBank = 24,
+    Saigonbank = 25,
+    PGBank = 26,
+    NCB = 27,
+    VietABank = 28,
+    BaoVietBank = 29,
+    VietBank = 30,
+    SCB = 31,
+    DongABank = 32,
+    GPBank = 33,
+    OceanBank = 34,
+    CBBank = 35,
+    Coopbank = 36,
+}
+
+export interface IKolGeneralDto {
+    id: string;
+    fullName: string | undefined;
+    phone: string | undefined;
+    address: string | undefined;
+    dob: moment.Moment;
+    identity: string | undefined;
+    bank: Bank;
+    bankNumber: string | undefined;
+    bankOwner: string | undefined;
+    kolIds: string[] | undefined;
+}
+
+export class KolGeneralDto implements IKolGeneralDto {
+    id: string;
+    fullName: string | undefined;
+    phone: string | undefined;
+    address: string | undefined;
+    dob: moment.Moment;
+    identity: string | undefined;
+    bank: Bank;
+    bankNumber: string | undefined;
+    bankOwner: string | undefined;
+    kolIds: string[] | undefined;
+
+    constructor(data?: IKolGeneralDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.fullName = _data["fullName"];
+            this.phone = _data["phone"];
+            this.address = _data["address"];
+            this.dob = _data["dob"] ? moment(_data["dob"]) : undefined;
+            this.identity = _data["identity"];
+            this.bank = _data["bank"];
+            this.bankNumber = _data["bankNumber"];
+            this.bankOwner = _data["bankOwner"];
+            if (Array.isArray(_data["kolIds"])) {
+                this.kolIds = [] as any;
+                for (let item of _data["kolIds"])
+                    this.kolIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): KolGeneralDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KolGeneralDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["fullName"] = this.fullName;
+        data["phone"] = this.phone;
+        data["address"] = this.address;
+        data["dob"] = this.dob ? this.dob.toISOString() : undefined;
+        data["identity"] = this.identity;
+        data["bank"] = this.bank;
+        data["bankNumber"] = this.bankNumber;
+        data["bankOwner"] = this.bankOwner;
+        if (Array.isArray(this.kolIds)) {
+            data["kolIds"] = [];
+            for (let item of this.kolIds)
+                data["kolIds"].push(item);
+        }
+        return data;
+    }
+
+    clone(): KolGeneralDto {
+        const json = this.toJSON();
+        let result = new KolGeneralDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface ICreateKolGeneralDto {
+    fullName: string | undefined;
+    phone: string | undefined;
+    address: string | undefined;
+    dob: moment.Moment;
+    identity: string | undefined;
+    bank: Bank;
+    bankNumber: string | undefined;
+    bankOwner: string | undefined;
+    kolIds: string[] | undefined;
+}
+
+export class CreateKolGeneralDto implements ICreateKolGeneralDto {
+    fullName: string | undefined;
+    phone: string | undefined;
+    address: string | undefined;
+    dob: moment.Moment;
+    identity: string | undefined;
+    bank: Bank;
+    bankNumber: string | undefined;
+    bankOwner: string | undefined;
+    kolIds: string[] | undefined = [];
+
+    constructor(data?: ICreateKolGeneralDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.fullName = _data["fullName"];
+            this.phone = _data["phone"];
+            this.address = _data["address"];
+            this.dob = _data["dob"] ? moment(_data["dob"]) : undefined;
+            this.identity = _data["identity"];
+            this.bank = _data["bank"];
+            this.bankNumber = _data["bankNumber"];
+            this.bankOwner = _data["bankOwner"];
+            if (Array.isArray(_data["kolIds"])) {
+                this.kolIds = [] as any;
+                for (let item of _data["kolIds"])
+                    this.kolIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateKolGeneralDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateKolGeneralDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["fullName"] = this.fullName;
+        data["phone"] = this.phone;
+        data["address"] = this.address;
+        data["dob"] = this.dob ? this.dob.toISOString() : undefined;
+        data["identity"] = this.identity;
+        data["bank"] = this.bank;
+        data["bankNumber"] = this.bankNumber;
+        data["bankOwner"] = this.bankOwner;
+        if (Array.isArray(this.kolIds)) {
+            data["kolIds"] = [];
+            for (let item of this.kolIds)
+                data["kolIds"].push(item);
+        }
+        return data;
+    }
+
+    clone(): CreateKolGeneralDto {
+        const json = this.toJSON();
+        let result = new CreateKolGeneralDto();
+        result.init(json);
+        return result;
+    }
+}
+
+export interface IKolGeneralDtoPagedResultDto {
+    totalCount: number;
+    items: KolGeneralDto[] | undefined;
+}
+
+export class KolGeneralDtoPagedResultDto implements IKolGeneralDtoPagedResultDto {
+    totalCount: number;
+    items: KolGeneralDto[] | undefined;
+
+    constructor(data?: IKolGeneralDtoPagedResultDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.totalCount = _data["totalCount"];
+            if (Array.isArray(_data["items"])) {
+                this.items = [] as any;
+                for (let item of _data["items"])
+                    this.items!.push(KolGeneralDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): KolGeneralDtoPagedResultDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new KolGeneralDtoPagedResultDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["totalCount"] = this.totalCount;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        return data;
+    }
+
+    clone(): KolGeneralDtoPagedResultDto {
+        const json = this.toJSON();
+        let result = new KolGeneralDtoPagedResultDto();
+        result.init(json);
+        return result;
+    }
+}
+
+@Injectable()
+export class KolGeneralServiceProxy {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    getAll(keyword: string | undefined, sorting: string | undefined, skipCount: number | undefined, maxResultCount: number | undefined): Observable<KolGeneralDtoPagedResultDto> {
+        let url_ = this.baseUrl + "/api/services/app/KolGeneral/GetAll?";
+        if (keyword !== undefined && keyword !== null)
+            url_ += "Keyword=" + encodeURIComponent("" + keyword) + "&";
+        if (sorting !== undefined && sorting !== null)
+            url_ += "Sorting=" + encodeURIComponent("" + sorting) + "&";
+        if (skipCount !== undefined && skipCount !== null)
+            url_ += "SkipCount=" + encodeURIComponent("" + skipCount) + "&";
+        if (maxResultCount !== undefined && maxResultCount !== null)
+            url_ += "MaxResultCount=" + encodeURIComponent("" + maxResultCount) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Accept": "text/plain" })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGetAll(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolGeneralDtoPagedResultDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolGeneralDtoPagedResultDto>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<KolGeneralDtoPagedResultDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolGeneralDtoPagedResultDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    get(id: string | undefined): Observable<KolGeneralDto> {
+        let url_ = this.baseUrl + "/api/services/app/KolGeneral/Get?";
+        if (id !== undefined && id !== null)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Accept": "text/plain" })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processGet(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processGet(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolGeneralDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolGeneralDto>;
+        }));
+    }
+
+    protected processGet(response: HttpResponseBase): Observable<KolGeneralDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolGeneralDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    create(body: CreateKolGeneralDto | undefined): Observable<KolGeneralDto> {
+        let url_ = this.baseUrl + "/api/services/app/KolGeneral/Create";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+
+        let options_: any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processCreate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolGeneralDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolGeneralDto>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<KolGeneralDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolGeneralDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    update(body: KolGeneralDto | undefined): Observable<KolGeneralDto> {
+        let url_ = this.baseUrl + "/api/services/app/KolGeneral/Update";
+        url_ = url_.replace(/[?&]$/, "");
+        const content_ = JSON.stringify(body);
+
+        let options_: any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({ "Content-Type": "application/json", "Accept": "text/plain" })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processUpdate(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<KolGeneralDto>; }
+            } else return _observableThrow(response_) as any as Observable<KolGeneralDto>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<KolGeneralDto> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                let result200: any = null;
+                let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+                result200 = KolGeneralDto.fromJS(resultData200);
+                return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    delete(id: string | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/services/app/KolGeneral/Delete?";
+        if (id !== undefined && id !== null)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_: any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({})
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_: any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try { return this.processDelete(response_ as any); }
+                catch (e) { return _observableThrow(e) as any as Observable<void>; }
+            } else return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob = response instanceof HttpResponse ? response.body : (response as any).error instanceof Blob ? (response as any).error : undefined;
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); } }
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+                return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export interface ICareerDto {
     id: string;
     name: string | undefined;

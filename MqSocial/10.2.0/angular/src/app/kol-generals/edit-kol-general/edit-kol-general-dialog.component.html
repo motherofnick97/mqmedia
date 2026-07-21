@@ -1,0 +1,73 @@
+<form class="form-horizontal" autocomplete="off" #editKolGeneralModal="ngForm" (ngSubmit)="save()">
+    <abp-modal-header [title]="'EditKolGeneral' | localize" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
+        <div class="row g-3">
+            <div class="col-md-6 form-group required">
+                <label class="form-label" for="fullName">{{ 'FullName' | localize }}</label>
+                <input
+                    pInputText
+                    type="text"
+                    name="fullName"
+                    id="fullName"
+                    required
+                    maxlength="256"
+                    [(ngModel)]="kolGeneral.fullName"
+                    #fullNameModel="ngModel"
+                    #fullNameEl
+                    style="width: 100%" />
+                <abp-validation-summary [control]="fullNameModel" [controlEl]="fullNameEl"></abp-validation-summary>
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" for="phone">{{ 'Phone' | localize }}</label>
+                <input pInputText type="text" name="phone" id="phone" [(ngModel)]="kolGeneral.phone" style="width: 100%" />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" for="address">{{ 'Address' | localize }}</label>
+                <input pInputText type="text" name="address" id="address" [(ngModel)]="kolGeneral.address" style="width: 100%" />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label">{{ 'Dob' | localize }}</label>
+                <p-datepicker name="dob" [(ngModel)]="dob" dateFormat="dd/mm/yy" [showIcon]="true" [showButtonBar]="true" [fluid]="true"></p-datepicker>
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" for="identity">{{ 'Identity' | localize }}</label>
+                <input pInputText type="text" name="identity" id="identity" [(ngModel)]="kolGeneral.identity" style="width: 100%" />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label">{{ 'Bank' | localize }}</label>
+                <p-select name="bank" [(ngModel)]="kolGeneral.bank" [options]="bankOptions" optionLabel="label" optionValue="value" [filter]="true" filterBy="label" [fluid]="true"></p-select>
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" for="bankNumber">{{ 'BankNumber' | localize }}</label>
+                <input pInputText type="text" name="bankNumber" id="bankNumber" [(ngModel)]="kolGeneral.bankNumber" style="width: 100%" />
+            </div>
+            <div class="col-md-6 form-group">
+                <label class="form-label" for="bankOwner">{{ 'BankOwner' | localize }}</label>
+                <input pInputText type="text" name="bankOwner" id="bankOwner" [(ngModel)]="kolGeneral.bankOwner" style="width: 100%" />
+            </div>
+            <div class="col-md-12 form-group">
+                <label class="form-label">{{ 'Kols' | localize }}</label>
+                <p-multiselect name="kols" inputId="kols" [(ngModel)]="kolGeneral.kolIds"
+                    [options]="kols" optionLabel="name" optionValue="id"
+                    [filter]="true" filterBy="name"
+                    placeholder="-- Chọn KOL --"
+                    [style]="{'width':'100%'}">
+                </p-multiselect>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <p-button
+            [label]="'Cancel' | localize"
+            severity="secondary"
+            [disabled]="saving"
+            (onClick)="bsModalRef.hide()">
+        </p-button>
+        <p-button
+            [label]="'Save' | localize"
+            [disabled]="!editKolGeneralModal.form.valid || saving"
+            [loading]="saving"
+            (onClick)="save()">
+        </p-button>
+    </div>
+</form>

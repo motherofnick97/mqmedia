@@ -14,6 +14,7 @@ using MqSocial.KolCareers;
 using MqSocial.ContractKolReviews;
 using MqSocial.KolDuplicateContracts;
 using MqSocial.ContractTemplates;
+using MqSocial.KolGenerals;
 
 namespace MqSocial.EntityFrameworkCore;
 
@@ -42,6 +43,8 @@ public class MqSocialDbContext : AbpZeroDbContext<Tenant, Role, User, MqSocialDb
     public DbSet<ContractKolReview> ContractKolReviews { get; set; }
 
     public DbSet<ContractTemplate> ContractTemplates { get; set; }
+
+    public DbSet<KolGeneral> KolGenerals { get; set; }
 
     public MqSocialDbContext(DbContextOptions<MqSocialDbContext> options)
         : base(options)

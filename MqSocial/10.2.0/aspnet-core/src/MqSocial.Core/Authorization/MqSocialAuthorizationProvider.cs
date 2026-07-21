@@ -41,6 +41,10 @@ public class MqSocialAuthorizationProvider : AuthorizationProvider
         context.CreatePermission(PermissionNames.Pages_ContractTemplates_Create, L("ContractTemplatesCreate"));
         context.CreatePermission(PermissionNames.Pages_ContractTemplates_Update, L("ContractTemplatesUpdate"));
         context.CreatePermission(PermissionNames.Pages_ContractTemplates_Delete, L("ContractTemplatesDelete"));
+        context.CreatePermission(PermissionNames.Pages_KolGenerals, L("KolGenerals"));
+        context.CreatePermission(PermissionNames.Pages_KolGenerals_Create, L("KolGeneralsCreate"));
+        context.CreatePermission(PermissionNames.Pages_KolGenerals_Update, L("KolGeneralsUpdate"));
+        context.CreatePermission(PermissionNames.Pages_KolGenerals_Delete, L("KolGeneralsDelete"));
     }
 
     private static ILocalizableString L(string name)

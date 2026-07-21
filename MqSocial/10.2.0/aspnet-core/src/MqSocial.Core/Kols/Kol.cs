@@ -3,6 +3,7 @@ using Abp.Domain.Entities.Auditing;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Common.Enum;
 using MqSocial.KolCareers;
+using MqSocial.KolGenerals;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -43,4 +44,10 @@ public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
     public string Phone { get; set; }
 
     public ICollection<KolCarrer> KolCareers { get; set; }
+
+    public Guid? KolGeneralId { get; set; }
+
+    [ForeignKey("KolGeneralId")]
+    public KolGeneral KolGeneral { get; set; }
+
 }

@@ -81,6 +81,12 @@ import { AppComponent } from './app.component';
                         canActivate: [AppRouteGuard],
                     },
                     {
+                        path: 'kol-generals',
+                        loadChildren: () => import('./kol-generals/kol-generals.module').then((m) => m.KolGeneralsModule),
+                        data: { permission: 'Pages.KolGenerals' },
+                        canActivate: [AppRouteGuard],
+                    },
+                    {
                         path: 'update-password',
                         loadChildren: () => import('./users/users.module').then((m) => m.UsersModule),
                         canActivate: [AppRouteGuard],
