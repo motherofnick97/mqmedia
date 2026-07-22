@@ -26,5 +26,7 @@ public class ContractDto : EntityDto<Guid>
 
     public int MaxReviewTime { get; set; }
 
+    public string ProductName { get; set; }
+
     public int? TenantId { get; set; }
 }

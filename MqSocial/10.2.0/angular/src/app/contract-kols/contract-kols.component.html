@@ -320,12 +320,6 @@
                                                     pTooltip="Sửa" tooltipPosition="top"
                                                     (onClick)="initRow(record)">
                                                 </p-button>
-                                                @if (isGranted('Pages.ContractKols.Payment')) {
-                                                    <p-button icon="pi pi-file-word" size="small" severity="help"
-                                                        pTooltip="Xuất hợp đồng" tooltipPosition="top"
-                                                        (onClick)="exportContract(record)">
-                                                    </p-button>
-                                                }
                                                 <p-button icon="pi pi-trash" size="small" severity="danger"
                                                     pTooltip="Xóa" tooltipPosition="top"
                                                     (onClick)="delete(record)">

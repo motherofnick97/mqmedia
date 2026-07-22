@@ -11,7 +11,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MqSocial.Kols;
 
-[Index(nameof(AccountId), nameof(Channel), IsUnique = true)]
+[Index(nameof(AccountId), nameof(Channel), IsUnique = false)]
 public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
 {
     public const int MaxNameLength = 256;

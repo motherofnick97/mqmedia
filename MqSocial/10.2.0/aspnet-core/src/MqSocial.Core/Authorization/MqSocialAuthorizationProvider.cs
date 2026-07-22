@@ -17,9 +17,6 @@ public class MqSocialAuthorizationProvider : AuthorizationProvider
         context.CreatePermission(PermissionNames.Pages_Campaigns_Update, L("CampaignsUpdate"));
         context.CreatePermission(PermissionNames.Pages_Campaigns_Delete, L("CampaignsDelete"));
         context.CreatePermission(PermissionNames.Pages_Kols, L("Kols"));
-        context.CreatePermission(PermissionNames.Pages_Kols_Create, L("KolsCreate"));
-        context.CreatePermission(PermissionNames.Pages_Kols_Update, L("KolsUpdate"));
-        context.CreatePermission(PermissionNames.Pages_Kols_Delete, L("KolsDelete"));
         context.CreatePermission(PermissionNames.Pages_Contracts, L("Contracts"));
         context.CreatePermission(PermissionNames.Pages_Contracts_Create, L("ContractsCreate"));
         context.CreatePermission(PermissionNames.Pages_Contracts_Update, L("ContractsUpdate"));
@@ -42,9 +39,6 @@ public class MqSocialAuthorizationProvider : AuthorizationProvider
         context.CreatePermission(PermissionNames.Pages_ContractTemplates_Update, L("ContractTemplatesUpdate"));
         context.CreatePermission(PermissionNames.Pages_ContractTemplates_Delete, L("ContractTemplatesDelete"));
         context.CreatePermission(PermissionNames.Pages_KolGenerals, L("KolGenerals"));
-        context.CreatePermission(PermissionNames.Pages_KolGenerals_Create, L("KolGeneralsCreate"));
-        context.CreatePermission(PermissionNames.Pages_KolGenerals_Update, L("KolGeneralsUpdate"));
-        context.CreatePermission(PermissionNames.Pages_KolGenerals_Delete, L("KolGeneralsDelete"));
     }
 
     private static ILocalizableString L(string name)

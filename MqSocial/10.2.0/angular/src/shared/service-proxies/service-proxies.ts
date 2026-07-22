@@ -6312,14 +6312,6 @@ export class ContractKolServiceProxy {
             headers: new HttpHeaders({ "Content-Type": "application/json" }),
         });
     }
-
-    exportContract(input: ExportContractDto): Observable<ExportContractResultDto> {
-        let url_ = this.baseUrl + "/api/services/app/ContractKol/ExportContract";
-        const content_ = JSON.stringify(input.toJSON());
-        return this.http.post<ExportContractResultDto>(url_, content_, {
-            headers: new HttpHeaders({ "Content-Type": "application/json" }),
-        });
-    }
 }
 
 export interface ISendContractKolsEmailDto {
@@ -6355,57 +6347,6 @@ export class SendContractKolsEmailDto implements ISendContractKolsEmailDto {
         data['body'] = this.body;
         return data;
     }
-}
-
-export interface IExportContractDto {
-    contractKolId: string;
-    contractTemplateId: string;
-    contractNumber: string | undefined;
-    signedDate: moment.Moment;
-    cccdIssueDate: moment.Moment | undefined;
-    cccdIssuePlace: string | undefined;
-    durationDays: number;
-}
-
-export class ExportContractDto implements IExportContractDto {
-    contractKolId: string;
-    contractTemplateId: string;
-    contractNumber: string | undefined;
-    signedDate: moment.Moment;
-    cccdIssueDate: moment.Moment | undefined;
-    cccdIssuePlace: string | undefined;
-    durationDays: number;
-
-    constructor(data?: IExportContractDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data['contractKolId'] = this.contractKolId;
-        data['contractTemplateId'] = this.contractTemplateId;
-        data['contractNumber'] = this.contractNumber;
-        data['signedDate'] = this.signedDate ? this.signedDate.toISOString() : undefined;
-        data['cccdIssueDate'] = this.cccdIssueDate ? this.cccdIssueDate.toISOString() : undefined;
-        data['cccdIssuePlace'] = this.cccdIssuePlace;
-        data['durationDays'] = this.durationDays;
-        return data;
-    }
-}
-
-export interface IExportContractResultDto {
-    filePath: string | undefined;
-    fileName: string | undefined;
-}
-
-export class ExportContractResultDto implements IExportContractResultDto {
-    filePath: string | undefined;
-    fileName: string | undefined;
 }
 
 export enum ContractStatus {

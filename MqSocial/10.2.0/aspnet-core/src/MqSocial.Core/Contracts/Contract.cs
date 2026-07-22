@@ -40,5 +40,7 @@ namespace MqSocial.Contracts
         public string Script { get; set; }
 
         public int MaxReviewTime { get; set; }
+
+        public string ProductName { get; set; }
     }
 }

@@ -20,12 +20,6 @@ public static class PermissionNames
 
     public const string Pages_Kols = "Pages.Kols";
 
-    public const string Pages_Kols_Create = "Pages.Kols.Create";
-
-    public const string Pages_Kols_Update = "Pages.Kols.Update";
-
-    public const string Pages_Kols_Delete = "Pages.Kols.Delete";
-
     public const string Pages_Contracts = "Pages.Contracts";
 
     public const string Pages_Contracts_Create = "Pages.Contracts.Create";
@@ -69,10 +63,4 @@ public static class PermissionNames
     public const string Pages_ContractTemplates_Delete = "Pages.ContractTemplates.Delete";
 
     public const string Pages_KolGenerals = "Pages.KolGenerals";
-
-    public const string Pages_KolGenerals_Create = "Pages.KolGenerals.Create";
-
-    public const string Pages_KolGenerals_Update = "Pages.KolGenerals.Update";
-
-    public const string Pages_KolGenerals_Delete = "Pages.KolGenerals.Delete";
 }

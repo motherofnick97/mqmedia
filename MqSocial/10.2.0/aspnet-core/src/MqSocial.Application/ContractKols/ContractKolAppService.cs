@@ -2,6 +2,7 @@ using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
 using Abp.Linq.Extensions;
 using Abp.UI;
 using Microsoft.EntityFrameworkCore;
@@ -83,11 +84,10 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
 
     protected override IQueryable<ContractKol> CreateFilteredQuery(PagedContractKolRequestDto input)
     {
-        // Không Include(x => x.Kol) ở đây: Kol là entity dùng chung giữa các tenant (TenantId luôn null,
-        // xem KolAppService dùng CurrentUnitOfWork.SetTenantId(null) khi truy vấn Kol). Vì KolId là khóa
-        // ngoại bắt buộc, EF Core sẽ áp global tenant-filter của Kol lên cả navigation Include và loại
-        // luôn dòng ContractKol nếu Kol không khớp tenant hiện tại — làm mất hết kết quả tìm kiếm.
-        // KolName được nạp riêng (bỏ qua tenant filter) trong GetAllAsync bên dưới.
+        // Không Include(x => x.Kol) ở đây: Kol có thể có TenantId null (dữ liệu cũ) hoặc TenantId thật
+        // (dữ liệu mới). Vì KolId là khóa ngoại bắt buộc, EF Core sẽ áp global tenant-filter của Kol lên
+        // cả navigation Include và loại luôn dòng ContractKol nếu Kol không khớp tenant hiện tại — làm
+        // mất hết kết quả tìm kiếm. KolName được nạp riêng (tắt hẳn tenant-filter) trong GetAllAsync bên dưới.
         return Repository.GetAll()
             .Include(x => x.Contract)
             .WhereIf(input.KolId.HasValue, x => x.KolId == input.KolId.Value)
@@ -108,7 +108,7 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
         if (kolIds.Count > 0)
         {
             Dictionary<Guid, string> kolNames;
-            using (CurrentUnitOfWork.SetTenantId(null))
+            using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
                 kolNames = await _kolRepository.GetAll()
                     .Where(x => kolIds.Contains(x.Id))

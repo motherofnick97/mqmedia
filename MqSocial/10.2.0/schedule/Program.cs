@@ -20,6 +20,7 @@ var host = Host.CreateDefaultBuilder(args)
         services.AddHangfireServer();
 
         services.AddTransient<UpdateContractKolResultJob>();
+        services.AddTransient<UpdateKolSourceJob>();
     })
     .Build();
 
@@ -30,7 +31,12 @@ var jobManager = host.Services.GetRequiredService<IRecurringJobManager>();
 jobManager.AddOrUpdate<UpdateContractKolResultJob>(
     "update-contract-kol-result",
     job => job.Execute(),
-    Cron.Minutely);
+    Cron.Daily(6));
+
+jobManager.AddOrUpdate<UpdateKolSourceJob>(
+    "update-kol-source",
+    job => job.Execute(),
+    Cron.Daily(4));
 
 Console.WriteLine("MqScheduler đang chạy. Ctrl+C để dừng.");
 await host.WaitForShutdownAsync();
