@@ -292,7 +292,7 @@ Build lại và upload:
 
 ```powershell
 dotnet publish -c Release -o publish
-scp -r publish\* root@<IP_SERVER>:/var/www/mqsocial/api/
+scp -r publish\* root@103.162.21.123:/var/www/mqsocial/api/
 ```
 
 ### 8.3. Kiểm tra file `log4net.config` có đi kèm không
@@ -361,7 +361,7 @@ Cả 2 phải trả về `200 OK` với JSON.
 ```powershell
 cd aspnet-core\src\MqSocial.Migrator
 dotnet publish -c Release -o publish
-scp -r publish\* root@<IP_SERVER>:/var/www/mqsocial/migrator/
+scp -r publish\* root@103.162.21.123:/var/www/mqsocial/migrator/
 ```
 
 Đảm bảo `appsettings.json` của Migrator cũng trỏ đúng connection string Postgres, và có `log4net.config` đi kèm (xem mục 8.3).
@@ -404,9 +404,9 @@ sudo -u postgres psql -d mqsocial_db -c "\dt"
 
 ### 10.2. Build
 
-```powershell
+```powershell <DEPLOY FE>
 cd angular
-npm install
+npm install 
 npx ng build --configuration production
 ```
 
@@ -421,7 +421,7 @@ rm -rf /var/www/mqsocial/manager/*
 
 ```powershell
 # trên local
-scp -r dist\browser\* root@<IP_SERVER>:/var/www/mqsocial/manager/
+scp -r dist\browser\* root@103.162.21.123:/var/www/mqsocial/manager/
 ```
 
 ```bash
@@ -470,13 +470,19 @@ ls -la /var/www/mqsocial/keys/     # phải thấy file key-xxxx.xml
 
 ---
 
-## 12. Deploy MqScheduler (Hangfire, console app)
+## 12. Deploy MqScheduler (Hangfire, console app — project `schedule\`)
 
-### 12.1. Build (self-contained executable)
+> Project thật nằm ở **`schedule\`** (top-level, ngang hàng `aspnet-core\`), không phải `aspnet-core\src\MqSocial.Scheduler`. Target `net9.0`, framework-dependent (không self-contained) — dùng chung runtime .NET 9 đã cài cho `mqsocial-api`, không cần cài thêm gì trên server.
+>
+> **Đã từng gặp thực tế (22-23/07):** project ban đầu tạo với `TargetFramework=net10.0` (kèm `Microsoft.Extensions.Hosting` bản 10.x) trong khi cả máy dev lẫn server chỉ có .NET 9 — publish local báo `NETSDK1045: The current .NET SDK does not support targeting .NET 10.0`, còn nếu build ở máy khác rồi deploy thì server chạy báo `You must install or update .NET to run this application... Framework: 'Microsoft.NETCore.App', version '10.0.0'`. Đã đổi hẳn về `net9.0` (và hạ `Microsoft.Extensions.Hosting` xuống `9.0.0`) để khớp với phần còn lại của hệ thống, tránh phải cài song song 2 runtime trên server.
+
+### 12.1. Build
+
+Thư mục `schedule\` có cả `.csproj`, `.sln`, `.slnx` cùng lúc → `dotnet publish` không tự chọn được, phải chỉ định rõ file `.csproj`:
 
 ```powershell
-cd aspnet-core\src\MqSocial.Scheduler
-dotnet publish -c Release -o publish
+cd schedule
+dotnet publish schedule.csproj -c Release -o publish
 ```
 
 ### 12.2. Kiểm tra connection string trong `publish\appsettings.json`
@@ -489,6 +495,8 @@ dotnet publish -c Release -o publish
 }
 ```
 
+> **Quan trọng:** `appsettings.json` ở local thường trỏ DB dev (user/password khác production). Kiểm tra lại file **sau khi build**, trước khi upload — không copy đè thẳng connection string dev lên server.
+
 ### 12.3. Upload
 
 ```bash
@@ -496,18 +504,18 @@ mkdir -p /var/www/mqsocial/scheduler
 ```
 
 ```powershell
-scp -r publish\* root@<IP_SERVER>:/var/www/mqsocial/scheduler/
+scp -r publish\* root@103.162.21.123:/var/www/mqsocial/scheduler/
 ```
 
 ### 12.4. Test chạy tay trước
 
 ```bash
 cd /var/www/mqsocial/scheduler
-chmod +x ./<tên_binary>          # ví dụ: schedule
-./<tên_binary>
+chmod +x ./schedule
+./schedule
 ```
 
-Kỳ vọng: Hangfire khởi động, đăng ký recurring jobs (`CrawlTikTokJob`, `SyncKolJob`, `UpdateContractKolResultJob`...) không lỗi. `Ctrl+C` để dừng.
+Kỳ vọng: Hangfire khởi động, đăng ký recurring jobs (`update-contract-kol-result`, `update-kol-source`...) không lỗi. `Ctrl+C` để dừng.
 
 > Đảm bảo project dùng `Hangfire.PostgreSql` (không phải `Hangfire.SqlServer`).
 > Kiểm tra `Web.Host` không đồng thời gọi `app.UseHangfireServer()` — nếu có, sẽ chạy trùng 2 Hangfire server cùng lúc, gây race-condition job.
@@ -525,7 +533,7 @@ After=network.target postgresql.service mqsocial-api.service
 
 [Service]
 WorkingDirectory=/var/www/mqsocial/scheduler
-ExecStart=/var/www/mqsocial/scheduler/<tên_binary>
+ExecStart=/usr/bin/dotnet /var/www/mqsocial/scheduler/schedule.dll
 Restart=always
 RestartSec=10
 KillSignal=SIGINT
@@ -538,7 +546,7 @@ Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
 WantedBy=multi-user.target
 ```
 
-> Nếu publish dạng framework-dependent (không phải self-contained), `ExecStart` cần dạng `/usr/bin/dotnet /đường/dẫn/MqSocial.Scheduler.dll` thay vì gọi thẳng binary.
+> **Đã từng gặp thực tế (23/07):** dùng `ExecStart=/var/www/mqsocial/scheduler/schedule` (gọi thẳng apphost binary) khiến service liên tục restart-loop với lỗi `You must install or update .NET to run this application... No frameworks were found`, dù chạy tay qua SSH (`./schedule` hoặc `dotnet --list-runtimes`) vẫn ra bình thường — apphost tự dò `dotnet` không ổn định trong PATH tối giản của systemd. Gọi qua muxer (`/usr/bin/dotnet <path>.dll`) như trên — giống cách `mqsocial-api` đang chạy — thì hết lỗi.
 
 ```bash
 chown -R www-data:www-data /var/www/mqsocial/scheduler
@@ -554,7 +562,32 @@ journalctl -u mqsocial-scheduler -f
 
 ```bash
 sudo -u postgres psql -d mqsocial_db -c "\dt \"HangFire\".*"
+sudo -u postgres psql -d mqsocial_db -c "SELECT id, cron FROM \"HangFire\".recurringjob;"
 ```
+
+### 12.7. Redeploy (cập nhật code sau này)
+
+```powershell
+cd schedule
+dotnet publish schedule.csproj -c Release -o publish
+```
+
+```bash
+systemctl stop mqsocial-scheduler     # tránh 2 instance tranh job khi ghi đè file
+```
+
+```powershell
+scp -r publish\* root@103.162.21.123:/var/www/mqsocial/scheduler/
+```
+
+```bash
+cat /var/www/mqsocial/scheduler/appsettings.json    # kiểm tra lại connection string, phòng bị ghi đè
+chown -R www-data:www-data /var/www/mqsocial/scheduler
+systemctl start mqsocial-scheduler
+journalctl -u mqsocial-scheduler -f
+```
+
+> `jobManager.AddOrUpdate(...)` trong `Program.cs` là idempotent — mỗi lần service start sẽ tự cập nhật lại lịch cron nếu có đổi trong code, không cần thao tác gì thêm trong DB.
 
 ---
 
@@ -654,3 +687,24 @@ curl -i https://manager.mqsocial.vn/api/services/app/Session/GetCurrentLoginInfo
 - [ ] Nội dung thật cho landing page `mqsocial.vn` (hiện đang demo)
 - [ ] Nâng cấp .NET 9 (STS, hết hỗ trợ 5/2026) lên .NET 10 LTS khi có thời gian
 - [ ] Giới hạn/ẩn endpoint `/swagger` ở production nếu có bật
+
+
+
+nano /etc/systemd/system/mqsocial-scheduler.service
+
+Sửa dòng ExecStart thành (thêm đường dẫn dotnet vào trước):
+
+ini
+ExecStart=/usr/bin/dotnet /var/www/mqsocial/scheduler/schedule.dll
+
+Lưu ý hai chỗ:
+
+Phải là đường dẫn tuyệt đối tới dotnet. Bạn chạy which dotnet để lấy đúng — nếu ra /usr/bin/dotnet thì dùng như trên; nếu ra chỗ khác (ví dụ /usr/share/dotnet/dotnet) thì thay cho khớp.
+Tên file là schedule.dll chứ không phải MqScheduler.dll như tôi đoán lúc trước — dùng đúng tên bạn có.
+
+Rồi reload và restart:
+
+bash
+systemctl daemon-reload
+systemctl restart mqsocial-scheduler
+systemctl status mqsocial-scheduler
