@@ -388,8 +388,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 Note = note,
                 Address = address,
                 Phone = phone,
-                Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{exists.AccountId}"
-                                    : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{exists.AccountId}/"
+                Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{accountId}"
+                                    : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{accountId}/"
                                         : string.Empty)
             });
 

@@ -20,9 +20,6 @@ public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, Pag
     public CareerAppService(IRepository<Career, Guid> repository)
         : base(repository)
     {
-        CreatePermissionName = PermissionNames.Pages_Careers_Create;
-        UpdatePermissionName = PermissionNames.Pages_Careers_Update;
-        DeletePermissionName = PermissionNames.Pages_Careers_Delete;
     }
 
     protected override IQueryable<Career> CreateFilteredQuery(PagedCareerRequestDto input)
@@ -52,6 +49,7 @@ public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, Pag
         }
     }
 
+    [AbpAuthorize(PermissionNames.Pages_Careers_Create)]
     public override async Task<CareerDto> CreateAsync(CreateCareerDto input)
     {
         using (CurrentUnitOfWork.SetTenantId(null))
@@ -66,16 +64,27 @@ public class CareerAppService : AsyncCrudAppService<Career, CareerDto, Guid, Pag
         }
     }
 
+    [AbpAuthorize(PermissionNames.Pages_Careers_Update)]
     public override async Task<CareerDto> UpdateAsync(CareerDto input)
     {
+        if(AbpSession.TenantId != null)
+        {
+            return input;
+        }
         using (CurrentUnitOfWork.SetTenantId(null))
         {
             return await base.UpdateAsync(input);
         }
     }
 
+    [AbpAuthorize(PermissionNames.Pages_Careers_Delete)]
     public override async Task DeleteAsync(EntityDto<Guid> input)
     {
+        if (AbpSession.TenantId != null)
+        {
+            return;
+        }
+
         using (CurrentUnitOfWork.SetTenantId(null))
         {
             await base.DeleteAsync(input);
