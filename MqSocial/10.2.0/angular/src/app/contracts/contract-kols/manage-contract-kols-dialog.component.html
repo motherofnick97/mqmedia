@@ -1,9 +1,12 @@
 <div>
     <abp-modal-header [title]="'KOLs: ' + contractName" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
     <div class="modal-body">
+        @if (isGranted('Pages.Kols')) {
         <div class="d-flex justify-content-end mb-3">
             <p-button icon="pi pi-plus" [label]="'Thêm KOL'" (onClick)="addKol()"></p-button>
         </div>
+        }
+
 
         <p-table [value]="contractKols" [loading]="loading" [tableStyle]="{'min-width': '36rem'}">
             <ng-template pTemplate="header">
@@ -11,26 +14,37 @@
                     <th>KOL</th>
                     <th style="width: 160px">Trạng thái</th>
                     <th style="width: 120px">Cash</th>
+                    @if (isGranted('Pages.ContractKols.Payment')) {
                     <th style="width: 120px">Payment</th>
+                    }
+                    @if (isGranted('Pages.ContractKols.Delete')) {
                     <th style="width: 80px"></th>
+                    }
                 </tr>
             </ng-template>
             <ng-template pTemplate="body" let-record="$implicit">
                 <tr>
                     <td>{{ getKolName(record.kolId) }}</td>
                     <td>
-                        <p-tag [severity]="getStatusSeverity(record.status)" [value]="getStatusLabel(record.status)"></p-tag>
+                        <p-tag [severity]="getStatusSeverity(record.status)"
+                            [value]="getStatusLabel(record.status)"></p-tag>
                     </td>
                     <td>{{ record.cash | number }}</td>
+                    @if (isGranted('Pages.ContractKols.Payment')) {
                     <td>{{ record.payment | number }}</td>
+                    }
+                    @if (isGranted('Pages.ContractKols.Delete')) {
                     <td>
-                        <p-button icon="pi pi-trash" severity="danger" size="small" (onClick)="removeKol(record)"></p-button>
+                        <p-button icon="pi pi-trash" severity="danger" size="small"
+                            (onClick)="removeKol(record)"></p-button>
                     </td>
+                    }
                 </tr>
             </ng-template>
             <ng-template pTemplate="emptymessage">
                 <tr>
-                    <td colspan="5" class="text-center">Chưa có KOL nào</td>
+                    <td [attr.colspan]="isGranted('Pages.ContractKols.Payment') ? 5 : 3" class="text-center">Chưa có KOL
+                        nào</td>
                 </tr>
             </ng-template>
         </p-table>

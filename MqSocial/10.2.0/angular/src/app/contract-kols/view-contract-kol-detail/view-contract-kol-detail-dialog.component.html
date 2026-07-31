@@ -1,144 +1,120 @@
 <form class="form-horizontal" autocomplete="off" #detailForm="ngForm" (ngSubmit)="save()">
-<abp-modal-header [title]="'Chi tiết KOL Hợp đồng'" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
-<div class="modal-body">
+    <abp-modal-header [title]="'Chi tiết KOL Hợp đồng'" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
+    <div class="modal-body">
 
-    <!-- Thông tin chung -->
-    <h6 class="text-primary border-bottom pb-1 mb-3">Thông tin chung</h6>
-    <div class="row mb-3">
-        <div class="col-md-6 mb-2">
-            <div class="text-muted small mb-1">KOL</div>
-            <div class="fw-semibold">{{ kolName }}</div>
-        </div>
-        <div class="col-md-6 mb-2">
-            <div class="text-muted small mb-1">Hợp đồng</div>
-            <div class="fw-semibold">{{ contractName }}</div>
-        </div>
+        <!-- Thông tin chung -->
+        <h6 class="text-primary border-bottom pb-1 mb-3">Thông tin chung</h6>
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <div class="text-muted small mb-1">KOL</div>
+                <div class="fw-semibold">{{ kolName }}</div>
+            </div>
+            <div class="col-md-6 mb-2">
+                <div class="text-muted small mb-1">Hợp đồng</div>
+                <div class="fw-semibold">{{ contractName }}</div>
+            </div>
 
-        <div class="col-md-3 mb-2">
-            <label class="text-muted small mb-1 d-block">Trạng thái</label>
-            <p-select
-                name="status"
-                [(ngModel)]="record.status"
-                [options]="statusOptions"
-                optionLabel="label"
-                optionValue="value"
-                [style]="{'width':'100%'}">
-            </p-select>
-        </div>
-        <div class="col-md-3 mb-2">
-            <label class="text-muted small mb-1 d-block">Ngày air</label>
-            <p-datepicker
-                name="airTime"
-                [(ngModel)]="airTimeDate"
-                dateFormat="dd/mm/yy"
-                [showIcon]="true"
-                [showButtonBar]="true"
-                [fluid]="true">
-            </p-datepicker>
-        </div>
-        <div class="col-md-3 mb-2">
-            <label class="text-muted small mb-1 d-block">Chi phí (Cash)</label>
-            <p-inputnumber
-                name="cash"
-                [(ngModel)]="record.cash"
-                [min]="0"
-                mode="decimal"
-                [fluid]="true">
-            </p-inputnumber>
-        </div>
-        @if (isGranted('Pages.ContractKols.Payment')) {
             <div class="col-md-3 mb-2">
-                <label class="text-muted small mb-1 d-block">Thanh toán (Payment)</label>
-                <p-inputnumber
-                    name="payment"
-                    [(ngModel)]="record.payment"
-                    [min]="0"
-                    mode="decimal"
-                    [fluid]="true">
+                <label class="text-muted small mb-1 d-block">Trạng thái</label>
+                <p-select name="status" [(ngModel)]="record.status" [options]="statusOptions" optionLabel="label"
+                    optionValue="value" [style]="{'width':'100%'}">
+                </p-select>
+            </div>
+            <div class="col-md-3 mb-2">
+                <label class="text-muted small mb-1 d-block">Ngày air</label>
+                <p-datepicker name="airTime" [(ngModel)]="airTimeDate" dateFormat="dd/mm/yy" [showIcon]="true"
+                    [showButtonBar]="true" [fluid]="true">
+                </p-datepicker>
+            </div>
+            <div class="col-md-3 mb-2">
+                <label class="text-muted small mb-1 d-block">Chi phí (Cash)</label>
+                <p-inputnumber name="cash" [(ngModel)]="record.cash" [min]="0" mode="decimal" [fluid]="true">
                 </p-inputnumber>
             </div>
+            @if (isGranted('Pages.ContractKols.Payment')) {
+            <div class="col-md-3 mb-2">
+                <label class="text-muted small mb-1 d-block">Thanh toán (Payment)</label>
+                <p-inputnumber name="payment" [(ngModel)]="record.payment" [min]="0" mode="decimal" [fluid]="true">
+                </p-inputnumber>
+            </div>
+            }
+        </div>
+
+        <!-- Mẫu sản phẩm -->
+        <h6 class="text-primary border-bottom pb-1 mb-3">Mẫu sản phẩm</h6>
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <label class="text-muted small mb-1 d-block">Tên mẫu</label>
+                <input pInputText name="sampleName" [(ngModel)]="record.sampleName" style="width:100%" />
+            </div>
+            <div class="col-md-2 mb-2">
+                <label class="text-muted small mb-1 d-block">Size</label>
+                <input pInputText name="sampleSize" [(ngModel)]="record.sampleSize" style="width:100%" />
+            </div>
+            <div class="col-md-2 mb-2">
+                <label class="text-muted small mb-1 d-block">Số lượng</label>
+                <p-inputnumber name="sampleQuantity" [(ngModel)]="record.sampleQuantity" [min]="0" [fluid]="true">
+                </p-inputnumber>
+            </div>
+            <div class="col-md-2 mb-2">
+                <label class="text-muted small mb-1 d-block">Trạng thái nhận mẫu</label>
+                <p-select name="sampleReceiveStatus" [(ngModel)]="record.sampleReceiveStatus"
+                    [options]="receiveStatusOptions" optionLabel="label" optionValue="value" [style]="{'width':'100%'}">
+                </p-select>
+            </div>
+        </div>
+
+        <!-- Nội dung -->
+        <h6 class="text-primary border-bottom pb-1 mb-3">Nội dung</h6>
+        <div class="row mb-3">
+            <div class="col-md-6 mb-2">
+                <label class="text-muted small mb-1 d-block">Brief</label>
+                <textarea pTextarea name="brief" [(ngModel)]="record.brief" rows="3" style="width:100%"></textarea>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="text-muted small mb-1 d-block">Feedback</label>
+                <textarea pTextarea name="feedback" [(ngModel)]="record.feedback" rows="3"
+                    style="width:100%"></textarea>
+            </div>
+            <div class="col-md-4 mb-2">
+                <label class="text-muted small mb-1 d-block">Brief Link</label>
+                <input pInputText name="briefLink" [(ngModel)]="record.briefLink" style="width:100%" />
+            </div>
+            <div class="col-md-4 mb-2">
+                <label class="text-muted small mb-1 d-block">Caption</label>
+                <input pInputText name="caption" [(ngModel)]="record.caption" style="width:100%" />
+                <!-- <textarea pTextarea name="caption" [(ngModel)]="record.caption" rows="3" style="width:100%"></textarea> -->
+            </div>
+            <div class="col-md-4 mb-2">
+                <label class="text-muted small mb-1 d-block">Hashtag</label>
+                <input pInputText name="hashTag" [(ngModel)]="record.hashTag" style="width:100%" />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="text-muted small mb-1 d-block">Portrait</label>
+                <input pInputText name="portrait" [(ngModel)]="record.portrait" style="width:100%" />
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="text-muted small mb-1 d-block">Review Corner</label>
+                <input pInputText name="reviewCorner" [(ngModel)]="record.reviewCorner" style="width:100%" />
+            </div>
+        </div>
+
+        <!-- Review -->
+        <h6 class="text-primary border-bottom pb-1 mb-3">Review</h6>
+        <div class="row mb-3">
+            <div class="col-md-12 mb-2">
+                <label class="text-muted small mb-1 d-block">Kết quả review</label>
+                <textarea pTextarea name="reviewResult" [(ngModel)]="record.reviewResult" rows="4"
+                    style="width:100%"></textarea>
+            </div>
+        </div>
+
+    </div>
+    <div class="modal-footer">
+        <p-button [label]="'Cancel' | localize" severity="secondary" [disabled]="saving"
+            (onClick)="bsModalRef.hide()"></p-button>
+        @if (isGranted('Pages.ContractKols.Create')) {
+        <p-button [label]="'Save' | localize" [loading]="saving" (onClick)="save()"></p-button>
         }
     </div>
-
-    <!-- Mẫu sản phẩm -->
-    <h6 class="text-primary border-bottom pb-1 mb-3">Mẫu sản phẩm</h6>
-    <div class="row mb-3">
-        <div class="col-md-6 mb-2">
-            <label class="text-muted small mb-1 d-block">Tên mẫu</label>
-            <input pInputText name="sampleName" [(ngModel)]="record.sampleName" style="width:100%" />
-        </div>
-        <div class="col-md-2 mb-2">
-            <label class="text-muted small mb-1 d-block">Size</label>
-            <input pInputText name="sampleSize" [(ngModel)]="record.sampleSize" style="width:100%" />
-        </div>
-        <div class="col-md-2 mb-2">
-            <label class="text-muted small mb-1 d-block">Số lượng</label>
-            <p-inputnumber
-                name="sampleQuantity"
-                [(ngModel)]="record.sampleQuantity"
-                [min]="0"
-                [fluid]="true">
-            </p-inputnumber>
-        </div>
-        <div class="col-md-2 mb-2">
-            <label class="text-muted small mb-1 d-block">Trạng thái nhận mẫu</label>
-            <p-select
-                name="sampleReceiveStatus"
-                [(ngModel)]="record.sampleReceiveStatus"
-                [options]="receiveStatusOptions"
-                optionLabel="label"
-                optionValue="value"
-                [style]="{'width':'100%'}">
-            </p-select>
-        </div>
-    </div>
-
-    <!-- Nội dung -->
-    <h6 class="text-primary border-bottom pb-1 mb-3">Nội dung</h6>
-    <div class="row mb-3">
-        <div class="col-md-6 mb-2">
-            <label class="text-muted small mb-1 d-block">Brief</label>
-            <textarea pTextarea name="brief" [(ngModel)]="record.brief" rows="3" style="width:100%"></textarea>
-        </div>
-        <div class="col-md-6 mb-2">
-            <label class="text-muted small mb-1 d-block">Feedback</label>
-            <textarea pTextarea name="feedback" [(ngModel)]="record.feedback" rows="3" style="width:100%"></textarea>
-        </div>
-        <div class="col-md-4 mb-2">
-            <label class="text-muted small mb-1 d-block">Brief Link</label>
-            <input pInputText name="briefLink" [(ngModel)]="record.briefLink" style="width:100%" />
-        </div>
-        <div class="col-md-4 mb-2">
-            <label class="text-muted small mb-1 d-block">Caption</label>
-            <input pInputText name="caption" [(ngModel)]="record.caption" style="width:100%" />
-            <!-- <textarea pTextarea name="caption" [(ngModel)]="record.caption" rows="3" style="width:100%"></textarea> -->
-        </div>
-        <div class="col-md-4 mb-2">
-            <label class="text-muted small mb-1 d-block">Hashtag</label>
-            <input pInputText name="hashTag" [(ngModel)]="record.hashTag" style="width:100%" />
-        </div>
-        <div class="col-md-6 mb-2">
-            <label class="text-muted small mb-1 d-block">Portrait</label>
-            <input pInputText name="portrait" [(ngModel)]="record.portrait" style="width:100%" />
-        </div>
-        <div class="col-md-6 mb-2">
-            <label class="text-muted small mb-1 d-block">Review Corner</label>
-            <input pInputText name="reviewCorner" [(ngModel)]="record.reviewCorner" style="width:100%" />
-        </div>
-    </div>
-
-    <!-- Review -->
-    <h6 class="text-primary border-bottom pb-1 mb-3">Review</h6>
-    <div class="row mb-3">
-        <div class="col-md-12 mb-2">
-            <label class="text-muted small mb-1 d-block">Kết quả review</label>
-            <textarea pTextarea name="reviewResult" [(ngModel)]="record.reviewResult" rows="4" style="width:100%"></textarea>
-        </div>
-    </div>
-
-</div>
-<div class="modal-footer">
-    <p-button [label]="'Cancel' | localize" severity="secondary" [disabled]="saving" (onClick)="bsModalRef.hide()"></p-button>
-    <p-button [label]="'Save' | localize" [loading]="saving" (onClick)="save()"></p-button>
-</div>
 </form>

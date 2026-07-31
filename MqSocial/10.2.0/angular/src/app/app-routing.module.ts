@@ -88,7 +88,8 @@ import { AppComponent } from './app.component';
                     },
                     {
                         path: 'update-password',
-                        loadChildren: () => import('./users/users.module').then((m) => m.UsersModule),
+                        loadComponent: () =>
+                            import('./users/change-password/change-password.component').then((m) => m.ChangePasswordComponent),
                         canActivate: [AppRouteGuard],
                     },
                 ],

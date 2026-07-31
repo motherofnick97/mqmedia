@@ -4,7 +4,9 @@
             <h1 class="m-0">{{ 'Campaigns' | localize }}</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createCampaign()"></p-button>
+            @if (isGranted('Pages.Campaigns.Create')) {
+                <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createCampaign()"></p-button>
+            }
         </ng-template>
     </p-toolbar>
 
@@ -120,14 +122,18 @@
                                     <td>{{ record.budget | number }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
-                                            <p-button icon="pi pi-pencil" size="small" severity="secondary"
-                                                pTooltip="Sửa" tooltipPosition="top"
-                                                (onClick)="editCampaign(record)">
-                                            </p-button>
-                                            <p-button icon="pi pi-trash" size="small" severity="danger"
-                                                pTooltip="Xóa" tooltipPosition="top"
-                                                (onClick)="delete(record)">
-                                            </p-button>
+                                            @if (isGranted('Pages.Campaigns.Update')) {
+                                                <p-button icon="pi pi-pencil" size="small" severity="secondary"
+                                                    pTooltip="Sửa" tooltipPosition="top"
+                                                    (onClick)="editCampaign(record)">
+                                                </p-button>
+                                            }
+                                            @if (isGranted('Pages.Campaigns.Delete')) {
+                                                <p-button icon="pi pi-trash" size="small" severity="danger"
+                                                    pTooltip="Xóa" tooltipPosition="top"
+                                                    (onClick)="delete(record)">
+                                                </p-button>
+                                            }
                                         </div>
                                     </td>
                                 </tr>

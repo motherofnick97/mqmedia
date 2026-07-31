@@ -35,4 +35,6 @@ public class KolDto : EntityDto<Guid>
 
     public string Phone { get; set; }
 
+    public Guid? KolGeneralId { get; set; }
+
 }

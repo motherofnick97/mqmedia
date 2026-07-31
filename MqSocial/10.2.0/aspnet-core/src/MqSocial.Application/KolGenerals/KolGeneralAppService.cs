@@ -130,4 +130,18 @@ public class KolGeneralAppService : AsyncCrudAppService<KolGeneral, KolGeneralDt
         result.KolIds = newKolIds;
         return result;
     }
+
+    public override async Task DeleteAsync(EntityDto<Guid> input)
+    {
+        var linkedKols = await _kolRepository.GetAll()
+            .Where(x => x.KolGeneralId == input.Id)
+            .ToListAsync();
+
+        foreach (var kol in linkedKols)
+        {
+            kol.KolGeneralId = null;
+        }
+
+        await base.DeleteAsync(input);
+    }
 }

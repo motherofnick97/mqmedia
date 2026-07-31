@@ -48,7 +48,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
             new MenuItem(this.l('ContractTemplates'), '/app/contract-templates', 'fas fa-file-alt', 'Pages.ContractTemplates'),
             new MenuItem(this.l('ContractKols'), '/app/contract-kols', 'fas fa-handshake', 'Pages.ContractKols'),
             new MenuItem(this.l('Kols'), '/app/kols', 'fas fa-star', 'Pages.Kols'),
-            new MenuItem(this.l('KolGenerals'), '/app/kol-generals', 'fas fa-id-card', 'Pages.KolGenerals'),
+            new MenuItem(this.l('KolGenerals'), '/app/kol-generals', 'fas fa-id-card', ['Pages.KolGenerals', 'Pages.Kols']),
             new MenuItem(this.l('Companies'), '/app/companies', 'fas fa-building', 'Pages.Companies'),
             new MenuItem(this.l('Campaigns'), '/app/campaigns', 'fas fa-bullhorn', 'Pages.Campaigns'),
             new MenuItem('Nghề nghiệp', '/app/careers', 'fas fa-briefcase', 'Pages.Careers'),
@@ -137,6 +137,7 @@ export class SidebarMenuComponent extends AppComponentBase implements OnInit {
         if (!item.permissionName) {
             return true;
         }
-        return this.permission.isGranted(item.permissionName);
+        const permissionNames = Array.isArray(item.permissionName) ? item.permissionName : [item.permissionName];
+        return permissionNames.every((p) => this.permission.isGranted(p));
     }
 }

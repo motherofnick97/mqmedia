@@ -4,7 +4,9 @@
             <h1 class="m-0">{{ 'Contracts' | localize }}</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createContract()"></p-button>
+            @if (isGranted('Pages.Contracts.Create')) {
+                <p-button icon="pi pi-plus" [label]="'Create' | localize" (onClick)="createContract()"></p-button>
+            }
         </ng-template>
     </p-toolbar>
 
@@ -114,14 +116,18 @@
                                                 pTooltip="Quản lý KOLs" tooltipPosition="top"
                                                 (onClick)="manageKols(record)">
                                             </p-button>
-                                            <p-button icon="pi pi-pencil" size="small" severity="secondary"
-                                                pTooltip="Sửa" tooltipPosition="top"
-                                                (onClick)="editContract(record)">
-                                            </p-button>
-                                            <p-button icon="pi pi-trash" size="small" severity="danger"
-                                                pTooltip="Xóa" tooltipPosition="top"
-                                                (onClick)="delete(record)">
-                                            </p-button>
+                                            @if (isGranted('Pages.Contracts.Update')) {
+                                                <p-button icon="pi pi-pencil" size="small" severity="secondary"
+                                                    pTooltip="Sửa" tooltipPosition="top"
+                                                    (onClick)="editContract(record)">
+                                                </p-button>
+                                            }
+                                            @if (isGranted('Pages.Contracts.Delete')) {
+                                                <p-button icon="pi pi-trash" size="small" severity="danger"
+                                                    pTooltip="Xóa" tooltipPosition="top"
+                                                    (onClick)="delete(record)">
+                                                </p-button>
+                                            }
                                         </div>
                                     </td>
                                 </tr>

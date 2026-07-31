@@ -1,5 +1,7 @@
 using Abp.Application.Services.Dto;
+using MqSocial.ContractKolResults.Dto;
 using System;
+using System.Collections.Generic;
 
 namespace MqSocial.ContractKols.Dto;
 
@@ -8,6 +10,8 @@ public class ContractKolDto : EntityDto<Guid>
     public Guid KolId { get; set; }
 
     public string KolName { get; set; }
+
+    public Guid? KolGeneralId { get; set; }
 
     public Guid ContractId { get; set; }
 
@@ -46,4 +50,6 @@ public class ContractKolDto : EntityDto<Guid>
     public string HashTag { get; set; }
 
     public string ReviewResult { get; set; }
+
+    public List<ContractKolResultDto> Results { get; set; } = new();
 }

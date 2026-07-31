@@ -186,6 +186,7 @@ public class UserAppService : AsyncCrudAppService<User, UserDto, long, PagedUser
         identityResult.CheckErrors(LocalizationManager);
     }
 
+    [AbpAllowAnonymous]
     public async Task<bool> ChangePassword(ChangePasswordDto input)
     {
         await _userManager.InitializeOptionsAsync(AbpSession.TenantId);

@@ -5402,6 +5402,7 @@ export interface IKolDto {
     accountId: string | undefined;
     address: string | undefined;
     phone: string | undefined;
+    kolGeneralId: string | undefined;
 }
 
 export class KolDto implements IKolDto {
@@ -5417,6 +5418,7 @@ export class KolDto implements IKolDto {
     accountId: string | undefined;
     address: string | undefined;
     phone: string | undefined;
+    kolGeneralId: string | undefined;
 
     constructor(data?: IKolDto) {
         if (data) {
@@ -5441,6 +5443,7 @@ export class KolDto implements IKolDto {
             this.accountId = _data["accountId"];
             this.address = _data["address"];
             this.phone = _data["phone"];
+            this.kolGeneralId = _data["kolGeneralId"];
         }
     }
 
@@ -5465,6 +5468,7 @@ export class KolDto implements IKolDto {
         data["accountId"] = this.accountId;
         data["address"] = this.address;
         data["phone"] = this.phone;
+        data["kolGeneralId"] = this.kolGeneralId;
         return data;
     }
 
@@ -5826,6 +5830,7 @@ export interface IContractKolDto {
     id: string;
     kolId: string | undefined;
     kolName: string | undefined;
+    kolGeneralId: string | undefined;
     contractId: string | undefined;
     contractName: string | undefined;
     status: ContractKolStatus | undefined;
@@ -5845,12 +5850,14 @@ export interface IContractKolDto {
     caption: string | undefined;
     hashTag: string | undefined;
     reviewResult: string | undefined;
+    results: ContractKolResultDto[] | undefined;
 }
 
 export class ContractKolDto implements IContractKolDto {
     id: string;
     kolId: string | undefined;
     kolName: string | undefined;
+    kolGeneralId: string | undefined;
     contractId: string | undefined;
     contractName: string | undefined;
     status: ContractKolStatus | undefined;
@@ -5870,6 +5877,7 @@ export class ContractKolDto implements IContractKolDto {
     caption: string | undefined;
     hashTag: string | undefined;
     reviewResult: string | undefined;
+    results: ContractKolResultDto[] | undefined;
 
     constructor(data?: IContractKolDto) {
         if (data) {
@@ -5885,6 +5893,7 @@ export class ContractKolDto implements IContractKolDto {
             this.id = _data["id"];
             this.kolId = _data["kolId"];
             this.kolName = _data["kolName"];
+            this.kolGeneralId = _data["kolGeneralId"];
             this.contractId = _data["contractId"];
             this.contractName = _data["contractName"];
             this.status = _data["status"];
@@ -5904,6 +5913,10 @@ export class ContractKolDto implements IContractKolDto {
             this.caption = _data["caption"];
             this.hashTag = _data["hashTag"];
             this.reviewResult = _data["reviewResult"];
+            if (Array.isArray(_data["results"])) {
+                this.results = [] as any;
+                for (let item of _data["results"]) this.results!.push(ContractKolResultDto.fromJS(item));
+            }
         }
     }
 
@@ -5919,6 +5932,7 @@ export class ContractKolDto implements IContractKolDto {
         data["id"] = this.id;
         data["kolId"] = this.kolId;
         data["kolName"] = this.kolName;
+        data["kolGeneralId"] = this.kolGeneralId;
         data["contractId"] = this.contractId;
         data["contractName"] = this.contractName;
         data["status"] = this.status;
@@ -5938,6 +5952,11 @@ export class ContractKolDto implements IContractKolDto {
         data["caption"] = this.caption;
         data["hashTag"] = this.hashTag;
         data["reviewResult"] = this.reviewResult;
+        if (Array.isArray(this.results)) {
+            data["results"] = [];
+            for (let item of this.results)
+                data["results"].push(item.toJSON());
+        }
         return data;
     }
 

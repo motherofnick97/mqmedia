@@ -10,6 +10,7 @@ using MqSocial.Authorization;
 using MqSocial.Common.Enum;
 using MqSocial.Contracts;
 using MqSocial.ContractKolResults;
+using MqSocial.ContractKolResults.Dto;
 using MqSocial.ContractKols.Dto;
 using MqSocial.ContractKolReviews;
 using MqSocial.Emails;
@@ -107,17 +108,26 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
         var kolIds = result.Items.Select(x => x.KolId).Distinct().ToList();
         if (kolIds.Count > 0)
         {
-            Dictionary<Guid, string> kolNames;
+            Dictionary<Guid, (string Name, Guid? KolGeneralId)> kolInfos;
             using (CurrentUnitOfWork.DisableFilter(AbpDataFilters.MayHaveTenant))
             {
-                kolNames = await _kolRepository.GetAll()
+                kolInfos = await _kolRepository.GetAll()
                     .Where(x => kolIds.Contains(x.Id))
-                    .ToDictionaryAsync(x => x.Id, x => x.Name);
+                    .ToDictionaryAsync(x => x.Id, x => new ValueTuple<string, Guid?>(x.Name, x.KolGeneralId));
             }
 
             foreach (var item in result.Items)
             {
-                item.KolName = kolNames.TryGetValue(item.KolId, out var name) ? name : null;
+                if (kolInfos.TryGetValue(item.KolId, out var kolInfo))
+                {
+                    item.KolName = kolInfo.Name;
+                    item.KolGeneralId = kolInfo.KolGeneralId;
+                }
+                else
+                {
+                    item.KolName = null;
+                    item.KolGeneralId = null;
+                }
             }
         }
 
@@ -126,6 +136,26 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
             foreach (var item in result.Items)
             {
                 item.Payment = 0;
+            }
+        }
+
+        var contractKolIds = result.Items.Select(x => x.Id).ToList();
+        if (contractKolIds.Count > 0)
+        {
+            var allResults = await _contractKolResultRepository.GetAll()
+                .Where(x => contractKolIds.Contains(x.ContractKolId))
+                .OrderBy(x => x.PostTime)
+                .ToListAsync();
+
+            var resultsByContractKolId = allResults
+                .GroupBy(x => x.ContractKolId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            foreach (var item in result.Items)
+            {
+                item.Results = resultsByContractKolId.TryGetValue(item.Id, out var kolResults)
+                    ? ObjectMapper.Map<List<ContractKolResultDto>>(kolResults)
+                    : new List<ContractKolResultDto>();
             }
         }
 

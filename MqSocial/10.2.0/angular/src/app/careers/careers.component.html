@@ -4,7 +4,9 @@
             <h1 class="m-0">Nghề nghiệp</h1>
         </ng-template>
         <ng-template pTemplate="end">
-            <p-button icon="pi pi-plus" label="Thêm mới" (onClick)="createCareer()"></p-button>
+            @if (isGranted('Pages.Careers.Create')) {
+                <p-button icon="pi pi-plus" label="Thêm mới" (onClick)="createCareer()"></p-button>
+            }
         </ng-template>
     </p-toolbar>
 
@@ -58,14 +60,18 @@
                                     <td>{{ record.name }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">
-                                            <p-button icon="pi pi-pencil" size="small" severity="secondary"
-                                                pTooltip="Sửa" tooltipPosition="top"
-                                                (onClick)="editCareer(record)">
-                                            </p-button>
-                                            <p-button icon="pi pi-trash" size="small" severity="danger"
-                                                pTooltip="Xóa" tooltipPosition="top"
-                                                (onClick)="delete(record)">
-                                            </p-button>
+                                            @if (isGranted('Pages.Careers.Update')) {
+                                                <p-button icon="pi pi-pencil" size="small" severity="secondary"
+                                                    pTooltip="Sửa" tooltipPosition="top"
+                                                    (onClick)="editCareer(record)">
+                                                </p-button>
+                                            }
+                                            @if (isGranted('Pages.Careers.Delete')) {
+                                                <p-button icon="pi pi-trash" size="small" severity="danger"
+                                                    pTooltip="Xóa" tooltipPosition="top"
+                                                    (onClick)="delete(record)">
+                                                </p-button>
+                                            }
                                         </div>
                                     </td>
                                 </tr>

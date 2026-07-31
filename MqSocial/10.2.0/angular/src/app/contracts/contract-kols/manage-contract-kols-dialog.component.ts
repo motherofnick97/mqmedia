@@ -5,8 +5,6 @@ import {
     ContractKolServiceProxy,
     ContractKolDto,
     ContractKolStatus,
-    KolServiceProxy,
-    KolDto,
 } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
@@ -72,7 +70,6 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
         injector: Injector,
         public bsModalRef: BsModalRef,
         private _contractKolService: ContractKolServiceProxy,
-        private _kolService: KolServiceProxy,
         private _modalService: BsModalService,
         private cd: ChangeDetectorRef
     ) {
@@ -80,10 +77,7 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
     }
 
     ngOnInit(): void {
-        this._kolService.getAll(undefined, undefined, undefined, undefined, 0, 1000).subscribe((result) => {
-            (result.items ?? []).forEach((k) => { this.kolMap[k.id] = k.name ?? k.id; });
-            this.loadKols();
-        });
+        this.loadKols();
     }
 
     loadKols(): void {
@@ -93,6 +87,9 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
             .subscribe({
                 next: (result) => {
                     this.contractKols = result.items ?? [];
+                    this.contractKols.forEach((ck) => {
+                        if (ck.kolId) this.kolMap[ck.kolId] = ck.kolName ?? ck.kolId;
+                    });
                     this.loading = false;
                     this.cd.detectChanges();
                 },

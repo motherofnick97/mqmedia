@@ -1,6 +1,5 @@
 import { ChangeDetectorRef, Component, Injector, OnInit, ViewChild } from '@angular/core';
 import { finalize } from 'rxjs/operators';
-import { forkJoin } from 'rxjs';
 import { BsModalService, BsModalRef } from 'ngx-bootstrap/modal';
 import * as XLSX from 'xlsx';
 import { appModuleAnimation } from '@shared/animations/routerTransition';
@@ -17,7 +16,11 @@ import {
     ContractKolResultDto,
     CreateContractKolResultDto,
     SendContractKolsEmailDto,
+    KolGeneralServiceProxy,
+    KolGeneralDto,
+    Bank,
 } from '@shared/service-proxies/service-proxies';
+import { bankLabels } from '../kol-generals/bank-labels';
 import { CreateContractKolDialogComponent } from './create-contract-kol/create-contract-kol-dialog.component';
 import { ViewContractKolDetailDialogComponent } from './view-contract-kol-detail/view-contract-kol-detail-dialog.component';
 import { Table, TableModule } from 'primeng/table';
@@ -84,6 +87,10 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     savingResultMap: Record<string, boolean> = {};
     newResultMap: Record<string, CreateContractKolResultDto> = {};
     newResultDateMap: Record<string, Date | null> = {};
+
+    // Row expansion — KolGeneral (hồ sơ định danh chung, cached theo kolGeneralId)
+    kolGeneralMap: Record<string, KolGeneralDto> = {};
+    loadingKolGeneralMap: Record<string, boolean> = {};
 
     statusOptions = [
         { value: undefined, label: 'Tất cả' },
@@ -175,6 +182,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
         private _contractKolService: ContractKolServiceProxy,
         private _contractService: ContractServiceProxy,
         private _contractKolResultService: ContractKolResultServiceProxy,
+        private _kolGeneralService: KolGeneralServiceProxy,
         private _modalService: BsModalService,
         cd: ChangeDetectorRef
     ) {
@@ -220,9 +228,28 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
             if (!this.resultsMap[id]) {
                 this.loadResults(id);
             }
+            if (record.kolGeneralId && !this.kolGeneralMap[record.kolGeneralId] && this.isGranted('Pages.KolGenerals')) {
+                this.loadKolGeneral(record.kolGeneralId);
+            }
             this.initNewResultForm(id);
         }
         this.cd.detectChanges();
+    }
+
+    private loadKolGeneral(kolGeneralId: string): void {
+        this.loadingKolGeneralMap[kolGeneralId] = true;
+        this._kolGeneralService.get(kolGeneralId).subscribe({
+            next: (kolGeneral) => {
+                this.kolGeneralMap[kolGeneralId] = kolGeneral;
+                this.loadingKolGeneralMap[kolGeneralId] = false;
+                this.cd.detectChanges();
+            },
+            error: () => { this.loadingKolGeneralMap[kolGeneralId] = false; this.cd.detectChanges(); },
+        });
+    }
+
+    getBankLabel(bank: Bank | undefined): string {
+        return bank != null ? (bankLabels[bank] ?? '') : '—';
     }
 
     private loadResults(contractKolId: string): void {
@@ -426,35 +453,33 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     exportExcel(): void {
+        if (!this.filterContractId) {
+            abp.message.warn('Vui lòng lọc theo hợp đồng trước khi gửi mail.');
+            return;
+        }
+
         this.exporting = true;
-        forkJoin({
-            kols: this._contractKolService.getAll(undefined, this.filterContractId, this.filterStatus, undefined, 0, 10000),
-            results: this._contractKolResultService.getAll(undefined, undefined, undefined, 0, 50000),
-        })
-        .pipe(finalize(() => { this.exporting = false; this.cd.detectChanges(); }))
-        .subscribe(({ kols, results }) => {
-            const allKols = kols.items ?? [];
-            const resultsByKolId: Record<string, ContractKolResultDto[]> = {};
-            (results.items ?? []).forEach(r => {
-                if (!resultsByKolId[r.contractKolId]) resultsByKolId[r.contractKolId] = [];
-                resultsByKolId[r.contractKolId].push(r);
-            });
+        this._contractKolService
+            .getAll(undefined, this.filterContractId, this.filterStatus, undefined, 0, 10000)
+            .pipe(finalize(() => { this.exporting = false; this.cd.detectChanges(); }))
+            .subscribe((kols) => {
+                const allKols = kols.items ?? [];
 
-            const rows: any[] = [];
-            for (const kol of allKols) {
-                const kolResults = resultsByKolId[kol.id] ?? [];
-                if (kolResults.length === 0) {
-                    rows.push(this.buildExportRow(kol, null));
-                } else {
-                    kolResults.forEach(r => rows.push(this.buildExportRow(kol, r)));
+                const rows: any[] = [];
+                for (const kol of allKols) {
+                    const kolResults = kol.results ?? [];
+                    if (kolResults.length === 0) {
+                        rows.push(this.buildExportRow(kol, null));
+                    } else {
+                        kolResults.forEach(r => rows.push(this.buildExportRow(kol, r)));
+                    }
                 }
-            }
 
-            const ws = XLSX.utils.json_to_sheet(rows);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'ContractKols');
-            XLSX.writeFile(wb, `ContractKols_${new Date().toISOString().slice(0, 10)}.xlsx`);
-        });
+                const ws = XLSX.utils.json_to_sheet(rows);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'ContractKols');
+                XLSX.writeFile(wb, `ContractKols_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            });
     }
 
     private buildExportRow(kol: ContractKolDto, result: ContractKolResultDto | null): any {
@@ -463,7 +488,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
             'Hợp đồng': this.getContractName(kol),
             'Trạng thái': kol.status != null ? this.getStatusLabel(kol.status) : '',
             'Cash': kol.cash ?? 0,
-            'Payment': kol.payment ?? 0,
+            ...(this.isGranted('Pages.ContractKols.Payment') ? { 'Payment': kol.payment ?? 0 } : {}),
             'Air Time': kol.airTime ? kol.airTime.format('DD/MM/YYYY') : '',
             'Brief Link': kol.briefLink ?? '',
             'Brief': kol.brief ?? '',
