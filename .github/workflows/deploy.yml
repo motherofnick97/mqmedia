@@ -18,7 +18,7 @@ jobs:
         working-directory: MqSocial/10.2.0/angular
         run: |
           npm ci
-          npm run build -- --configuration production
+          npx ng build --configuration production
 
       - name: Deploy backend
         run: >
