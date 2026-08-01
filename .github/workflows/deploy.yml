@@ -1,0 +1,31 @@
+name: Deploy MqSocial
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Publish API
+        run: dotnet publish MqSocial/10.2.0/aspnet-core/src/MqSocial.Web.Host/MqSocial.Web.Host.csproj -c Release -o out/api
+
+      - name: Build Angular
+        working-directory: MqSocial/10.2.0/angular
+        run: |
+          npm ci
+          npm run build -- --configuration production
+
+      - name: Deploy backend
+        run: >
+          rsync -a --delete
+          --exclude 'appsettings.Production.json'
+          --exclude 'Logs/'
+          out/api/ /var/www/mqsocial/api/
+
+      - name: Deploy frontend
+        run: rsync -a --delete MqSocial/10.2.0/angular/dist/ /var/www/mqsocial/manager/
