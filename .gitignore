@@ -4,3 +4,7 @@
 
 /MqSocial/10.2.0/aspnet-core/src/MqSocial.Web.Host/appsettings.json
 /MqSocial/10.2.0/aspnet-core/src/MqSocial.Migrator/appsettings.json
+
+# Chứa connection string production (mật khẩu DB thật) - không commit, CI/CD sinh từ GitHub Secrets
+/MqSocial/10.2.0/aspnet-core/src/MqSocial.Web.Host/appsettings.Production.json
+/MqSocial/10.2.0/schedule/appsettings.json

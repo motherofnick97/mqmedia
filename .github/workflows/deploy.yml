@@ -2,30 +2,94 @@ name: Deploy MqSocial
 
 on:
   push:
-    branches: [ main ]
-  workflow_dispatch:
+    branches: [main]
+  workflow_dispatch: {}
+
+env:
+  PROJECT_ROOT: MqSocial/10.2.0
 
 jobs:
-  deploy:
-    runs-on: self-hosted
+  deploy-backend:
+    name: Deploy Backend (Web.Host)
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Publish API
-        run: dotnet publish MqSocial/10.2.0/aspnet-core/src/MqSocial.Web.Host/MqSocial.Web.Host.csproj -c Release -o out/api
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
 
-      - name: Build Angular
-        working-directory: MqSocial/10.2.0/angular
+      # appsettings.Production.json không commit vào git (chứa connection string DB thật) -
+      # sinh lại từ GitHub Secret ngay trước khi publish, để csproj tự copy vào output theo wildcard appsettings*.json
+      - name: Write appsettings.Production.json
+        working-directory: ${{ env.PROJECT_ROOT }}/aspnet-core/src/MqSocial.Web.Host
+        run: echo "$APPSETTINGS_PRODUCTION_JSON" > appsettings.Production.json
+        env:
+          APPSETTINGS_PRODUCTION_JSON: ${{ secrets.WEBHOST_APPSETTINGS_PRODUCTION_JSON }}
+
+      - name: Publish
+        working-directory: ${{ env.PROJECT_ROOT }}/aspnet-core/src/MqSocial.Web.Host
+        run: dotnet publish MqSocial.Web.Host.csproj -c Release -o publish
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Add server to known_hosts
+        run: ssh-keyscan -H "${{ secrets.DEPLOY_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Upload build
+        working-directory: ${{ env.PROJECT_ROOT }}/aspnet-core/src/MqSocial.Web.Host
+        run: scp -r publish/* ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }}:/var/www/mqsocial/api/
+
+      - name: Restart mqsocial-api
         run: |
-          npm ci
-          npx ng build --configuration production
+          ssh ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} '
+            set -e
+            chown -R www-data:www-data /var/www/mqsocial/api
+            systemctl restart mqsocial-api
+            sleep 3
+            systemctl is-active mqsocial-api
+          '
 
-      - name: Deploy backend
-        run: >
-          rsync -a --delete
-          --exclude 'appsettings.Production.json'
-          --exclude 'Logs/'
-          out/api/ /var/www/mqsocial/api/
+  deploy-frontend:
+    name: Deploy Frontend (Angular)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Deploy frontend
-        run: rsync -a --delete MqSocial/10.2.0/angular/dist/ /var/www/mqsocial/manager/
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: ${{ env.PROJECT_ROOT }}/angular
+        run: npm ci
+
+      - name: Build (production)
+        working-directory: ${{ env.PROJECT_ROOT }}/angular
+        run: npx ng build --configuration production
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.9.0
+        with:
+          ssh-private-key: ${{ secrets.DEPLOY_SSH_KEY }}
+
+      - name: Add server to known_hosts
+        run: ssh-keyscan -H "${{ secrets.DEPLOY_SSH_HOST }}" >> ~/.ssh/known_hosts
+
+      # dọn sạch build cũ trước khi upload, tránh sót file lỗi thời (giống bước thủ công trong deploy guide)
+      - name: Clear old build on server
+        run: ssh ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} 'rm -rf /var/www/mqsocial/manager/*'
+
+      - name: Upload build
+        working-directory: ${{ env.PROJECT_ROOT }}/angular
+        run: scp -r dist/browser/* ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }}:/var/www/mqsocial/manager/
+
+      - name: Fix ownership
+        run: ssh ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} 'chown -R www-data:www-data /var/www/mqsocial/manager'
