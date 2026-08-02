@@ -51,8 +51,16 @@ jobs:
             set -e
             chown -R www-data:www-data /var/www/mqsocial/api
             systemctl restart mqsocial-api
-            sleep 3
-            systemctl is-active mqsocial-api
+            for i in $(seq 1 15); do
+              if systemctl is-active --quiet mqsocial-api; then
+                echo "mqsocial-api is active"
+                exit 0
+              fi
+              sleep 2
+            done
+            echo "mqsocial-api did not become active in time"
+            systemctl status mqsocial-api --no-pager
+            exit 1
           '
 
   deploy-frontend:
