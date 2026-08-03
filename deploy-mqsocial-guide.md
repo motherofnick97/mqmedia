@@ -7,14 +7,17 @@
 ```
 mqsocial.vn / www.mqsocial.vn      → Landing page (static, Nginx serve)
 manager.mqsocial.vn                → Angular (Nginx static)
-                                       + proxy /api, /signalr, route gốc ABP → localhost:5000
-                                                    ↓
-                                       MqSocial.Web.Host (systemd, port 5000)
-                                                    ↓
-                                       PostgreSQL (mqsocial_db, localhost:5432)
-                                                    ↑
-                                       MqSocial.Scheduler (Hangfire, systemd, dùng chung DB)
+                                       + proxy /api, /signalr, route gốc ABP → upstream "mqsocial_api" (Nginx LB, ip_hash)
+                                                    ↓                              ↓
+                                       MqSocial.Web.Host #1 (:5000)   MqSocial.Web.Host #2 (:5001)
+                                                    └──────────────┬───────────────┘
+                                                                    ↓
+                                                    PostgreSQL (mqsocial_db, localhost:5432)
+                                                                    ↑
+                                                    MqSocial.Scheduler (Hangfire, systemd — CHỈ 1 instance, không nhân bản)
 ```
+
+> Từ mục 15: backend chạy 2 instance trên cùng server (chống downtime khi 1 process crash). Trước mục 15, kiến trúc chỉ có 1 instance `MqSocial.Web.Host` port 5000 — xem mục 8.
 
 ---
 
@@ -216,6 +219,20 @@ certbot --nginx -d mqsocial.vn -d www.mqsocial.vn -d manager.mqsocial.vn
 - Chọn **Redirect HTTP → HTTPS** khi được hỏi.
 - Certbot tự thêm `listen 443 ssl` + đường dẫn cert vào từng file config tương ứng.
 - Cert Let's Encrypt **miễn phí vĩnh viễn**, hết hạn sau 90 ngày nhưng **tự động gia hạn** qua `certbot.timer`/cron có sẵn — không cần thao tác gì thêm.
+
+> **Đã từng gặp thực tế (03/08):** chạy `certbot --nginx -d mqsocial.vn -d www.mqsocial.vn -d manager.mqsocial.vn` trong 1 lệnh — certbot cấp cert cho cả 3 domain đúng (`certbot certificates` thấy đủ), và sửa nginx đúng cho `mqsocial.vn`/`www.mqsocial.vn`, nhưng với `manager.mqsocial.vn` thì **chỉ tạo được block redirect (`listen 80` → 301, kèm `return 404;` cho host lạ) mà quên hẳn thêm `listen 443 ssl` + cert vào block nội dung chính**. Hậu quả: gọi `https://manager.mqsocial.vn` không khớp `server_name` nào ở cổng 443 → Nginx rơi vào server block 443 đầu tiên trong toàn bộ config làm default (ở đây là landing page) → dính `location / { try_files ... =404; }` của landing page → **404** dù backend hoàn toàn bình thường. Lỗi này im lặng, không có gì trong log Nginx/certbot báo rõ ràng.
+>
+> **Cách nhận biết:** `curl -i http://localhost:5000/...` (thẳng backend, bỏ qua Nginx) ra `200` nhưng `curl -i https://manager.mqsocial.vn/...` ra `404` → nghi ngay Nginx thiếu block 443 đúng domain, không phải lỗi backend. Xác nhận bằng `nginx -T 2>/dev/null | grep -n "server_name manager.mqsocial.vn\|listen "` — nếu không thấy `listen 443 ssl` nào nằm trong phạm vi block `manager.mqsocial.vn`, đúng là bị lỗi này.
+>
+> **Cách sửa:** cert vẫn còn hạn (`certbot certificates` xác nhận `Certificate Path` tồn tại) nên không cần cấp lại — chỉ cần thủ công thêm đúng 5 dòng vào block nội dung của domain bị thiếu, đặt cạnh `location /` cuối cùng trước dấu `}` đóng block (bỏ luôn `listen 80;` khỏi block này vì block redirect riêng đã lo phần đó):
+> ```nginx
+>     listen 443 ssl; # managed by Certbot
+>     ssl_certificate /etc/letsencrypt/live/<domain>/fullchain.pem; # managed by Certbot
+>     ssl_certificate_key /etc/letsencrypt/live/<domain>/privkey.pem; # managed by Certbot
+>     include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+>     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+> ```
+> Rồi `nginx -t && systemctl reload nginx`. **Sau khi certbot chạy xong, luôn kiểm tra lại từng domain** bằng lệnh grep ở trên hoặc `curl -i https://<domain>` trước khi coi như xong bước này — đừng tin certbot đã làm đúng hết cho mọi domain chỉ vì lệnh chạy không báo lỗi.
 
 Kiểm tra auto-renew hoạt động:
 
@@ -681,12 +698,201 @@ curl -i https://manager.mqsocial.vn/api/services/app/Session/GetCurrentLoginInfo
 
 ---
 
+## 15. Load Balancing nhiều instance backend trên cùng 1 server (chống downtime khi 1 process crash)
+
+> **Phạm vi mục này:** bảo vệ khỏi trường hợp 1 process `MqSocial.Web.Host` bị crash/treo (OOM, lỗi runtime, đứng lúc deploy...) — request của user tự động được chuyển sang instance còn sống, gần như không nhận ra downtime.
+>
+> **Không** chống được trường hợp cả VPS chết (hỏng ổ đĩa, mất mạng, sập DC/hosting) — trường hợp đó cần server thứ 2 hoàn toàn độc lập + load balancer riêng + Postgres HA/replication (hiện Postgres vẫn là 1 điểm chết duy nhất dù backend có bao nhiêu instance) + DataProtection keys/SignalR dùng chung qua storage ngoài server. Phức tạp và tốn kém hơn hẳn — chỉ nên làm khi thực sự cần chống được mất cả server.
+
+### 15.1. Vì sao cách này work
+
+- Chạy **2 process `MqSocial.Web.Host` độc lập** trên cùng VPS, khác port (`5000`, `5001`).
+- Nginx đóng vai trò load balancer qua `upstream`: dàn tải + tự động ngừng gửi request tới instance đang lỗi (passive health check có sẵn trong Nginx open-source, không cần Nginx Plus).
+- Cả 2 instance dùng chung:
+  - **1 database Postgres** — đã đúng sẵn, không cần đổi gì.
+  - **1 thư mục DataProtection keys** `/var/www/mqsocial/keys` (đã setup ở mục 11) — **bắt buộc phải có trước khi làm mục này**. Nếu bỏ qua, mỗi instance tự sinh key riêng: user login ở instance A, request kế tiếp bị Nginx route sang instance B sẽ bị văng ra ngoài vì cookie/token không giải mã được.
+- **`mqsocial-scheduler` (Hangfire) giữ nguyên đúng 1 instance** — tuyệt đối không nhân bản theo cách dưới đây. Đã cảnh báo ở mục 12.4: 2 Hangfire server chạy trùng gây race-condition job (chạy lặp/đụng nhau).
+
+### 15.2. Gỡ service đơn cũ, tạo systemd template cho nhiều instance
+
+Service đơn `mqsocial-api.service` đang hardcode port 5000 qua `appsettings.Production.json`. Đổi qua **systemd template** để chạy N instance từ 1 file cấu hình duy nhất, port truyền qua biến môi trường.
+
+```bash
+systemctl stop mqsocial-api
+systemctl disable mqsocial-api
+rm /etc/systemd/system/mqsocial-api.service
+systemctl daemon-reload
+```
+
+Tạo file template (chú ý tên có `@` trước `.service`):
+
+```bash
+nano /etc/systemd/system/mqsocial-api@.service
+```
+
+```ini
+[Unit]
+Description=MqSocial Web.Host API (instance %i)
+After=network.target postgresql.service
+
+[Service]
+WorkingDirectory=/var/www/mqsocial/api
+ExecStart=/usr/bin/dotnet /var/www/mqsocial/api/MqSocial.Web.Host.dll
+Restart=always
+RestartSec=10
+KillSignal=SIGINT
+SyslogIdentifier=mqsocial-api-%i
+User=www-data
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Environment=Kestrel__Endpoints__Http__Url=http://localhost:%i
+Environment=DOTNET_PRINT_TELEMETRY_MESSAGE=false
+
+[Install]
+WantedBy=multi-user.target
+```
+
+> **Vì sao dùng `Kestrel__Endpoints__Http__Url` chứ không phải `ASPNETCORE_URLS`:** `appsettings.Production.json` đang khai báo cứng `Kestrel:Endpoints:Http:Url` (xem mục 8.2). Khi Kestrel đã có cấu hình endpoint kiểu này, nó **ưu tiên hơn** biến `ASPNETCORE_URLS`/`--urls` — set `ASPNETCORE_URLS=http://localhost:5001` sẽ bị bỏ qua hoàn toàn, cả 2 instance vẫn cùng cố bind port 5000 và 1 trong 2 sẽ crash lúc start vì trùng port. Phải override đúng key phân cấp (`Kestrel__Endpoints__Http__Url`, 2 dấu gạch dưới = 1 cấp con trong JSON) thì biến môi trường mới thắng được giá trị đã khai báo trong file JSON.
+
+`%i` trong file template sẽ được thay bằng phần sau dấu `@` lúc start service — dùng luôn số port cho dễ nhớ:
+
+```bash
+chown -R www-data:www-data /var/www/mqsocial/api
+systemctl daemon-reload
+systemctl enable --now mqsocial-api@5000
+systemctl enable --now mqsocial-api@5001
+systemctl status mqsocial-api@5000 mqsocial-api@5001
+journalctl -u mqsocial-api@5000 -u mqsocial-api@5001 -f
+```
+
+Muốn thêm instance thứ 3 (nếu VPS còn dư CPU core): `systemctl enable --now mqsocial-api@5002`, rồi thêm 1 dòng `server` tương ứng vào `upstream` ở bước 15.3 — không cần sửa gì khác.
+
+### 15.3. Cấu hình Nginx upstream
+
+Sửa `/etc/nginx/sites-available/mqsocial-manager`: thêm khối `upstream` ở **ngoài** block `server {}`, đổi mọi `proxy_pass http://localhost:5000;` thành `proxy_pass http://mqsocial_api;`:
+
+```nginx
+upstream mqsocial_api {
+    server 127.0.0.1:5000 max_fails=3 fail_timeout=10s;
+    server 127.0.0.1:5001 max_fails=3 fail_timeout=10s;
+}
+
+server {
+    server_name manager.mqsocial.vn;
+
+    root /var/www/mqsocial/manager;
+    index index.html;
+
+    client_max_body_size 50M;
+
+    location ~ ^/(AbpUserConfiguration|TokenAuth|Account|Abp|connect|Session|AccountVerify|Migration|Notification) {
+        proxy_pass http://mqsocial_api;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /api {
+        proxy_pass http://mqsocial_api;
+        proxy_next_upstream error timeout invalid_header http_500 http_502 http_503;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location /signalr {
+        proxy_pass http://mqsocial_api;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_read_timeout 86400;
+    }
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+
+    listen 443 ssl; # managed by Certbot
+    ssl_certificate /etc/letsencrypt/live/manager.mqsocial.vn/fullchain.pem; # managed by Certbot
+    ssl_certificate_key /etc/letsencrypt/live/manager.mqsocial.vn/privkey.pem; # managed by Certbot
+    include /etc/letsencrypt/options-ssl-nginx.conf; # managed by Certbot
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem; # managed by Certbot
+}
+server {
+    if ($host = manager.mqsocial.vn) {
+        return 301 https://$host$request_uri;
+    } # managed by Certbot
+    listen 80;
+    server_name manager.mqsocial.vn;
+    return 404; # managed by Certbot
+}
+```
+
+> **Không dùng `ip_hash`** — round-robin (mặc định của Nginx khi không khai báo `ip_hash`/`least_conn`/`hash`) chia request đều cho cả 2 instance. Chỉ an toàn làm vậy vì DataProtection keys đã dùng chung qua `/var/www/mqsocial/keys` (mục 11) — nhờ đó cookie/token đăng nhập giải mã được ở cả 2 instance, 2 request liên tiếp của cùng 1 user rơi vào 2 instance khác nhau vẫn hợp lệ. **Nếu chưa xác nhận cả 2 instance đọc/ghi được thư mục `keys` (không còn `UnauthorizedAccessException` trong `journalctl`) thì đừng bỏ `ip_hash`** — thiếu điều kiện đó, round-robin sẽ làm user bị văng đăng nhập ngẫu nhiên thường xuyên.
+>
+> `proxy_next_upstream ... http_502 http_503` giúp Nginx **tự retry sang instance còn sống ngay trong cùng 1 request** nếu instance đầu tiên trả lỗi/timeout — đây là phần tạo cảm giác "không downtime" cho user, không chỉ dừng ở việc ngừng route tới instance chết cho các request *sau đó*. Không thêm dòng này vào `location /signalr` vì SignalR là kết nối dài hơi (WebSocket) — retry giữa chừng không có ý nghĩa, client sẽ tự reconnect qua instance khác nếu rớt kết nối. Đổi round-robin/`ip_hash` cũng không ảnh hưởng 1 connection SignalR đang chạy — kết nối đã mở luôn dính nguyên vào 1 instance suốt thời gian sống của nó, thuật toán chỉ quyết định instance nào nhận connection *mới*.
+>
+> Certbot đã thêm `listen 443 ssl` + đường dẫn cert vào block này ở mục 6 (và tách 1 block `listen 80` riêng chỉ để redirect) — nếu domain của bạn bị đúng lỗi certbot thiếu block 443 đã ghi ở mục 6, xem lại đó trước khi áp dụng đoạn cấu hình trên.
+
+```bash
+nginx -t
+systemctl reload nginx
+```
+
+### 15.4. Kiểm tra thực tế: giả lập 1 instance chết
+
+```bash
+# Terminal 1: theo dõi cả 2 instance
+journalctl -u mqsocial-api@5000 -u mqsocial-api@5001 -f
+```
+
+```bash
+# Terminal 2: gọi liên tục trong lúc test
+watch -n 1 'curl -s -o /dev/null -w "%{http_code}\n" https://manager.mqsocial.vn/api/services/app/Session/GetCurrentLoginInformations'
+```
+
+```bash
+# Terminal 3: giả lập crash 1 instance
+systemctl stop mqsocial-api@5000
+```
+
+Kỳ vọng: `curl` ở Terminal 2 vẫn ra `200` liên tục (Nginx tự route hết sang `5001`), không có request nào bị `502`/timeout. Bật lại: `systemctl start mqsocial-api@5000`.
+
+### 15.5. Redeploy code khi đã chạy nhiều instance
+
+Không còn `mqsocial-api.service` nữa — thay các bước ở mục 8.4/8.2 bằng rolling restart từng instance một (không stop cả 2 cùng lúc):
+
+```bash
+# scp đè file mới vào /var/www/mqsocial/api/ như cũ, rồi:
+systemctl stop mqsocial-api@5000
+systemctl start mqsocial-api@5000
+# đợi vài giây, xác nhận instance 5000 đã lên (systemctl status), rồi mới làm instance còn lại
+systemctl stop mqsocial-api@5001
+systemctl start mqsocial-api@5001
+```
+
+> Đây là lợi ích kép của việc load balance: **deploy code mới cũng không downtime** — luôn có ít nhất 1 instance sống phục vụ request trong lúc cập nhật instance kia.
+
+Checklist mục 14 cũng đổi tương ứng: thay `systemctl status mqsocial-api` bằng `systemctl status mqsocial-api@5000 mqsocial-api@5001`.
+
+> **Nếu có CI/CD (GitHub Actions `.github/workflows/deploy.yml` hoặc tương đương):** nhớ sửa luôn step restart backend — nó rất có thể đang gọi `systemctl restart mqsocial-api` (tên service đơn, đã bị xóa ở mục 15.2). Không sửa thì lần deploy tự động tiếp theo sẽ fail đúng ngay bước restart (`Unit mqsocial-api.service not found`), code mới đã upload lên server nhưng không bao giờ được áp dụng vì service không restart được. Đổi step đó thành rolling-restart lần lượt `mqsocial-api@5000` rồi `mqsocial-api@5001` (không đồng thời, giữ đúng nguyên tắc không-downtime ở trên) — xem `.github/workflows/deploy.yml` trong repo này để tham khảo bản đã sửa.
+
+---
+
 ## Việc chưa làm / cần cân nhắc thêm sau này
 
 - [ ] Backup off-site (đồng bộ file backup ra ngoài server, VD: rclone → Google Drive/S3) để tránh mất trắng nếu VPS gặp sự cố
 - [ ] Nội dung thật cho landing page `mqsocial.vn` (hiện đang demo)
 - [ ] Nâng cấp .NET 9 (STS, hết hỗ trợ 5/2026) lên .NET 10 LTS khi có thời gian
 - [ ] Giới hạn/ẩn endpoint `/swagger` ở production nếu có bật
+- [ ] HA thật sự (chống mất cả VPS): server thứ 2 độc lập + load balancer riêng + Postgres replication + DataProtection keys/SignalR dùng chung qua storage ngoài server — mục 15 mới chỉ chống được 1 process crash trên cùng 1 server
 
 
 

@@ -45,22 +45,33 @@ jobs:
         working-directory: ${{ env.PROJECT_ROOT }}/aspnet-core/src/MqSocial.Web.Host
         run: scp -r publish/* ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }}:/var/www/mqsocial/api/
 
-      - name: Restart mqsocial-api
+      # mqsocial-api chạy 2 instance (mqsocial-api@5000, mqsocial-api@5001) đằng sau Nginx load
+      # balancer từ mục 15 của deploy-mqsocial-guide.md — service đơn "mqsocial-api" cũ không còn
+      # tồn tại nữa. Restart lần lượt từng instance (không đồng thời) để deploy không downtime:
+      # luôn có ít nhất 1 instance sống phục vụ request trong lúc cập nhật instance kia.
+      - name: Restart mqsocial-api (rolling, không downtime)
         run: |
           ssh ${{ secrets.DEPLOY_SSH_USER }}@${{ secrets.DEPLOY_SSH_HOST }} '
             set -e
             chown -R www-data:www-data /var/www/mqsocial/api
-            systemctl restart mqsocial-api
-            for i in $(seq 1 15); do
-              if systemctl is-active --quiet mqsocial-api; then
-                echo "mqsocial-api is active"
-                exit 0
-              fi
-              sleep 2
-            done
-            echo "mqsocial-api did not become active in time"
-            systemctl status mqsocial-api --no-pager
-            exit 1
+
+            restart_and_check() {
+              unit="$1"
+              systemctl restart "$unit"
+              for i in $(seq 1 15); do
+                if systemctl is-active --quiet "$unit"; then
+                  echo "$unit is active"
+                  return 0
+                fi
+                sleep 2
+              done
+              echo "$unit did not become active in time"
+              systemctl status "$unit" --no-pager
+              return 1
+            }
+
+            restart_and_check mqsocial-api@5000
+            restart_and_check mqsocial-api@5001
           '
 
   deploy-frontend:
