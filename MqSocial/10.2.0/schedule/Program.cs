@@ -37,7 +37,7 @@ var jobOptions = new RecurringJobOptions { TimeZone = vnTimeZone };
 jobManager.AddOrUpdate<UpdateContractKolResultJob>(
     "update-contract-kol-result",
     job => job.Execute(),
-    Cron.Daily(10),
+    Cron.Daily(6),
     jobOptions);
 
 jobManager.AddOrUpdate<UpdateKolSourceJob>(
