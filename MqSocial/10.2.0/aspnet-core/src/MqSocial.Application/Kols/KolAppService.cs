@@ -8,6 +8,8 @@ using Abp.UI;
 using Castle.Core.Logging;
 using Castle.MicroKernel.Registration;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
 using MqSocial.Careers;
@@ -293,6 +295,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 var phone = sheet.Cells[row, 4].Text?.Trim();
                 var address = sheet.Cells[row, 5].Text?.Trim();
                 var note = sheet.Cells[row, 6].Text?.Trim();
+                var age = sheet.Cells[row, 7].Text?.Trim();
+                var otherContact = sheet.Cells[row, 8].Text?.Trim();
 
                 if (string.IsNullOrEmpty(accountId))
                 {
@@ -320,7 +324,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                     continue;
                 }
 
-                Guid kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, effectiveCareerIds);
+                Guid kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, age, otherContact, effectiveCareerIds);
 
                 if (input.ContractId.HasValue)
                 {
@@ -349,7 +353,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return result;
     }
 
-    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType channel, string address, string note, string phone, List<Guid> effectiveCareerIds)
+    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType channel, string address, string note, string phone, string age, string otherContact, List<Guid> effectiveCareerIds)
     {
         Guid kolId = new Guid();
 
@@ -364,6 +368,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             exists.Address = address;
             exists.Note = note;
             exists.Phone = phone;
+            exists.OtherContacts = otherContact;
+            exists.Age = string.IsNullOrEmpty(age) ? null : Int32.Parse(age);
             exists.Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{exists.AccountId}"
                             : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{exists.AccountId}/" 
                                 : string.Empty);
@@ -388,6 +394,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
                 Note = note,
                 Address = address,
                 Phone = phone,
+                OtherContacts = otherContact,
+                Age = string.IsNullOrEmpty(age) ? null : Int32.Parse(age),
                 Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{accountId}"
                                     : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{accountId}/"
                                         : string.Empty)

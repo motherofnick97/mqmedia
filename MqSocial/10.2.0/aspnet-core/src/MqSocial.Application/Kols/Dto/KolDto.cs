@@ -37,4 +37,8 @@ public class KolDto : EntityDto<Guid>
 
     public Guid? KolGeneralId { get; set; }
 
+    public string OtherContacts { get; set; }
+
+    public int? Age { get; set; }
+
 }

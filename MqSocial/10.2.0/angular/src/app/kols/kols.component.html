@@ -195,6 +195,8 @@
                                     </th>
                                     <th style="min-width: 130px">{{ 'Phone' | localize }}</th>
                                     <th style="min-width: 180px">{{ 'Address' | localize }}</th>
+                                    <th style="min-width: 180px">Liên hệ khác</th>
+                                    <th style="min-width: 80px">Tuổi</th>
                                     <th style="min-width: 200px">Ghi chú</th>
                                     <th style="min-width: 160px">{{ 'Actions' | localize }}</th>
                                 </tr>
@@ -223,6 +225,8 @@
                                     <td>{{ record.generalCast | number }}</td>
                                     <td>{{ record.phone }}</td>
                                     <td>{{ record.address }}</td>
+                                    <td>{{ record.otherContacts }}</td>
+                                    <td>{{ record.age }}</td>
                                     <td style="white-space: pre-wrap; max-width: 200px">{{ record.note }}</td>
                                     <td>
                                         <div class="d-flex" style="gap: 0.25rem">

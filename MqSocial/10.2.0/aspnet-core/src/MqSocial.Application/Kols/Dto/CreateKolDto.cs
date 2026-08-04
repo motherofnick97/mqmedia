@@ -32,5 +32,8 @@ public class CreateKolDto
 
     public string Phone { get; set; }
 
+    public string OtherContacts { get; set; }
+
+    public int? Age { get; set; }
 
 }

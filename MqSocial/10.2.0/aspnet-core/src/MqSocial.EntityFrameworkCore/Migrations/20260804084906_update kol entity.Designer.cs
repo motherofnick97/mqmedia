@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MqSocial.EntityFrameworkCore;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MqSocial.Migrations
 {
     [DbContext(typeof(MqSocialDbContext))]
-    partial class MqSocialDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260804084906_update kol entity")]
+    partial class updatekolentity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -2185,9 +2188,6 @@ namespace MqSocial.Migrations
 
                     b.Property<string>("Address")
                         .HasColumnType("text");
-
-                    b.Property<int?>("Age")
-                        .HasColumnType("integer");
 
                     b.Property<int>("Channel")
                         .HasColumnType("integer");

@@ -5403,6 +5403,8 @@ export interface IKolDto {
     address: string | undefined;
     phone: string | undefined;
     kolGeneralId: string | undefined;
+    otherContacts: string | undefined;
+    age: number | undefined;
 }
 
 export class KolDto implements IKolDto {
@@ -5419,6 +5421,8 @@ export class KolDto implements IKolDto {
     address: string | undefined;
     phone: string | undefined;
     kolGeneralId: string | undefined;
+    otherContacts: string | undefined;
+    age: number | undefined;
 
     constructor(data?: IKolDto) {
         if (data) {
@@ -5444,6 +5448,8 @@ export class KolDto implements IKolDto {
             this.address = _data["address"];
             this.phone = _data["phone"];
             this.kolGeneralId = _data["kolGeneralId"];
+            this.otherContacts = _data["otherContacts"];
+            this.age = _data["age"];
         }
     }
 
@@ -5469,6 +5475,8 @@ export class KolDto implements IKolDto {
         data["address"] = this.address;
         data["phone"] = this.phone;
         data["kolGeneralId"] = this.kolGeneralId;
+        data["otherContacts"] = this.otherContacts;
+        data["age"] = this.age;
         return data;
     }
 
@@ -5491,6 +5499,8 @@ export interface ICreateKolDto {
     accountId: string | undefined;
     address: string | undefined;
     phone: string | undefined;
+    otherContacts: string | undefined;
+    age: number | undefined;
 }
 
 export class CreateKolDto implements ICreateKolDto {
@@ -5504,6 +5514,8 @@ export class CreateKolDto implements ICreateKolDto {
     accountId: string | undefined;
     address: string | undefined;
     phone: string | undefined;
+    otherContacts: string | undefined;
+    age: number | undefined;
 
     constructor(data?: ICreateKolDto) {
         if (data) {
@@ -5526,6 +5538,8 @@ export class CreateKolDto implements ICreateKolDto {
             this.accountId = _data["accountId"];
             this.address = _data["address"];
             this.phone = _data["phone"];
+            this.otherContacts = _data["otherContacts"];
+            this.age = _data["age"];
         }
     }
 
@@ -5548,6 +5562,8 @@ export class CreateKolDto implements ICreateKolDto {
         data["accountId"] = this.accountId;
         data["address"] = this.address;
         data["phone"] = this.phone;
+        data["otherContacts"] = this.otherContacts;
+        data["age"] = this.age;
         return data;
     }
 

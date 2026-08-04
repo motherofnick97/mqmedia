@@ -50,4 +50,7 @@ public class Kol : FullAuditedEntity<Guid>, IMayHaveTenant
     [ForeignKey("KolGeneralId")]
     public KolGeneral KolGeneral { get; set; }
 
+    public string OtherContacts { get; set; }
+    public int? Age { get; set; }
+
 }
