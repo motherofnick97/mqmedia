@@ -1,6 +1,7 @@
 using Abp.Application.Services;
 using Abp.Application.Services.Dto;
 using Abp.Authorization;
+using Abp.BackgroundJobs;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
@@ -12,6 +13,8 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
+using MqSocial.BackgroundJob;
+using MqSocial.BackgroundJob.Dto;
 using MqSocial.Careers;
 using MqSocial.Common.Enum;
 using MqSocial.CommonFunc;
@@ -47,6 +50,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
     private readonly IRepository<ContractKol, Guid> _contractKolRepository;
     private readonly IRepository<KolDuplicateContract, Guid> _kolDuplicateContractRepository;
     private readonly IRepository<Contract, Guid> _contractRepository;
+    private readonly IBackgroundJobManager _backgroundJobManager;
 
     public KolAppService(
         IRepository<Kol, Guid> repository,
@@ -55,7 +59,8 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         IRepository<KolCarrer, Guid> kolCareerRepository,
         IRepository<ContractKol, Guid> contractKolRepository,
         IRepository<KolDuplicateContract, Guid> kolDuplicateContractRepository,
-        IRepository<Contract, Guid> contractRepository)
+        IRepository<Contract, Guid> contractRepository,
+        IBackgroundJobManager backgroundJobManager)
         : base(repository)
     {
         _httpClientFactory = httpClientFactory;
@@ -64,6 +69,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         _contractKolRepository = contractKolRepository;
         _kolDuplicateContractRepository = kolDuplicateContractRepository;
         _contractRepository = contractRepository;
+        _backgroundJobManager = backgroundJobManager;
     }
 
     // Trả về: KolId → danh sách tên contract bị duplicate với contractId đầu vào
@@ -230,43 +236,6 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
         return MapToEntityDto(kol);
     }
 
-    private async Task<KolDto> CrawlUserInfo(string uniqueId)
-    {
-        try
-        {
-            var client = new HttpClient();
-            var request = new HttpRequestMessage
-            {
-                Method = HttpMethod.Get,
-                RequestUri = new Uri("https://tiktok-api23.p.rapidapi.com/api/user/info?uniqueId=" + uniqueId),
-                Headers =
-            {
-                { "x-rapidapi-key", "63fb251e9emsh10eab69a0126292p15c65cjsn4f2df599110c" },
-                { "x-rapidapi-host", "tiktok-api23.p.rapidapi.com" },
-            },
-            };
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            var body = await response.Content.ReadAsStringAsync();
-            var json = JObject.Parse(body);
-
-            var name = json["userInfo"]["user"]["nickname"].ToString();
-            var followers = json["userInfo"]["stats"]["followerCount"].Value<int>();
-
-            return new KolDto()
-            {
-                AccountId = uniqueId,
-                Follow = followers,
-                Name = name
-            };
-        }
-        catch (Exception)
-        {
-            return null;
-        }
-        
-    }
-
     public async Task<ImportKolResultDto> ImportFromExcel([FromForm] ImportKolDto input)
     {
         if (input.File == null || input.File.Length == 0)
@@ -285,143 +254,100 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
 
         var dupKolContractNames = await GetKolDuplicateContractNamesAsync(input.ContractId);
 
-        for (int row = 2; row <= rowCount; row++)
-        {
-            try
-            {
-                var accountId = sheet.Cells[row, 1].Text?.Trim();
-                var channelText = sheet.Cells[row, 2].Text?.Trim();
-                var follow = sheet.Cells[row, 3].Text?.Trim();
-                var phone = sheet.Cells[row, 4].Text?.Trim();
-                var address = sheet.Cells[row, 5].Text?.Trim();
-                var note = sheet.Cells[row, 6].Text?.Trim();
-                var age = sheet.Cells[row, 7].Text?.Trim();
-                var otherContact = sheet.Cells[row, 8].Text?.Trim();
+        result = await CheckImportKol(result, rowCount, sheet, input.CareerIds, dupKolContractNames);
 
-                if (string.IsNullOrEmpty(accountId))
-                {
-                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Mã tài khoản không được để trống" });
-                    result.FailCount++;
-                    continue;
-                }
+        // Loi tra luon khong insert nua
+        if (result.FailCount > 0 || result.DuplicateCount > 0) 
+            return result;
 
-                ChannelType channel = ChannelType.Khac;
-                if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
-                    channel = ch;
-
-                var effectiveCareerIds = new List<Guid>();
-                if (input.CareerIds != null && input.CareerIds.Count > 0)
-                {
-                    effectiveCareerIds = input.CareerIds;
-                }
-
-                KolDto kolDto = await CrawlUserInfo(accountId);
-
-                if (kolDto == null)
-                {
-                    result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Fail when crawl data" });
-                    result.FailCount++;
-                    continue;
-                }
-
-                Guid kolId = await HandleKolFromExcel(kolDto, accountId, channel, address, note, phone, age, otherContact, effectiveCareerIds);
-
-                if (input.ContractId.HasValue)
-                {
-                    if (dupKolContractNames.TryGetValue(kolId, out var conflictingContracts))
-                    {
-                        var names = string.Join(", ", conflictingContracts);
-                        result.Duplicates.Add(new ImportKolErrorDto { Row = row, Message = $"KOL đã nằm trong hợp đồng: {names}" });
-                        result.DuplicateCount++;
-                        continue;
-                    }
-                    else
-                    {
-                        await HanleContractKolFromExcel(kolId, input.ContractId.Value);
-                    }
-                }
-
-                result.SuccessCount++;
-            }
-            catch (Exception ex)
-            {
-                result.Errors.Add(new ImportKolErrorDto { Row = row, Message = ex.Message });
-                result.FailCount++;
-            }
-        }
+        await HandleImportKol(rowCount, sheet, input.CareerIds, input.ContractId);
 
         return result;
     }
 
-    private async Task<Guid> HandleKolFromExcel(KolDto kolDto, string accountId, ChannelType channel, string address, string note, string phone, string age, string otherContact, List<Guid> effectiveCareerIds)
+    private async Task<ImportKolResultDto> CheckImportKol(ImportKolResultDto result, int rowCount, ExcelWorksheet sheet, List<Guid> careerIds, Dictionary<Guid, List<string>> dupKolContractNames)
     {
-        Guid kolId = new Guid();
-
-        var exists = await Repository.GetAll()
-                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
-        if (exists != null)
+        for (int row = 2; row <= rowCount; row++)
         {
-            kolId = exists.Id;
+            var accountId = sheet.Cells[row, 1].Text?.Trim();
+            var channelText = sheet.Cells[row, 2].Text?.Trim();
+            var follow = sheet.Cells[row, 3].Text?.Trim();
+            var phone = sheet.Cells[row, 4].Text?.Trim();
+            var address = sheet.Cells[row, 5].Text?.Trim();
+            var note = sheet.Cells[row, 6].Text?.Trim();
+            var age = sheet.Cells[row, 7].Text?.Trim();
+            var otherContact = sheet.Cells[row, 8].Text?.Trim();
 
-            exists.Follow = kolDto.Follow;
-            exists.Name = kolDto.Name;
-            exists.Address = address;
-            exists.Note = note;
-            exists.Phone = phone;
-            exists.OtherContacts = otherContact;
-            exists.Age = string.IsNullOrEmpty(age) ? null : Int32.Parse(age);
-            exists.Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{exists.AccountId}"
-                            : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{exists.AccountId}/" 
-                                : string.Empty);
+            ChannelType channel = ChannelType.Khac;
+            if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
+                channel = ch;
 
-            foreach (var careerId in effectiveCareerIds)
+            var effectiveCareerIds = new List<Guid>();
+            if (careerIds != null && careerIds.Count > 0)
             {
-                var alreadyLinked = await _kolCareerRepository.GetAll()
-                    .AnyAsync(x => x.KolId == exists.Id && x.CareerId == careerId);
-                if (!alreadyLinked)
-                    await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = exists.Id, CareerId = careerId, TenantId = AbpSession.TenantId });
+                effectiveCareerIds = careerIds;
+            }
+
+            var exists = await Repository.GetAll()
+                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
+            if (exists != null && dupKolContractNames.TryGetValue(exists.Id, out var conflictingContracts))
+            {
+                var names = string.Join(", ", conflictingContracts);
+                result.Duplicates.Add(new ImportKolErrorDto { Row = row, Message = $"KOL đã nằm trong hợp đồng: {names}" });
+                result.DuplicateCount++;
+                continue;
+            }
+
+            if (string.IsNullOrEmpty(accountId))
+            {
+                result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Mã tài khoản không được để trống" });
+                result.FailCount++;
+                continue;
             }
         }
-        else
-        {
-            var newKol = await Repository.InsertAsync(new Kol
-            {
-                Name = kolDto.Name,
-                AccountId = accountId,
-                Channel = channel,
-                TenantId = AbpSession.TenantId,
-                Follow = kolDto.Follow,
-                Note = note,
-                Address = address,
-                Phone = phone,
-                OtherContacts = otherContact,
-                Age = string.IsNullOrEmpty(age) ? null : Int32.Parse(age),
-                Link = channel == ChannelType.Tiktok ? $"https://www.tiktok.com/@{accountId}"
-                                    : (channel == ChannelType.Facebook ? $"https://www.facebook.com/{accountId}/"
-                                        : string.Empty)
-            });
-
-            kolId = newKol.Id;
-
-            foreach (var careerId in effectiveCareerIds)
-                await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = newKol.Id, CareerId = careerId, TenantId = AbpSession.TenantId });
-        }
-        return kolId;
+        return result;
     }
 
-    private async Task HanleContractKolFromExcel(Guid kolId, Guid contractId)
+    private async Task HandleImportKol(int rowCount, ExcelWorksheet sheet, List<Guid> careerIds, Guid? contractId)
     {
+        for (int row = 2; row <= rowCount; row++)
+        {
+            var accountId = sheet.Cells[row, 1].Text?.Trim();
+            var channelText = sheet.Cells[row, 2].Text?.Trim();
+            var follow = sheet.Cells[row, 3].Text?.Trim();
+            var phone = sheet.Cells[row, 4].Text?.Trim();
+            var address = sheet.Cells[row, 5].Text?.Trim();
+            var note = sheet.Cells[row, 6].Text?.Trim();
+            var age = sheet.Cells[row, 7].Text?.Trim();
+            var otherContact = sheet.Cells[row, 8].Text?.Trim();
 
-        var contractKolExists = await _contractKolRepository.GetAll()
-                       .AnyAsync(x => x.KolId == kolId && x.ContractId == contractId);
-        if (!contractKolExists)
-            await _contractKolRepository.InsertAsync(new ContractKol
+            ChannelType channel = ChannelType.Khac;
+            if (!string.IsNullOrEmpty(channelText) && Enum.TryParse<ChannelType>(channelText, true, out var ch))
+                channel = ch;
+
+            //var effectiveCareerIds = new List<Guid>();
+            //if (input.CareerIds != null && input.CareerIds.Count > 0)
+            //{
+            //    effectiveCareerIds = input.CareerIds;
+            //}
+
+            //var exists = await Repository.GetAll()
+            //        .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
+
+            _backgroundJobManager.Enqueue<ContractKolImportExcelJob, ContractKolImportExcelJobArgs>(new ContractKolImportExcelJobArgs
             {
-                KolId = kolId,
-                ContractId = contractId,
-                Status = ContractKolStatus.Register,
+                AccountId = accountId,
+                AhannelText = channelText,
+                Follow = follow,
+                Phone = phone,
+                Address = address,
+                Note = note,
+                Age = age,
+                OtherContact = otherContact,
                 TenantId = AbpSession.TenantId,
-                SampleReceiveStatus = ReceiveStatus.NotShip
+                CareerIds = careerIds,
+                ContractId = contractId
             });
+        }
     }
 }
