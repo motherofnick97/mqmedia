@@ -334,7 +334,7 @@ public class KolAppService : AsyncCrudAppService<Kol, KolDto, Guid, PagedKolRequ
             //var exists = await Repository.GetAll()
             //        .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
 
-            _backgroundJobManager.Enqueue<ContractKolImportExcelJob, ContractKolImportExcelJobArgs>(new ContractKolImportExcelJobArgs
+            await _backgroundJobManager.EnqueueAsync<ContractKolImportExcelJob, ContractKolImportExcelJobArgs>(new ContractKolImportExcelJobArgs
             {
                 AccountId = accountId,
                 AhannelText = channelText,

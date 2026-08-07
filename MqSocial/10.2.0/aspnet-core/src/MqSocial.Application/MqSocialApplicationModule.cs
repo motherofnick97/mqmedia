@@ -14,7 +14,6 @@ public class MqSocialApplicationModule : AbpModule
     public override void PreInitialize()
     {
         Configuration.Authorization.Providers.Add<MqSocialAuthorizationProvider>();
-        Configuration.BackgroundJobs.IsJobExecutionEnabled = true;
     }
 
     public override void Initialize()

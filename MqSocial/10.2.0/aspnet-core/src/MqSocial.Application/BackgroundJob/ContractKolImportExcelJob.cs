@@ -1,6 +1,7 @@
 ﻿using Abp.BackgroundJobs;
 using Abp.Dependency;
 using Abp.Domain.Repositories;
+using Abp.Domain.Uow;
 using Abp.Runtime.Session;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.BackgroundJob.Dto;
@@ -23,7 +24,7 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace MqSocial.BackgroundJob
 {
-    public class ContractKolImportExcelJob : BackgroundJob<ContractKolImportExcelJobArgs>, ITransientDependency
+    public class ContractKolImportExcelJob : AsyncBackgroundJob<ContractKolImportExcelJobArgs>, ITransientDependency
     {
         private readonly IRepository<Kol, Guid> _kolRepository;
         private readonly IRepository<KolCarrer, Guid> _kolCareerRepository;
@@ -31,9 +32,9 @@ namespace MqSocial.BackgroundJob
         private readonly IRepository<KolDuplicateContract, Guid> _kolDuplicateContractRepository;
         private readonly IRepository<Contract, Guid> _contractRepository;
 
-        public ContractKolImportExcelJob(IRepository<Kol, Guid> kolRepository, 
-            IRepository<KolCarrer, Guid> kolCareerRepository, 
-            IRepository<ContractKol, Guid> contractKolRepository, 
+        public ContractKolImportExcelJob(IRepository<Kol, Guid> kolRepository,
+            IRepository<KolCarrer, Guid> kolCareerRepository,
+            IRepository<ContractKol, Guid> contractKolRepository,
             IRepository<KolDuplicateContract, Guid> kolDuplicateContractRepository,
             IRepository<Contract, Guid> contractRepository
             )
@@ -45,7 +46,8 @@ namespace MqSocial.BackgroundJob
             _contractRepository = contractRepository;
         }
 
-        public async override void Execute(ContractKolImportExcelJobArgs args)
+        [UnitOfWork]
+        public override async Task ExecuteAsync(ContractKolImportExcelJobArgs args)
         {
             try
             {
@@ -143,6 +145,9 @@ namespace MqSocial.BackgroundJob
                 {
                     Logger.Error($"Fail when crawl data (attempt {attempt}/{maxAttempts}): AccountId= {uniqueId} - {ex.Message}");
                 }
+
+                if (attempt < maxAttempts)
+                    await Task.Delay(1000);
             }
 
             return null;
@@ -153,7 +158,7 @@ namespace MqSocial.BackgroundJob
             Guid kolId = new Guid();
 
             var exists = await _kolRepository.GetAll()
-                        .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
+                    .FirstOrDefaultAsync(x => x.AccountId == accountId && x.Channel == channel);
             if (exists != null)
             {
                 kolId = exists.Id;
@@ -202,6 +207,8 @@ namespace MqSocial.BackgroundJob
                     await _kolCareerRepository.InsertAsync(new KolCarrer { KolId = newKol.Id, CareerId = careerId, TenantId = tenantId });
             }
             return kolId;
+
+
         }
 
         private async Task HanleContractKolFromExcel(Guid kolId, Guid contractId, int? tenantId)
