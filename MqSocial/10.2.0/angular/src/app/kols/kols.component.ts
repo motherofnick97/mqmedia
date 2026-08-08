@@ -198,7 +198,11 @@ export class KolsComponent extends PagedListingComponentBase<KolDto> {
                 this.importCareerIds = [];
                 this.importContractId = null;
                 this.importResult = response.result;
-                this.showImportResult = true;
+                if (response.result.failCount === 0 && response.result.duplicateCount === 0) {
+                    abp.notify.success('Import thành công, vui lòng chờ dữ liệu được xử lý');
+                } else {
+                    this.showImportResult = true;
+                }
                 this.refresh();
                 this.cd.detectChanges();
             },
