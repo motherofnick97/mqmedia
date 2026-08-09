@@ -51,54 +51,57 @@ namespace MqSocial.BackgroundJob
         {
             try
             {
-                ChannelType channel = ChannelType.Khac;
-                if (!string.IsNullOrEmpty(args.AhannelText) && Enum.TryParse<ChannelType>(args.AhannelText, true, out var ch))
-                    channel = ch;
-
-                var effectiveCareerIds = new List<Guid>();
-                if (args.CareerIds != null && args.CareerIds.Count > 0)
+                using (CurrentUnitOfWork.SetTenantId(args.TenantId))
                 {
-                    effectiveCareerIds = args.CareerIds;
-                }
+                    ChannelType channel = ChannelType.Khac;
+                    if (!string.IsNullOrEmpty(args.AhannelText) && Enum.TryParse<ChannelType>(args.AhannelText, true, out var ch))
+                        channel = ch;
 
-                var dupKolContractNames = await GetKolDuplicateContractNamesAsync(args.ContractId);
-
-                if (args.ContractId.HasValue && await CheckContractKolAdded(args.AccountId, channel, args.ContractId.Value))
-                {
-                    Logger.Info("Skip: KOL already added to contract. AccountId= " + args.AccountId);
-                    return;
-                }
-
-                if (args.ContractId.HasValue && dupKolContractNames != null)
-                {
-                    var conflictingContractNames = await GetKolConflictingContractNames(args.AccountId, channel, dupKolContractNames);
-                    if (conflictingContractNames != null)
+                    var effectiveCareerIds = new List<Guid>();
+                    if (args.CareerIds != null && args.CareerIds.Count > 0)
                     {
-                        Logger.Info($"Skip: KOL đã nằm trong hợp đồng không được phép trùng: {conflictingContractNames}. AccountId= {args.AccountId}");
+                        effectiveCareerIds = args.CareerIds;
+                    }
+
+                    var dupKolContractNames = await GetKolDuplicateContractNamesAsync(args.ContractId);
+
+                    if (args.ContractId.HasValue && await CheckContractKolAdded(args.AccountId, channel, args.ContractId.Value))
+                    {
+                        Logger.Info("Skip: KOL already added to contract. AccountId= " + args.AccountId);
                         return;
                     }
-                }
 
-                KolDto kolDto = await CrawlUserInfo(args.AccountId);
+                    if (args.ContractId.HasValue && dupKolContractNames != null)
+                    {
+                        var conflictingContractNames = await GetKolConflictingContractNames(args.AccountId, channel, dupKolContractNames);
+                        if (conflictingContractNames != null)
+                        {
+                            Logger.Info($"Skip: KOL đã nằm trong hợp đồng không được phép trùng: {conflictingContractNames}. AccountId= {args.AccountId}");
+                            return;
+                        }
+                    }
 
-                if (kolDto == null)
-                {
-                    Logger.Error("Fail when crawl data: AccountId= " + args.AccountId);
-                    //result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Fail when crawl data" });
-                    //result.FailCount++;
-                    //continue;
+                    KolDto kolDto = await CrawlUserInfo(args.AccountId);
+
+                    if (kolDto == null)
+                    {
+                        Logger.Error("Fail when crawl data: AccountId= " + args.AccountId);
+                        //result.Errors.Add(new ImportKolErrorDto { Row = row, Message = "Fail when crawl data" });
+                        //result.FailCount++;
+                        //continue;
+                        return;
+                    }
+
+                    Guid kolId = await HandleKolFromExcel(kolDto, args.AccountId, channel, args.Address, args.Note, args.Phone, args.Age, args.OtherContact, effectiveCareerIds, args.TenantId);
+
+                    if (args.ContractId.HasValue)
+                    {
+                        await HanleContractKolFromExcel(kolId, args.ContractId.Value, args.TenantId);
+                    }
+
+                    Logger.Info("Success when crawl data: AccountId= " + args.AccountId);
                     return;
                 }
-
-                Guid kolId = await HandleKolFromExcel(kolDto, args.AccountId, channel, args.Address, args.Note, args.Phone, args.Age, args.OtherContact, effectiveCareerIds, args.TenantId);
-
-                if (args.ContractId.HasValue)
-                {
-                    await HanleContractKolFromExcel(kolId, args.ContractId.Value, args.TenantId);
-                }
-
-                Logger.Info("Success when crawl data: AccountId= " + args.AccountId);
-                return;
             }
             catch (Exception ex)
             {
@@ -256,7 +259,7 @@ namespace MqSocial.BackgroundJob
         private async Task<Dictionary<Guid, List<string>>> GetKolDuplicateContractNamesAsync(Guid? contractId)
         {
             if (contractId == null)
-                return new Dictionary<Guid, List<string>>();
+            return new Dictionary<Guid, List<string>>();
 
             var duplicateContractIds = await _kolDuplicateContractRepository.GetAll()
                 .Where(x => x.FirstContractId == contractId || x.SecondContractId == contractId)
