@@ -40,6 +40,7 @@ export class ViewContractKolDetailDialogComponent extends AppComponentBase {
     kolName: string = '—';
     contractName: string = '—';
     saving = false;
+    originalStatus: ContractKolStatus | undefined;
 
     airTimeDate: Date | null = null;
 
@@ -96,6 +97,14 @@ export class ViewContractKolDetailDialogComponent extends AppComponentBase {
     setRecord(record: ContractKolDto): void {
         this.record = ContractKolDto.fromJS(record.toJSON());
         this.airTimeDate = record.airTime ? record.airTime.toDate() : null;
+        this.originalStatus = record.status;
+    }
+
+    // Chặn save nếu hợp đồng ĐÃ hoàn thành từ trước khi mở dialog này — dùng originalStatus (không
+    // phải record.status) vì record.status có thể đang bị đổi ngay trong form (VD: chuyển sang "Hoàn thành"
+    // ở lần lưu này vẫn phải cho phép).
+    get isDone(): boolean {
+        return this.originalStatus === ContractKolStatus.Done;
     }
 
     getStatusSeverity(status: ContractKolStatus | undefined): 'secondary' | 'info' | 'success' | 'warn' | 'danger' {
@@ -107,6 +116,11 @@ export class ViewContractKolDetailDialogComponent extends AppComponentBase {
     }
 
     save(): void {
+        if (this.isDone) {
+            this.notify.warn('Hợp đồng đã hoàn thành, không thể chỉnh sửa.');
+            return;
+        }
+
         this.saving = true;
         this.record.airTime = this.airTimeDate ? moment(this.airTimeDate) : undefined;
 

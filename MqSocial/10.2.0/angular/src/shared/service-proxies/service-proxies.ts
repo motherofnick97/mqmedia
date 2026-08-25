@@ -5861,7 +5861,7 @@ export interface IContractKolDto {
     sampleReceiveStatus: ReceiveStatus | undefined;
     airTime: moment.Moment | undefined;
     brief: string | undefined;
-    briefLink: string | undefined;
+    demoLink: string | undefined;
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
@@ -5888,7 +5888,7 @@ export class ContractKolDto implements IContractKolDto {
     sampleReceiveStatus: ReceiveStatus | undefined;
     airTime: moment.Moment | undefined;
     brief: string | undefined;
-    briefLink: string | undefined;
+    demoLink: string | undefined;
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
@@ -5924,7 +5924,7 @@ export class ContractKolDto implements IContractKolDto {
             this.sampleReceiveStatus = _data["sampleReceiveStatus"];
             this.airTime = _data["airTime"] ? moment(_data["airTime"]) : undefined;
             this.brief = _data["brief"];
-            this.briefLink = _data["briefLink"];
+            this.demoLink = _data["demoLink"];
             this.feedback = _data["feedback"];
             this.caption = _data["caption"];
             this.hashTag = _data["hashTag"];
@@ -5963,7 +5963,7 @@ export class ContractKolDto implements IContractKolDto {
         data["sampleReceiveStatus"] = this.sampleReceiveStatus;
         data["airTime"] = this.airTime ? this.airTime.toISOString() : undefined;
         data["brief"] = this.brief;
-        data["briefLink"] = this.briefLink;
+        data["demoLink"] = this.demoLink;
         data["feedback"] = this.feedback;
         data["caption"] = this.caption;
         data["hashTag"] = this.hashTag;
@@ -5998,7 +5998,7 @@ export interface ICreateContractKolDto {
     sampleReceiveStatus: ReceiveStatus | undefined;
     airTime: moment.Moment | undefined;
     brief: string | undefined;
-    briefLink: string | undefined;
+    demoLink: string | undefined;
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
@@ -6019,7 +6019,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
     sampleReceiveStatus: ReceiveStatus | undefined;
     airTime: moment.Moment | undefined;
     brief: string | undefined;
-    briefLink: string | undefined;
+    demoLink: string | undefined;
     feedback: string | undefined;
     caption: string | undefined;
     hashTag: string | undefined;
@@ -6049,7 +6049,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
             this.sampleReceiveStatus = _data["sampleReceiveStatus"];
             this.airTime = _data["airTime"] ? moment(_data["airTime"]) : undefined;
             this.brief = _data["brief"];
-            this.briefLink = _data["briefLink"];
+            this.demoLink = _data["demoLink"];
             this.feedback = _data["feedback"];
             this.caption = _data["caption"];
             this.hashTag = _data["hashTag"];
@@ -6079,7 +6079,7 @@ export class CreateContractKolDto implements ICreateContractKolDto {
         data["sampleReceiveStatus"] = this.sampleReceiveStatus;
         data["airTime"] = this.airTime ? this.airTime.toISOString() : undefined;
         data["brief"] = this.brief;
-        data["briefLink"] = this.briefLink;
+        data["demoLink"] = this.demoLink;
         data["feedback"] = this.feedback;
         data["caption"] = this.caption;
         data["hashTag"] = this.hashTag;

@@ -1,7 +1,7 @@
 <div>
     <abp-modal-header [title]="'KOLs: ' + contractName" (onCloseClick)="bsModalRef.hide()"></abp-modal-header>
     <div class="modal-body">
-        @if (isGranted('Pages.Kols')) {
+        @if (isGranted('Pages.Kols') && !isContractDone) {
         <div class="d-flex justify-content-end mb-3">
             <p-button icon="pi pi-plus" [label]="'Thêm KOL'" (onClick)="addKol()"></p-button>
         </div>
@@ -17,7 +17,7 @@
                     @if (isGranted('Pages.ContractKols.Payment')) {
                     <th style="width: 120px">Payment</th>
                     }
-                    @if (isGranted('Pages.ContractKols.Delete')) {
+                    @if (isGranted('Pages.ContractKols.Delete') && !isContractDone) {
                     <th style="width: 80px"></th>
                     }
                 </tr>
@@ -33,7 +33,7 @@
                     @if (isGranted('Pages.ContractKols.Payment')) {
                     <td>{{ record.payment | number }}</td>
                     }
-                    @if (isGranted('Pages.ContractKols.Delete')) {
+                    @if (isGranted('Pages.ContractKols.Delete') && !isContractDone) {
                     <td>
                         <p-button icon="pi pi-trash" severity="danger" size="small"
                             (onClick)="removeKol(record)"></p-button>

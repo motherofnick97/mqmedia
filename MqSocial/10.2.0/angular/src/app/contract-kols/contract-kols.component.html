@@ -57,29 +57,30 @@
                             rows="{{ primengTableHelper.defaultRecordsCountPerPage }}"
                             [paginator]="false"
                             [lazy]="true"
+                            [tableStyle]="{'width': '2800px', 'table-layout': 'fixed'}"
                             styleClass="p-datatable-sm p-datatable-striped p-datatable-gridlines">
 
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th style="width:30px; position:sticky; left:0; z-index:2; background:#f8f9fa"></th>
-                                    <th style=" position:sticky; left:3rem; z-index:2; background:#f8f9fa">KOL</th>
-                                    <th style="">Hợp đồng</th>
-                                    <th style="">Trạng thái</th>
-                                    <th style="" pSortableColumn="cash">Cash <p-sortIcon field="cash"></p-sortIcon></th>
+                                    <th style="width:50px; position:sticky; left:0; z-index:2; background:#f8f9fa"></th>
+                                    <th style="width:150px; position:sticky; z-index:2; background:#f8f9fa">KOL</th>
+                                    <th style="width:180px">Hợp đồng</th>
+                                    <th style="width:120px">Trạng thái</th>
+                                    <th style="width:110px" pSortableColumn="cash">Cash <p-sortIcon field="cash"></p-sortIcon></th>
                                     <!-- <th style="width:110px" pSortableColumn="payment">Payment <p-sortIcon field="payment"></p-sortIcon></th> -->
-                                    <th style="">Air Time</th>
-                                    <!-- <th style="width:160px">Brief Link</th>
+                                    <th style="width:110px">Air Time</th>
+                                    <th style="width:160px">Demo Link</th>
                                     <th style="width:200px">Brief</th>
-                                    <th style="width:150px">Portrait</th>
-                                    <th style="width:150px">Review Corner</th> -->
-                                    <!-- <th style="width:150px">Tên mẫu</th>
+                                    <th style="width:150px">Chân dung</th>
+                                    <th style="width:150px">Góc Review</th>
+                                    <th style="width:150px">Tên mẫu</th>
                                     <th style="width:110px">Size mẫu</th>
-                                    <th style="width:90px">SL mẫu</th> -->
-                                    <th style="">Nhận mẫu</th>
-                                    <!-- <th style="width:200px">Caption</th>
+                                    <th style="width:90px">SL mẫu</th>
+                                    <th style="width:120px">Nhận mẫu</th>
+                                    <th style="width:200px">Caption</th>
                                     <th style="width:160px">HashTag</th>
-                                    <th style="width:200px">Feedback</th> -->
-                                    <th style="width: 25%;">Kết quả review</th>
+                                    <th style="width:200px">Feedback</th>
+                                    <th style="width:300px">Kết quả review</th>
                                     <th style="width:110px; position:sticky; right:0; z-index:2; background:#f8f9fa">{{ 'Actions' | localize }}</th>
                                 </tr>
                             </ng-template>
@@ -95,7 +96,7 @@
                                     </td>
 
                                     <!-- KOL (readonly - chỉ đổi trong create) -->
-                                    <td style="position:sticky; left:3rem; z-index:1; background:inherit">
+                                    <td style="position:sticky; z-index:1; background:inherit">
                                         <strong>{{ getKolName(record) }}</strong>
                                     </td>
 
@@ -152,26 +153,26 @@
                                         </p-cellEditor>
                                     </td>
 
-                                    <!-- Brief Link -->
-                                    <!-- <td>
+                                    <!-- Demo Link -->
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">
-                                                @if (record.briefLink) {
-                                                    <a [href]="record.briefLink" target="_blank" rel="noopener"
-                                                       [pTooltip]="record.briefLink" tooltipPosition="top"
+                                                @if (record.demoLink) {
+                                                    <a [href]="record.demoLink" target="_blank" rel="noopener"
+                                                       [pTooltip]="record.demoLink" tooltipPosition="top"
                                                        style="max-width:140px; display:inline-block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; vertical-align:middle">
                                                         <i class="pi pi-link me-1"></i>Link
                                                     </a>
                                                 } @else { <span class="text-muted">—</span> }
                                             </ng-template>
                                             <ng-template pTemplate="input">
-                                                <input pInputText [(ngModel)]="record.briefLink" style="width:100%" />
+                                                <input pInputText [(ngModel)]="record.demoLink" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Brief -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">
                                                 <span [pTooltip]="record.brief" tooltipPosition="top"
@@ -183,57 +184,57 @@
                                                 <textarea pInputText [(ngModel)]="record.brief" rows="2" style="width:100%"></textarea>
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Portrait -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.portrait || '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <input pInputText [(ngModel)]="record.portrait" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Review Corner -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.reviewCorner || '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <input pInputText [(ngModel)]="record.reviewCorner" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Tên mẫu -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.sampleName || '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <input pInputText [(ngModel)]="record.sampleName" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Size mẫu -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.sampleSize || '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <input pInputText [(ngModel)]="record.sampleSize" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- SL mẫu -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.sampleQuantity ?? '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <p-inputnumber [(ngModel)]="record.sampleQuantity" [min]="0" mode="decimal" [fluid]="true"></p-inputnumber>
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Nhận mẫu -->
                                     <td>
@@ -256,7 +257,7 @@
                                     </td>
 
                                     <!-- Caption -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">
                                                 <span [pTooltip]="record.caption" tooltipPosition="top"
@@ -268,20 +269,20 @@
                                                 <textarea pInputText [(ngModel)]="record.caption" rows="2" style="width:100%"></textarea>
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- HashTag -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">{{ record.hashTag || '—' }}</ng-template>
                                             <ng-template pTemplate="input">
                                                 <input pInputText [(ngModel)]="record.hashTag" style="width:100%" />
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Feedback -->
-                                    <!-- <td>
+                                    <td>
                                         <p-cellEditor>
                                             <ng-template pTemplate="output">
                                                 <span [pTooltip]="record.feedback" tooltipPosition="top"
@@ -293,7 +294,7 @@
                                                 <textarea pInputText [(ngModel)]="record.feedback" rows="2" style="width:100%"></textarea>
                                             </ng-template>
                                         </p-cellEditor>
-                                    </td> -->
+                                    </td>
 
                                     <!-- Kết quả review -->
                                     <td>
@@ -318,7 +319,7 @@
                                                     pTooltip="Xem chi tiết" tooltipPosition="top"
                                                     (onClick)="viewDetail(record)">
                                                 </p-button>
-                                                @if (isGranted('Pages.ContractKols.Update')) {
+                                                @if (isGranted('Pages.ContractKols.Update') && record.status !== contractKolStatusDone) {
                                                     <p-button icon="pi pi-pencil" size="small" severity="secondary"
                                                         pTooltip="Sửa" tooltipPosition="top"
                                                         (onClick)="initRow(record)">
@@ -439,10 +440,12 @@
                                                             <td class="text-right">{{ r.save | number }}</td>
                                                             <td class="text-right">{{ r.share | number }}</td>
                                                             <td>
-                                                                <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true"
-                                                                    pTooltip="Xóa" tooltipPosition="top"
-                                                                    (onClick)="deleteResult(r)">
-                                                                </p-button>
+                                                                @if (record.status !== contractKolStatusDone) {
+                                                                    <p-button icon="pi pi-trash" size="small" severity="danger" [text]="true"
+                                                                        pTooltip="Xóa" tooltipPosition="top"
+                                                                        (onClick)="deleteResult(r)">
+                                                                    </p-button>
+                                                                }
                                                             </td>
                                                         </tr>
                                                     }
@@ -453,7 +456,7 @@
                                         }
 
                                         <!-- Add new result form -->
-                                        @if (newResultMap[record.id]) {
+                                        @if (newResultMap[record.id] && record.status !== contractKolStatusDone) {
                                             <div class="border rounded p-3" style="background:#fff">
                                                 <div class="font-weight-bold mb-2 small text-uppercase text-secondary">Thêm kết quả mới</div>
                                                 <div class="d-flex flex-wrap" style="gap: 0.5rem; align-items: flex-end">

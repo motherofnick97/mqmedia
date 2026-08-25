@@ -116,7 +116,7 @@
                                                 pTooltip="Quản lý KOLs" tooltipPosition="top"
                                                 (onClick)="manageKols(record)">
                                             </p-button>
-                                            @if (isGranted('Pages.Contracts.Update')) {
+                                            @if (isGranted('Pages.Contracts.Update') && record.status !== contractStatusComplete) {
                                                 <p-button icon="pi pi-pencil" size="small" severity="secondary"
                                                     pTooltip="Sửa" tooltipPosition="top"
                                                     (onClick)="editContract(record)">

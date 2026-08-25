@@ -41,7 +41,7 @@ public class ContractKolDto : EntityDto<Guid>
 
     public string Brief { get; set; }
 
-    public string BriefLink { get; set; }
+    public string DemoLink { get; set; }
 
     public string Feedback { get; set; }
 

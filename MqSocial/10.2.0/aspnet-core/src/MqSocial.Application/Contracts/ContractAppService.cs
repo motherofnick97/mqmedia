@@ -3,6 +3,7 @@ using Abp.Authorization;
 using Abp.Domain.Repositories;
 using Abp.Extensions;
 using Abp.Linq.Extensions;
+using Abp.UI;
 using Microsoft.EntityFrameworkCore;
 using MqSocial.Authorization;
 using MqSocial.ContractKols;
@@ -53,6 +54,10 @@ public class ContractAppService : AsyncCrudAppService<Contract, ContractDto, Gui
 
     public override async Task<ContractDto> UpdateAsync(ContractDto input)
     {
+        var existing = await Repository.GetAsync(input.Id);
+        if (existing.Status == ContractStatus.Complete)
+            throw new UserFriendlyException("Hợp đồng đã hoàn thành, không thể chỉnh sửa.");
+
         var result = await base.UpdateAsync(input);
 
         if (input.Status == ContractStatus.Complete)

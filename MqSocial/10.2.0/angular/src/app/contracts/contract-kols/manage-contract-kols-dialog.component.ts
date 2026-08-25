@@ -5,6 +5,7 @@ import {
     ContractKolServiceProxy,
     ContractKolDto,
     ContractKolStatus,
+    ContractStatus,
 } from '@shared/service-proxies/service-proxies';
 import { FormsModule } from '@angular/forms';
 import { AbpModalHeaderComponent } from '../../../shared/components/modal/abp-modal-header.component';
@@ -33,6 +34,7 @@ import { AddContractKolDialogComponent } from './add-contract-kol-dialog.compone
 export class ManageContractKolsDialogComponent extends AppComponentBase implements OnInit {
     @Input() contractId: string;
     @Input() contractName: string;
+    @Input() contractStatus: ContractStatus;
 
     contractKols: ContractKolDto[] = [];
     kolMap: Record<string, string> = {};
@@ -80,6 +82,10 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
         this.loadKols();
     }
 
+    get isContractDone(): boolean {
+        return this.contractStatus === ContractStatus.Complete;
+    }
+
     loadKols(): void {
         this.loading = true;
         this._contractKolService
@@ -98,6 +104,10 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
     }
 
     addKol(): void {
+        if (this.isContractDone) {
+            abp.notify.warn('Hợp đồng đã hoàn thành, không thể thêm KOL.');
+            return;
+        }
         const modalRef: BsModalRef = this._modalService.show(AddContractKolDialogComponent, {
             class: 'modal-xl',
             initialState: { contractId: this.contractId },
@@ -106,6 +116,10 @@ export class ManageContractKolsDialogComponent extends AppComponentBase implemen
     }
 
     removeKol(ck: ContractKolDto): void {
+        if (this.isContractDone) {
+            abp.notify.warn('Hợp đồng đã hoàn thành, không thể xóa KOL.');
+            return;
+        }
         abp.message.confirm(
             `Xóa KOL "${this.getKolName(ck.kolId)}" khỏi hợp đồng?`,
             undefined,

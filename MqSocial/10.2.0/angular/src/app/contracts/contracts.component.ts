@@ -57,6 +57,8 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
     filterStatus: ContractStatus | undefined = undefined;
     advancedFiltersVisible = false;
 
+    readonly contractStatusComplete = ContractStatus.Complete;
+
     // contractId -> tên các contract không cho trùng KOL
     duplicateMap: Record<string, string[]> = {};
     private _allContractNames: Record<string, string> = {};
@@ -86,6 +88,10 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
     }
 
     editContract(contract: ContractDto): void {
+        if (contract.status === this.contractStatusComplete) {
+            abp.notify.warn('Hợp đồng đã hoàn thành, không thể chỉnh sửa.');
+            return;
+        }
         const modalRef: BsModalRef = this._modalService.show(EditContractDialogComponent, {
             class: 'modal-lg',
             initialState: { id: contract.id },
@@ -172,7 +178,7 @@ export class ContractsComponent extends PagedListingComponentBase<ContractDto> {
     manageKols(contract: ContractDto): void {
         this._modalService.show(ManageContractKolsDialogComponent, {
             class: 'modal-lg',
-            initialState: { contractId: contract.id, contractName: contract.name ?? '' },
+            initialState: { contractId: contract.id, contractName: contract.name ?? '', contractStatus: contract.status },
         });
     }
 

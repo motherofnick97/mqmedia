@@ -181,6 +181,10 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
 
     public override async Task<ContractKolDto> CreateAsync(CreateContractKolDto input)
     {
+        var contract = await _contractRepository.GetAsync(input.ContractId);
+        if (contract.Status == ContractStatus.Complete)
+            throw new UserFriendlyException("Hợp đồng đã hoàn thành, không thể thêm KOL.");
+
         var existing = await Repository.GetAll()
             .FirstOrDefaultAsync(x => x.ContractId == input.ContractId && x.KolId == input.KolId);
 
@@ -205,6 +209,10 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
     public override async Task<ContractKolDto> UpdateAsync(ContractKolDto input)
     {
         var existing = await Repository.GetAsync(input.Id);
+
+        if (existing.Status == ContractKolStatus.Done)
+            throw new UserFriendlyException("Hợp đồng đã hoàn thành, không thể chỉnh sửa.");
+
         var oldReviewResult = existing.ReviewResult;
 
         if (!await IsPaymentGrantedAsync())
@@ -236,6 +244,16 @@ public class ContractKolAppService : AsyncCrudAppService<ContractKol, ContractKo
         }
 
         return result;
+    }
+
+    public override async Task DeleteAsync(EntityDto<Guid> input)
+    {
+        var existing = await Repository.GetAsync(input.Id);
+
+        if (existing.Status == ContractKolStatus.Done)
+            throw new UserFriendlyException("Hợp đồng đã hoàn thành, không thể xóa KOL.");
+
+        await base.DeleteAsync(input);
     }
 
     private async Task<List<string>> GetConflictingContractNamesAsync(Guid contractId, Guid kolId)

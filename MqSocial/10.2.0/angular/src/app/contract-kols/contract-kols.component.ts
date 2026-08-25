@@ -72,6 +72,8 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     filterStatus: ContractKolStatus | undefined = undefined;
     filterContractId: string | undefined = undefined;
 
+    readonly contractKolStatusDone = ContractKolStatus.Done;
+
     contractOptions: { value: string | undefined; label: string }[] = [];
 
     editingRowKeys: { [s: string]: boolean } = {};
@@ -275,6 +277,13 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     saveResult(contractKolId: string): void {
         const dto = this.newResultMap[contractKolId];
         if (!dto) return;
+
+        const record = this.primengTableHelper.records.find((r: ContractKolDto) => r.id === contractKolId);
+        if (record?.status === this.contractKolStatusDone) {
+            this.notify.warn('Hợp đồng đã hoàn thành, không thể thêm kết quả.');
+            return;
+        }
+
         dto.postTime = this.newResultDateMap[contractKolId]
             ? moment(this.newResultDateMap[contractKolId])
             : undefined;
@@ -293,6 +302,12 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     deleteResult(result: ContractKolResultDto): void {
+        const record = this.primengTableHelper.records.find((r: ContractKolDto) => r.id === result.contractKolId);
+        if (record?.status === this.contractKolStatusDone) {
+            this.notify.warn('Hợp đồng đã hoàn thành, không thể xóa kết quả.');
+            return;
+        }
+
         abp.message.confirm('Xóa kết quả này?', undefined, (ok: boolean) => {
             if (!ok) return;
             this._contractKolResultService.delete(result.id).subscribe(() => {
@@ -312,6 +327,10 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
     }
 
     initRow(record: ContractKolDto): void {
+        if (record.status === this.contractKolStatusDone) {
+            this.notify.warn('Hợp đồng đã hoàn thành, không thể chỉnh sửa.');
+            return;
+        }
         this.clonedRecords[record.id] = record.clone();
         this.airTimeDates[record.id] = record.airTime ? record.airTime.toDate() : null;
         this.editingRowKeys = { ...this.editingRowKeys, [record.id]: true };
@@ -490,7 +509,7 @@ export class ContractKolsComponent extends PagedListingComponentBase<ContractKol
             'Cash': kol.cash ?? 0,
             ...(this.isGranted('Pages.ContractKols.Payment') ? { 'Payment': kol.payment ?? 0 } : {}),
             'Air Time': kol.airTime ? kol.airTime.format('DD/MM/YYYY') : '',
-            'Brief Link': kol.briefLink ?? '',
+            'Demo Link': kol.demoLink ?? '',
             'Brief': kol.brief ?? '',
             'Feedback': kol.feedback ?? '',
             'Caption': kol.caption ?? '',

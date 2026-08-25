@@ -77,8 +77,8 @@
                     style="width:100%"></textarea>
             </div>
             <div class="col-md-4 mb-2">
-                <label class="text-muted small mb-1 d-block">Brief Link</label>
-                <input pInputText name="briefLink" [(ngModel)]="record.briefLink" style="width:100%" />
+                <label class="text-muted small mb-1 d-block">Demo Link</label>
+                <input pInputText name="demoLink" [(ngModel)]="record.demoLink" style="width:100%" />
             </div>
             <div class="col-md-4 mb-2">
                 <label class="text-muted small mb-1 d-block">Caption</label>
@@ -90,11 +90,11 @@
                 <input pInputText name="hashTag" [(ngModel)]="record.hashTag" style="width:100%" />
             </div>
             <div class="col-md-6 mb-2">
-                <label class="text-muted small mb-1 d-block">Portrait</label>
+                <label class="text-muted small mb-1 d-block">Chân dung</label>
                 <input pInputText name="portrait" [(ngModel)]="record.portrait" style="width:100%" />
             </div>
             <div class="col-md-6 mb-2">
-                <label class="text-muted small mb-1 d-block">Review Corner</label>
+                <label class="text-muted small mb-1 d-block">Góc Review</label>
                 <input pInputText name="reviewCorner" [(ngModel)]="record.reviewCorner" style="width:100%" />
             </div>
         </div>
@@ -113,7 +113,7 @@
     <div class="modal-footer">
         <p-button [label]="'Cancel' | localize" severity="secondary" [disabled]="saving"
             (onClick)="bsModalRef.hide()"></p-button>
-        @if (isGranted('Pages.ContractKols.Create')) {
+        @if (isGranted('Pages.ContractKols.Create') && !isDone) {
         <p-button [label]="'Save' | localize" [loading]="saving" (onClick)="save()"></p-button>
         }
     </div>
